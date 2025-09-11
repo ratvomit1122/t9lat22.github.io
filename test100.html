@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>T9 OS Global Image System</title>
+  <title>T9 OS Global Image Sender</title>
   <style>
     body {
       background: black;
@@ -9,12 +9,6 @@
       font-family: monospace;
       text-align: center;
       margin-top: 30px;
-    }
-    #imgBox img {
-      max-width: 400px;
-      border-radius: 10px;
-      box-shadow: 0 0 20px lime;
-      margin-top: 20px;
     }
     input {
       margin-top: 10px;
@@ -31,19 +25,17 @@
   </style>
 </head>
 <body>
-  <h1>🌍 T9 OS Global Image Broadcast</h1>
+  <h1>🌍 T9 OS Global Image Sender</h1>
 
   <input id="imgUrl" type="text" placeholder="Enter image URL..." />
   <br>
   <button onclick="showImage()">Show Image</button>
   <button onclick="hideImage()">Hide Image</button>
 
-  <div id="imgBox"></div>
-
   <!-- Firebase SDK -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-    import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
+    import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
 
     // 🔥 Your Firebase config
     const firebaseConfig = {
@@ -61,11 +53,8 @@
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
 
-    const imgBox = document.getElementById("imgBox");
-    const imgUrlInput = document.getElementById("imgUrl");
-
-    // Set your password here
-    const PASSWORD = "t9secret"; // change this to whatever you want
+    // Optional: Password for sending images
+    const PASSWORD = "t9secret";
 
     function promptPassword() {
       const entered = prompt("Enter password:");
@@ -78,9 +67,9 @@
         alert("Incorrect password!");
         return;
       }
-      const url = imgUrlInput.value.trim() || "https://placekitten.com/400/300";
+      const url = document.getElementById("imgUrl").value.trim() || "https://placekitten.com/400/300";
       set(ref(db, "globalImage"), { url: url });
-      imgUrlInput.value = "";
+      document.getElementById("imgUrl").value = "";
     }
 
     // Hide image globally
@@ -91,16 +80,6 @@
       }
       set(ref(db, "globalImage"), { url: "" });
     }
-
-    // Listen for changes in real-time
-    onValue(ref(db, "globalImage"), (snapshot) => {
-      const data = snapshot.val();
-      if (data && data.url) {
-        imgBox.innerHTML = `<img src="${data.url}">`;
-      } else {
-        imgBox.innerHTML = "";
-      }
-    });
   </script>
 </body>
 </html>
