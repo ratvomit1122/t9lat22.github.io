@@ -14,6 +14,7 @@
       max-width: 400px;
       border-radius: 10px;
       box-shadow: 0 0 20px lime;
+      margin-top: 20px;
     }
     input {
       margin-top: 10px;
@@ -23,16 +24,15 @@
     button {
       margin: 5px;
       padding: 8px 15px;
+      cursor: pointer;
       font-family: monospace;
       border-radius: 5px;
-      cursor: pointer;
     }
   </style>
 </head>
 <body>
-  <h1>🌍 Global Image Broadcast</h1>
+  <h1>🌍 T9 OS Global Image Broadcast</h1>
 
-  <!-- Input lets users pick their own image -->
   <input id="imgUrl" type="text" placeholder="Enter image URL..." />
   <br>
   <button onclick="showImage()">Show Image</button>
@@ -41,42 +41,43 @@
   <div id="imgBox"></div>
 
   <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js"></script>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+    import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
 
-  <script>
-    // ✅ Your Firebase Config
+    // 🔥 Your Firebase config
     const firebaseConfig = {
       apiKey: "AIzaSyDB4VU2JNQGO5pMgXGaasIiY6kFxgsb-84",
       authDomain: "chat-99dfe.firebaseapp.com",
+      databaseURL: "https://chat-99dfe-default-rtdb.firebaseio.com",
       projectId: "chat-99dfe",
       storageBucket: "chat-99dfe.firebasestorage.app",
       messagingSenderId: "17277094525",
       appId: "1:17277094525:web:989d19d04fdde769de7f14",
-      measurementId: "G-NEXJFPJPCP",
-      databaseURL: "https://chat-99dfe-default-rtdb.firebaseio.com"
+      measurementId: "G-NEXJFPJPCP"
     };
 
-    // Init Firebase
-    const app = firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
 
     const imgBox = document.getElementById("imgBox");
     const imgUrlInput = document.getElementById("imgUrl");
 
     // Show image globally
-    function showImage() {
-      const url = imgUrlInput.value || "https://placekitten.com/400/300"; // default if empty
-      firebase.database().ref("globalImage").set({ url: url });
+    window.showImage = function() {
+      const url = imgUrlInput.value.trim() || "https://placekitten.com/400/300";
+      set(ref(db, "globalImage"), { url: url });
+      imgUrlInput.value = "";
     }
 
     // Hide image globally
-    function hideImage() {
-      firebase.database().ref("globalImage").set({ url: "" });
+    window.hideImage = function() {
+      set(ref(db, "globalImage"), { url: "" });
     }
 
-    // Listen for realtime changes
-    firebase.database().ref("globalImage").on("value", (snapshot) => {
+    // Listen for changes in real-time
+    onValue(ref(db, "globalImage"), (snapshot) => {
       const data = snapshot.val();
       if (data && data.url) {
         imgBox.innerHTML = `<img src="${data.url}">`;
