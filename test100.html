@@ -64,8 +64,20 @@
     const imgBox = document.getElementById("imgBox");
     const imgUrlInput = document.getElementById("imgUrl");
 
+    // Set your password here
+    const PASSWORD = "t9secret"; // change this to whatever you want
+
+    function promptPassword() {
+      const entered = prompt("Enter password:");
+      return entered === PASSWORD;
+    }
+
     // Show image globally
     window.showImage = function() {
+      if (!promptPassword()) {
+        alert("Incorrect password!");
+        return;
+      }
       const url = imgUrlInput.value.trim() || "https://placekitten.com/400/300";
       set(ref(db, "globalImage"), { url: url });
       imgUrlInput.value = "";
@@ -73,6 +85,10 @@
 
     // Hide image globally
     window.hideImage = function() {
+      if (!promptPassword()) {
+        alert("Incorrect password!");
+        return;
+      }
       set(ref(db, "globalImage"), { url: "" });
     }
 
