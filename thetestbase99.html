@@ -973,13 +973,7 @@ requestAnimationFrame(trackFPS);
 </select>
 <a   onclick="openGame()"  class="round-btn">Hide url</a>
 <a  id="toggleBTN" class="round-btn">Toggle logo</a>
-  <label class="label" for="tab-select">Tab Cloak:</label>
-  <select id="tab-select">
-    <option value="default">Default</option>
-    <option value="google">Google</option>
-    <option value="classroom">Google Classroom</option>
-    <option value="vocabulary">Vocabulary.com</option>
-  </select>
+
 <style>
    .round-btn {
     border-radius: 12px;
@@ -1283,64 +1277,7 @@ if (selectedBackground) {
   document.body.style.backgroundSize = "cover"; 
 </script>
 
- <script>
-    document.addEventListener("DOMContentLoaded", function() {
- 
-  var select = document.getElementById("background-select");
 
-  var selectedBackground = localStorage.getItem("selectedBackground");
-  
-  if (selectedBackground) {
-    document.body.style.backgroundImage = "url(" + selectedBackground + ")";
-    select.value = selectedBackground;
-  }
-
-
-   select.addEventListener("change", function() {
-     var newBackground = this.value;
-     document.body.style.backgroundImage = "url(" + newBackground + ")";
-     localStorage.setItem("selectedBackground", newBackground);
-   });
-});
-
-  document.addEventListener("DOMContentLoaded", function() {
-      const tabSelect = document.getElementById("tab-select");
-      const favicon = document.querySelector("link[rel='icon']") || document.createElement("link");
-      favicon.rel = "icon";
-      document.head.appendChild(favicon);
-
-    
-    const storedPreset = localStorage.getItem("selectedTabPreset") || "default";
-    tabSelect.value = storedPreset;
-    updateTabPreset(storedPreset);
-
-    tabSelect.addEventListener("change", function() {
-      const preset = this.value;
-      updateTabPreset(preset);
-      localStorage.setItem("selectedTabPreset", preset); 
-    });
-
-    function updateTabPreset(preset) {
-      switch (preset) {
-        case "google":
-          document.title = "Google";
-          favicon.href = "https://www.google.com/favicon.ico";
-          break;
-        case "classroom":
-          document.title = "Google Classroom";
-          favicon.href = "https://www.gstatic.com/classroom/logo_square_rounded.svg";
-          break;
-        case "vocabulary":
-          document.title = "My learning | Vocabulary.com";
-          favicon.href = "https://www.vocabulary.com/favicon.ico";
-          break;
-        default:
-          document.title = "T9 OS";
-          favicon.href = "favicon.png";
-      }
-    }
-    });
-  </script>
 </head>
 
 
