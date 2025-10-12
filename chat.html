@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -21,7 +20,6 @@
       border-radius: 10px;
       color:rgb(255, 255, 255);
       font-weight: bold;
-
     }
     #messageInput, #nameInput {
       width: 40%;
@@ -94,6 +92,14 @@
       }
     }
 
+    // 🔒 Basic profanity filter
+    const bannedWords = ["fuck", "porn", "shit", "bitch", "asshole", "dick", "bastard", "cunt", "nigger", "nigga", "fag", "slut", "faggot", "whore"]; 
+
+    function containsProfanity(text) {
+      const lower = text.toLowerCase();
+      return bannedWords.some(word => lower.includes(word));
+    }
+
     sendBtn.addEventListener('click', sendMessage);
     messageInput.addEventListener('keypress', function(e) {
       if (e.key === 'Enter') sendMessage();
@@ -102,6 +108,13 @@
     function sendMessage() {
       const message = messageInput.value.trim();
       if (message !== '' && username !== '') {
+        // 🚫 Block profanity
+        if (containsProfanity(message)) {
+          alert("⚠️ Your message contains inappropriate language and was not sent.");
+          messageInput.value = '';
+          return;
+        }
+
         const msgData = {
           text: message,
           name: username,
@@ -112,10 +125,10 @@
       }
     }
 
-    // Clear chat every 1 minute (60000 ms)
+    // Clear chat every 2 minutes
     setInterval(() => {
-      db.ref('messages').remove();       // Clear Firebase messages
-      chatBox.innerHTML = '';            // Clear chat UI
+      db.ref('messages').remove();
+      chatBox.innerHTML = '';
     }, 120000);
 
     db.ref('messages').on('child_added', (snapshot) => {
