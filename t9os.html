@@ -1394,7 +1394,90 @@ if (selectedBackground) {
   document.body.style.background = localStorage.getItem("bg");
   document.body.style.backgroundSize = "cover"; 
 </script>
+<div id="notifications"></div>
 
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+    import { getDatabase, ref, onChildAdded } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
+
+    // 🔥 Your Firebase config
+    const firebaseConfig = {
+      apiKey: "AIzaSyDB4VU2JNQGO5pMgXGaasIiY6kFxgsb-84",
+      authDomain: "chat-99dfe.firebaseapp.com",
+      databaseURL: "https://chat-99dfe-default-rtdb.firebaseio.com",
+      projectId: "chat-99dfe",
+      storageBucket: "chat-99dfe.firebasestorage.app",
+      messagingSenderId: "17277094525",
+      appId: "1:17277094525:web:989d19d04fdde769de7f14",
+      measurementId: "G-NEXJFPJPCP"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const messagesRef = ref(db, "globalMessages");
+
+    const container = document.getElementById("notifications");
+
+    // Function to show a toast
+    function showNotification(text) {
+      const toast = document.createElement("div");
+      toast.className = "toast";
+      toast.textContent = text;
+      container.appendChild(toast);
+
+      // Remove after 5 seconds
+      setTimeout(() => {
+        toast.style.transition = "opacity 0.5s ease";
+        toast.style.opacity = "0";
+        setTimeout(() => toast.remove(), 500);
+      }, 5000);
+    }
+
+    // Listen for new messages
+    onChildAdded(messagesRef, (snapshot) => {
+      const msg = snapshot.val();
+      showNotification(msg.text);
+    });
+  </script>
+  <style>
+ /* Notification container */
+    #notifications {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+
+    /* Each toast */
+    .toast {
+      background: #2563eb;
+      color: white;
+      padding: 12px 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+      animation: slideDown 0.3s ease-out;
+      font-size: 16px;
+      opacity: 0.95;
+      max-width: 80%;
+      text-align: center;
+    }
+
+    @keyframes slideDown {
+      from {
+        transform: translateY(-30px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+  </style>
 
 </head>
 
