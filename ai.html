@@ -1,538 +1,636 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>T9 OS — Optimized & Reactive (Plain JS)</title>
-
-<!-- Lightweight fonts + fallback -->
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Luckiest+Guy&display=swap" rel="stylesheet">
-
+<title>T9 OS — Reactive (Plain JS)</title>
+<link rel="shortcut icon" href="favicon.png" />
 <style>
+  /* ---------- BASE / THEME ---------- */
   :root{
-    --bg-1: #0b0620;
-    --bg-2: #3a0057;
-    --accent: #7c3aed;
+    --bg1: #0b0220;
+    --bg2: #3a0057;
     --glass: rgba(255,255,255,0.06);
-    --glass-2: rgba(255,255,255,0.04);
-    --muted: #9aa0a6;
-    --ui-radius: 14px;
-    --nav-height: 56px;
-    --transition: 200ms cubic-bezier(.2,.9,.2,1);
+    --accent: #7c4dff;
+    --ui: #111;
+    --text: #fff;
+    --muted: #bdbdbd;
+    --shadow: 0 8px 30px rgba(2,2,8,0.6);
+    --radius: 14px;
+    --nav-h: 58px;
   }
-
-  /* basic reset */
-  *{box-sizing:border-box}
-  html,body{height:100%;margin:0;-webkit-font-smoothing:antialiased}
-  body{
-    font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-    background: linear-gradient(180deg,var(--bg-1),var(--bg-2));
-    color:#fff;
-    overflow:hidden;
-    -webkit-user-select:none;user-select:none;
-  }
-
-  /* container */
-  .desktop{
-    height:100vh;width:100vw;position:relative;overflow:hidden;
-    display:flex;flex-direction:column;
-  }
-
-  /* top bar */
-  .topbar{
-    height:36px;padding:6px 12px;display:flex;align-items:center;gap:12px;
-    position:fixed;left:0;right:0;top:10px;margin:auto;z-index:40;
-    justify-content:flex-end;
-    pointer-events:auto;
-  }
-  .clock, .battery { font-size:13px;color:var(--muted);margin-left:8px; }
-  .iconbtn{ width:30px;height:30px;border-radius:8px;background:var(--glass);display:inline-flex;align-items:center;justify-content:center;cursor:pointer;border:1px solid rgba(255,255,255,0.03); }
-  .iconbtn:active{transform:translateY(1px)}
-
-  /* dock / navbar (center bottom) */
-  .dock{
-    position:fixed;bottom:18px;left:50%;transform:translateX(-50%);
-    display:flex;gap:12px;padding:8px 16px;background:linear-gradient(180deg,rgba(0,0,0,0.35),rgba(0,0,0,0.5));
-    border-radius:999px;align-items:center;z-index:40;border:1px solid rgba(255,255,255,0.04);
-    box-shadow: 0 10px 30px rgba(0,0,0,0.45);
-    backdrop-filter: blur(6px);
-  }
-  .dock img{width:38px;height:38px;border-radius:9px;cursor:pointer;transition:transform var(--transition)}
-  .dock img:hover{transform:translateY(-6px) scale(1.03)}
-
-  /* windows (app panels) */
-  .win{
-    position:absolute;background:linear-gradient(180deg,var(--glass),var(--glass-2));
-    border-radius:var(--ui-radius);padding:10px;border:1px solid rgba(255,255,255,0.04);
-    box-shadow:0 8px 30px rgba(0,0,0,0.5);min-width:280px;min-height:140px;display:flex;flex-direction:column;
-    transition: transform var(--transition), opacity var(--transition);
-    will-change: transform, opacity, left, top;
-    overflow:hidden;
-  }
-  .win .title{
-    display:flex;align-items:center;gap:8px;padding:8px;border-bottom:1px solid rgba(255,255,255,0.02);
-    cursor:grab;background:transparent;font-weight:600;
-  }
-  .win .title .controls{margin-left:auto;display:flex;gap:6px}
-  .ctrl{width:12px;height:12px;border-radius:50%;display:inline-block;flex-shrink:0}
-  .c-close{background:#ff6b6b}
-  .c-min{background:#f3c623}
-  .c-max{background:#5efc8d}
-
-  .win .body{flex:1;padding:10px;overflow:auto}
-  .hidden{display:none !important}
-
-  /* responsive: make windows full on small screens */
-  @media (max-width:720px){
-    .win{left:8px!important;right:8px!important;top:80px!important;width:auto!important;height:60vh!important;border-radius:12px}
-    .dock img{width:34px;height:34px}
-  }
-
-  /* tiny helpers */
-  .muted{color:var(--muted);font-size:13px}
-  .btn{display:inline-flex;gap:8px;align-items:center;padding:8px 12px;border-radius:10px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.03);cursor:pointer}
-  .search{min-width:260px;padding:10px;border-radius:999px;border:1px solid rgba(255,255,255,0.04);background:rgba(0,0,0,0.16);color:#fff}
-
-  /* subtle show animation */
-  .enter{opacity:0;transform:scale(.98) translateY(6px)}
-  .enter.on{opacity:1;transform:scale(1) translateY(0)}
-  .fade-in{animation:fadeIn 220ms ease forwards}
-  @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
-
-  /* reduced motion support */
   @media (prefers-reduced-motion: reduce){
-    .dock img, .win{transition:none}
+    * { transition: none !important; animation: none !important; }
+  }
+  html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial;}
+  body{
+    background: linear-gradient(180deg,var(--bg1),var(--bg2));
+    color:var(--text);
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+    overflow:hidden;
+  }
+
+  /* ---------- LAYOUT ---------- */
+  .screen{
+    position:relative;
+    height:100vh;
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+    padding:14px;
+    box-sizing:border-box;
+  }
+
+  /* Top bar (clock + small nav) */
+  .topbar{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+  }
+  .top-left { display:flex; gap:8px; align-items:center; }
+  .brand { font-family: 'Luckiest Guy',sans-serif; font-size:20px; letter-spacing:1px; color:var(--text); }
+  .clock { font-size:14px; color:var(--muted); min-width:90px; text-align:right; }
+
+  /* central work area */
+  .desktop{
+    position:relative;
+    flex:1 1 auto;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    overflow:hidden;
+  }
+  /* grid icons */
+  .dock{
+    position:fixed;
+    bottom:14px;
+    left:50%;
+    transform:translateX(-50%);
+    display:flex;
+    gap:10px;
+    background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01));
+    padding:8px 12px;
+    border-radius:999px;
+    box-shadow:var(--shadow);
+    z-index:100;
+    align-items:center;
+  }
+  .dock button{ background:transparent;border:0;padding:6px 8px;border-radius:10px; cursor:pointer; display:flex; align-items:center; gap:8px; color:var(--text); }
+  .dock img{ width:36px; height:36px; border-radius:10px; display:block; transition:transform .18s ease; }
+  .dock button:hover img{ transform:translateY(-6px) scale(1.06); }
+
+  /* windows */
+  .win{
+    position:absolute;
+    min-width:260px;
+    min-height:160px;
+    max-width:96%;
+    max-height:92%;
+    width:min(1100px,86%);
+    height:min(640px,84%);
+    background:linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
+    border-radius:var(--radius);
+    box-shadow:var(--shadow);
+    border:1px solid rgba(255,255,255,0.04);
+    overflow:hidden;
+    display:flex;
+    flex-direction:column;
+    transform-origin: left top;
+    will-change: transform, opacity;
+    transition: transform 220ms cubic-bezier(.2,.9,.25,1), opacity 160ms linear;
+  }
+  .win.hidden{ opacity:0; pointer-events:none; transform:scale(.98); }
+  .win .top{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:10px 12px; gap:8px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.02), transparent);
+    border-bottom:1px solid rgba(255,255,255,0.02);
+  }
+  .win .title{ font-weight:600; color:var(--text); font-size:14px; }
+  .win .controls{ display:flex; gap:8px; align-items:center; }
+  .cbtn{ width:28px; height:28px; display:inline-grid; place-items:center; border-radius:6px; cursor:pointer; border:0; background:transparent; color:var(--muted); }
+  .cbtn:hover{ background:rgba(255,255,255,0.02); color:var(--text); }
+  .win .body{ flex:1 1 auto; position:relative; overflow:auto; -webkit-overflow-scrolling:touch; }
+
+  /* small responsive tweaks */
+  @media (max-width:860px){
+    .win{ width:92%; height:78%; min-width:200px; min-height:120px; }
+    .dock img{ width:30px; height:30px; }
+  }
+
+  /* search bar */
+  .searchbar{
+    position:fixed; top:70px; left:50%; transform:translateX(-50%);
+    width:min(720px,92%); background:var(--glass); padding:10px 12px; border-radius:999px; box-shadow:0 6px 30px rgba(2,2,8,0.5); display:flex; gap:8px; align-items:center;
+  }
+  .searchbar input{ flex:1; border:0; background:transparent; color:var(--text); outline:none; font-size:15px; }
+  .searchbar button{ padding:8px 12px; border-radius:8px; border:0; cursor:pointer; background:rgba(255,255,255,0.03); color:var(--text); }
+
+  /* notifications */
+  .notify-wrap{ position:fixed; top:18px; left:50%; transform:translateX(-50%); z-index:9999; display:flex; gap:8px; flex-direction:column; align-items:center; pointer-events:none; }
+  .toast{ background:rgba(20,20,20,0.7); padding:10px 14px; border-radius:10px; color:var(--text); box-shadow:var(--shadow); pointer-events:auto; }
+
+  /* small helper */
+  .muted{ color:var(--muted); font-size:13px; }
+  .grow{ flex:1; }
+
+  /* draggable handle */
+  .handle{ cursor:grab; display:flex; align-items:center; gap:8px; }
+  .handle:active{ cursor:grabbing; }
+
+  /* tiny loader */
+  .loader{ width:20px; height:20px; border-radius:50%; border:3px solid rgba(255,255,255,0.08); border-top-color:var(--accent); animation:spin 800ms linear infinite; }
+  @keyframes spin{ to{ transform:rotate(360deg); } }
+
+  /* subtle wallpaper example */
+  .wallpaper{
+    position:absolute; inset:0; background-image:url('abstract.png'); background-size:cover; background-position:center; opacity:0.08; filter:blur(2px) saturate(120%); pointer-events:none; z-index:0;
+  }
+
+  /* small mobile dock */
+  .mobile-dock{
+    display:none;
+  }
+  @media(max-width:520px){
+    .topbar { padding:6px 0; }
+    .dock{ bottom:10px; }
+    .searchbar{ top:14px; }
+    .mobile-dock{ display:flex; position:fixed; right:12px; top:12px; gap:8px; z-index:100; flex-direction:column; }
   }
 </style>
 </head>
 <body>
-<div class="desktop" id="desktop" aria-label="T9 OS Desktop">
+  <div class="screen" id="screen" tabindex="0">
+    <div class="topbar">
+      <div class="top-left">
+        <div class="brand">T9 OS</div>
+        <div class="muted" id="version">v2.17</div>
+      </div>
+      <div class="grow"></div>
+      <div class="clock" id="clock">--:--</div>
+    </div>
 
-  <!-- Topbar (clock / battery / settings) -->
-  <div class="topbar" id="topbar">
-    <div class="search" id="globalSearch" role="search" contenteditable="true" aria-label="Search">Type to search...</div>
-    <div class="iconbtn" id="notifBtn" title="Notifications">🔔</div>
-    <div class="iconbtn" id="settingsBtn" title="Settings">⚙️</div>
-    <div class="clock" id="clock">--:--</div>
-    <div class="battery" id="battery">--%</div>
+    <div class="desktop" id="desktop" aria-live="polite">
+      <div class="wallpaper" id="wallpaper" aria-hidden="true"></div>
+
+      <!-- Example starter windows (hidden until opened) -->
+      <div class="win hidden" id="win-browser" data-type="iframe" aria-hidden="true" style="left:calc(50% - 520px); top:80px;">
+        <div class="top">
+          <div class="handle" data-drag="win-browser"><span class="title">Browser</span></div>
+          <div class="controls">
+            <button class="cbtn" data-action="min" aria-label="Minimize">▁</button>
+            <button class="cbtn" data-action="close" aria-label="Close">✕</button>
+          </div>
+        </div>
+        <div class="body" data-body="win-browser" id="body-browser">
+          <!-- content will lazy load when opened -->
+          <div class="muted" style="padding:20px">Open an app from the dock (lazy-load iframe)</div>
+        </div>
+      </div>
+
+      <div class="win hidden" id="win-games" data-type="iframe" aria-hidden="true" style="left:calc(50% + 20px); top:120px;">
+        <div class="top">
+          <div class="handle" data-drag="win-games"><span class="title">Games</span></div>
+          <div class="controls">
+            <button class="cbtn" data-action="min" aria-label="Minimize">▁</button>
+            <button class="cbtn" data-action="close" aria-label="Close">✕</button>
+          </div>
+        </div>
+        <div class="body" data-body="win-games">
+          <div class="muted" style="padding:20px">Open to load games.</div>
+        </div>
+      </div>
+
+      <!-- notifications container -->
+      <div class="notify-wrap" id="notifications" aria-live="polite"></div>
+    </div>
+
+    <!-- dock (center) -->
+    <div class="dock" role="toolbar" aria-label="Dock">
+      <button data-open="win-browser" title="Open Browser">
+        <img src="search.png" alt="Browser" />
+      </button>
+      <button data-open="win-games" title="Open Games">
+        <img src="gameicon.png" alt="Games" />
+      </button>
+      <button id="open-chat" title="Chat">
+        <img src="chat2.png" alt="Chat" />
+      </button>
+      <button id="open-settings" title="Settings">
+        <img src="settings22.png" alt="Settings" />
+      </button>
+    </div>
+
+    <!-- small mobile quick buttons -->
+    <div class="mobile-dock" aria-hidden="true">
+      <button id="m-open-search" title="Search">🔎</button>
+    </div>
+
+    <!-- search bar -->
+    <div class="searchbar" id="searchbar" role="search" aria-hidden="false">
+      <input id="searchInput" placeholder="Search the web or open app..." aria-label="Search"/>
+      <button id="searchBtn">Go</button>
+    </div>
+
+    <!-- hidden chat window template: lazy-loads iframe -->
+    <template id="iframeTpl">
+      <iframe src="" loading="lazy" style="width:100%;height:100%;border:0"></iframe>
+    </template>
+
   </div>
-
-  <!-- dynamic windows container -->
-  <!-- windows are inserted here by JS -->
-  <div id="windowsRoot" style="position:relative;flex:1;z-index:20"></div>
-
-  <!-- dock -->
-  <div class="dock" id="dock" role="navigation" aria-label="dock">
-    <img src="gameicon.png" data-app="games" alt="Games" title="Games">
-    <img src="apps1.png" data-app="apps" alt="Apps" title="Apps">
-    <img src="chat2.png" data-app="chat" alt="Chat" title="Chat">
-    <img src="search.png" data-app="browser" alt="Browser" title="Browser">
-  </div>
-</div>
 
 <script>
-/* ============================
-   Utilities & small helpers
-   ============================ */
-const $ = (sel, root=document) => root.querySelector(sel);
-const $$ = (sel, root=document) => Array.from(root.querySelectorAll(sel));
-
-/* Debounce */
-const debounce = (fn, ms=150) => {
+/* =========================
+   Utilities: throttle/debounce
+   ========================= */
+const throttle = (fn, wait=50) => {
+  let last = 0;
+  return (...args) => {
+    const now = Date.now();
+    if (now - last >= wait) {
+      last = now;
+      fn(...args);
+    }
+  };
+};
+const debounce = (fn, wait=200) => {
   let t;
-  return (...a) => { clearTimeout(t); t = setTimeout(()=>fn(...a), ms); };
+  return (...args) => {
+    clearTimeout(t);
+    t = setTimeout(()=>fn(...args), wait);
+  };
 };
 
-/* Simple clamp */
-const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+/* =========================
+   Tiny DOM helpers
+   ========================= */
+const $ = s => document.querySelector(s);
+const $$ = s => Array.from(document.querySelectorAll(s));
+const screen = $('#screen');
+const notifWrap = $('#notifications');
+const clockEl = $('#clock');
+const wallpaper = $('#wallpaper');
+const searchInput = $('#searchInput');
 
-/* Lazy-load helper for iframes/images using IntersectionObserver */
-const lazyObserver = new IntersectionObserver((entries)=>{
-  entries.forEach(e=>{
-    if(e.isIntersecting){
-      const node = e.target;
-      const src = node.getAttribute('data-src');
-      if(src){
-        node.src = src;
-        node.removeAttribute('data-src');
-      }
-      lazyObserver.unobserve(node);
-    }
-  });
-},{root:null,rootMargin:'200px',threshold:0.01});
-
-/* ============================
-   Basic State + persistence
-   ============================ */
-const state = {
-  z: 100,
-  windows: {},
-  theme: localStorage.getItem('t9_theme') || 'default',
-  bg: localStorage.getItem('t9_bg') || ''
-};
-
-/* ============================
-   Small accessibility helpers
-   ============================ */
-function announce(text){
-  // simple non-intrusive announcement (could be improved with ARIA live region)
-  const el = document.getElementById('announcer') || document.createElement('div');
-  el.id = 'announcer';
-  el.style.position='absolute';el.style.left='-9999px';
-  el.setAttribute('aria-live','polite');
-  el.textContent = text;
-  document.body.appendChild(el);
-  setTimeout(()=>el.remove(),1800);
-}
-
-/* ============================
-   Clock + Battery updates
-   ============================ */
-function updateClock(){
-  const el = $('#clock');
-  const now = new Date();
-  const opts = {hour:'numeric',minute:'numeric',hour12:true};
-  el.textContent = now.toLocaleTimeString('en-US',opts);
-}
-setInterval(updateClock,1000); updateClock();
-
-if('getBattery' in navigator){
-  navigator.getBattery().then(b=>{
-    const update = ()=> $('#battery').textContent = Math.round(b.level*100)+'%';
-    update();
-    b.addEventListener('levelchange', update);
-  });
-} else { $('#battery').textContent = 'N/A' }
-
-/* ============================
-   Window manager (create, focus, close)
-   - small, efficient, drag support
-   ============================ */
-const windowsRoot = $('#windowsRoot');
-
-function createWindow(id, opts = {}){
-  if(state.windows[id]){ focusWindow(id); return state.windows[id]; }
-
-  const w = document.createElement('section');
-  w.className = 'win enter';
-  w.dataset.wid = id;
-  w.style.left = (opts.left ?? 80) + 'px';
-  w.style.top = (opts.top ?? 80) + 'px';
-  w.style.width = (opts.width ?? 720) + 'px';
-  w.style.height = (opts.height ?? 420) + 'px';
-  w.style.zIndex = ++state.z;
-
-  // header / title bar
-  const title = document.createElement('div');
-  title.className = 'title';
-  title.innerHTML = `<span>${opts.title || id}</span>`;
-  const controls = document.createElement('div');
-  controls.className = 'controls';
-  controls.innerHTML = '<span class="ctrl c-close" data-action="close" title="close"></span><span class="ctrl c-min" data-action="min" title="minimize"></span><span class="ctrl c-max" data-action="max" data-maxed="false" title="maximize"></span>';
-  title.appendChild(controls);
-  w.appendChild(title);
-
-  // body
-  const body = document.createElement('div');
-  body.className = 'body';
-  body.innerHTML = opts.html || '<div class="muted">Empty</div>';
-  w.appendChild(body);
-
-  windowsRoot.appendChild(w);
-
-  // animate in
-  requestAnimationFrame(()=> w.classList.add('on'));
-
-  // track in state
-  state.windows[id] = { el: w, meta: opts };
-
-  // make it draggable
-  makeDraggable(w, title);
-
-  // attach control actions via delegation
-  controls.addEventListener('click', (ev)=>{
-    const act = ev.target.dataset.action;
-    if(!act) return;
-    if(act === 'close') closeWindow(id);
-    if(act === 'min') minimizeWindow(id);
-    if(act === 'max') toggleMaximize(id);
-  });
-
-  // lazy-load any iframes inside body
-  $$('iframe[data-src]', body).forEach(f => lazyObserver.observe(f));
-
-  // increase z on focus
-  w.addEventListener('mousedown', ()=>focusWindow(id));
-  w.addEventListener('touchstart', ()=>focusWindow(id), {passive:true});
-
-  return state.windows[id];
-}
-
-function focusWindow(id){
-  const win = state.windows[id];
-  if(!win) return;
-  win.el.style.zIndex = ++state.z;
-}
-
-function closeWindow(id){
-  const win = state.windows[id];
-  if(!win) return;
-  win.el.remove();
-  delete state.windows[id];
-}
-
-function minimizeWindow(id){
-  const win = state.windows[id];
-  if(!win) return;
-  win.el.style.transition = 'transform 200ms ease, opacity 200ms ease';
-  win.el.style.opacity = '0';
-  win.el.style.transform = 'scale(.96) translateY(20px)';
-  setTimeout(()=> {
-    if(win && win.el) win.el.classList.add('hidden');
-  },220);
-}
-
-function toggleMaximize(id){
-  const win = state.windows[id];
-  if(!win) return;
-  const el = win.el;
-  const maxed = el.dataset.maxed === 'true';
-  if(!maxed){
-    // remember rect
-    win.meta._rect = {left:el.offsetLeft, top:el.offsetTop, width:el.offsetWidth, height:el.offsetHeight};
-    el.style.left = '28px'; el.style.top = '72px'; el.style.width = 'calc(100% - 56px)'; el.style.height = 'calc(100% - 160px)';
-    el.dataset.maxed = 'true';
-  } else {
-    const r = win.meta._rect || {left:80,top:80,width:720,height:420};
-    el.style.left = r.left + 'px'; el.style.top = r.top + 'px'; el.style.width = r.width + 'px'; el.style.height = r.height + 'px';
-    el.dataset.maxed = 'false';
-  }
-}
-
-/* Draggable (pointer events) */
-function makeDraggable(winEl, handle){
-  handle.style.touchAction = 'none';
-  let dragging = false;
-  let start = {x:0,y:0}, origin = {x:0,y:0};
-
-  const onPointerDown = (e)=>{
-    e.preventDefault();
-    focusWindow(winEl.dataset.wid);
-    dragging = true;
-    const p = getPoint(e);
-    start = {x:p.x,y:p.y};
-    origin = {x:winEl.offsetLeft,y:winEl.offsetTop};
-    handle.setPointerCapture && handle.setPointerCapture(e.pointerId);
-    handle.style.cursor = 'grabbing';
+/* =========================
+   Time + Clock (efficient)
+   ========================= */
+(function startClock(){
+  const update = () => {
+    const d = new Date();
+    const h = d.getHours();
+    const m = String(d.getMinutes()).padStart(2,'0');
+    clockEl.textContent = `${h % 12 === 0 ? 12 : h % 12}:${m} ${h<12?'AM':'PM'}`;
   };
-
-  const onPointerMove = (e)=>{
-    if(!dragging) return;
-    const p = getPoint(e);
-    const dx = p.x - start.x;
-    const dy = p.y - start.y;
-    const left = clamp(origin.x + dx, 8, window.innerWidth - 80);
-    const top = clamp(origin.y + dy, 8, window.innerHeight - 120);
-    winEl.style.left = left + 'px';
-    winEl.style.top = top + 'px';
-  };
-
-  const onPointerUp = (e) => {
-    dragging = false;
-    handle.style.cursor = 'grab';
-  };
-
-  handle.addEventListener('pointerdown', onPointerDown, {passive:false});
-  window.addEventListener('pointermove', onPointerMove, {passive:true});
-  window.addEventListener('pointerup', onPointerUp, {passive:true});
-
-  function getPoint(e){
-    if(e.touches && e.touches[0]) return {x:e.touches[0].clientX, y:e.touches[0].clientY};
-    return {x:e.clientX ?? e.x, y:e.clientY ?? e.y};
-  }
-}
-
-/* ============================
-   App definitions (lightweight)
-   Each app is a small function returning HTML or DOM
-   ============================ */
-function app_games(){
-  const container = document.createElement('div');
-  container.innerHTML = `
-    <div style="display:flex;gap:10px;flex-wrap:wrap">
-      <button class="btn" data-load="https://example.com/game1">Play Game 1</button>
-      <button class="btn" data-load="https://example.com/game2">Play Game 2</button>
-      <button class="btn" data-load="https://example.com/game3">Play Game 3</button>
-    </div>
-    <div style="margin-top:12px" id="gamesFrameWrap"></div>
-  `;
-  // click delegation to lazy-create iframe
-  container.addEventListener('click', (ev)=>{
-    const url = ev.target.dataset.load;
-    if(!url) return;
-    const wrap = container.querySelector('#gamesFrameWrap');
-    wrap.innerHTML = `<iframe data-src="${url}" style="width:100%;height:420px;border:none;border-radius:10px"></iframe>`;
-    const f = wrap.querySelector('iframe');
-    lazyObserver.observe(f);
-  });
-  return container;
-}
-
-function app_apps(){
-  const el = document.createElement('div');
-  el.innerHTML = `
-    <div class="muted">Quick links</div>
-    <div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:10px">
-      <a class="btn" href="https://netflix.com" target="_blank" rel="noopener">Netflix</a>
-      <a class="btn" href="https://discord.com" target="_blank" rel="noopener">Discord</a>
-      <a class="btn" href="https://tiktok.com" target="_blank" rel="noopener">TikTok</a>
-    </div>
-  `;
-  return el;
-}
-
-function app_chat(){
-  const el = document.createElement('div');
-  el.innerHTML = `<div class="muted">Chat</div><div style="margin-top:12px">This chat container is lightweight — integrate your chat iframe or component here.</div>`;
-  return el;
-}
-
-function app_browser(){
-  const el = document.createElement('div');
-  el.innerHTML = `
-    <div style="display:flex;gap:8px;align-items:center">
-      <input class="search" id="miniUrl" placeholder="Enter URL (https://...)" style="min-width:240px"/>
-      <button class="btn" id="openUrl">Open</button>
-    </div>
-    <div style="margin-top:12px"><iframe data-src="about:blank" id="miniIframe" style="width:100%;height:420px;border:none;border-radius:10px"></iframe></div>
-  `;
-  // lazy load later
-  el.querySelector('#openUrl').addEventListener('click', ()=>{
-    const url = el.querySelector('#miniUrl').value.trim();
-    if(!url) return alert('Please enter a URL starting with https://');
-    const f = el.querySelector('#miniIframe');
-    f.setAttribute('data-src', url);
-    lazyObserver.observe(f);
-  });
-  return el;
-}
-
-/* ============================
-   Dock interactions (event delegation)
-   ============================ */
-$('#dock').addEventListener('click', (ev)=>{
-  const img = ev.target.closest('img');
-  if(!img) return;
-  const app = img.dataset.app;
-  if(app === 'games') {
-    const win = createWindow('games', {title:'Games', html:''});
-    // attach DOM from app
-    win.el.querySelector('.body').appendChild(app_games());
-  }
-  if(app === 'apps') {
-    const win = createWindow('apps', {title:'Apps', html:''});
-    win.el.querySelector('.body').appendChild(app_apps());
-  }
-  if(app === 'chat') {
-    const win = createWindow('chat', {title:'Chat', html:''});
-    win.el.querySelector('.body').appendChild(app_chat());
-  }
-  if(app === 'browser') {
-    const win = createWindow('browser', {title:'Browser', html:''});
-    win.el.querySelector('.body').appendChild(app_browser());
-  }
-});
-
-/* ============================
-   Global search behavior (simple reactive)
-   ============================ */
-const globalSearch = $('#globalSearch');
-let searchTimeout;
-globalSearch.addEventListener('focus', ()=> { if(globalSearch.textContent.trim() === 'Type to search...') globalSearch.textContent = ''; });
-globalSearch.addEventListener('blur', ()=> { if(!globalSearch.textContent.trim()) globalSearch.textContent = 'Type to search...'; });
-
-globalSearch.addEventListener('input', debounce(()=> {
-  const q = globalSearch.textContent.trim();
-  if(!q) return;
-  // simple quick search: if typed 'chat' open chat, etc.
-  const low = q.toLowerCase();
-  if(low.includes('chat')) { $('#dock img[data-app="chat"]').click(); announce('Opening chat'); }
-  if(low.includes('games')) { $('#dock img[data-app="games"]').click(); announce('Opening games'); }
-  if(low.includes('browser') || low.includes('open')) { $('#dock img[data-app="browser"]').click(); announce('Opening browser'); }
-}, 350));
-
-/* ============================
-   Small keyboard accessibility
-   ============================ */
-window.addEventListener('keydown', (e)=>{
-  if(e.key === 'Escape'){
-    // close topmost window if any
-    const wins = Object.values(state.windows);
-    if(wins.length) {
-      const top = wins.reduce((a,b) => (Number(a.el.style.zIndex||0) > Number(b.el.style.zIndex||0))?a:b);
-      closeWindow(top.el.dataset.wid);
-    }
-  }
-});
-
-/* ============================
-   Restore background / theme
-   ============================ */
-if(state.bg){
-  document.body.style.backgroundImage = state.bg;
-  document.body.style.backgroundSize = 'cover';
-}
-
-/* ============================
-   Start-up: add a lightweight welcome window
-   ============================ */
-(function init(){
-  const id = 'welcome';
-  const html = document.createElement('div');
-  html.innerHTML = `
-    <h3 style="margin:0 0 8px 0;font-family:'Luckiest Guy',sans-serif">T9 OS</h3>
-    <div class="muted">Optimized & reactive interface. Dock icons open lightweight, lazy-loaded windows.</div>
-    <div style="margin-top:12px;display:flex;gap:8px">
-      <button class="btn" id="openGamesQuick">Open Games</button>
-      <button class="btn" id="openAppsQuick">Open Apps</button>
-      <button class="btn" id="openBrowserQuick">Open Browser</button>
-    </div>
-  `;
-  const w = createWindow(id, {title:'Welcome', html:''});
-  w.el.querySelector('.body').appendChild(html);
-
-  // wire quick buttons
-  html.querySelector('#openGamesQuick').addEventListener('click', ()=> $('#dock img[data-app="games"]').click());
-  html.querySelector('#openAppsQuick').addEventListener('click', ()=> $('#dock img[data-app="apps"]').click());
-  html.querySelector('#openBrowserQuick').addEventListener('click', ()=> $('#dock img[data-app="browser"]').click());
-
-  // mark enter animation on
-  setTimeout(()=> {
-    const el = w.el;
-    el.classList.remove('enter');
-    el.classList.add('enter','on');
-    el.classList.add('fade-in');
-  }, 8);
+  update();
+  setInterval(update, 30_000); // every 30s (no need for every second)
 })();
 
-/* ============================
-   Optional: Firebase / realtime hooks
-   - This is intentionally commented out to avoid loading heavy libs by default.
-   - If you want to re-enable, load firebase via module import and update the DOM in a minimal way.
-   ============================ */
-/*
-import('https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js').then(({initializeApp})=>{
-  // do lazy firebase setup here
-});
-*/
+/* =========================
+   Simple notification
+   ========================= */
+function notify(text, time=4000){
+  const t = document.createElement('div');
+  t.className = 'toast';
+  t.textContent = text;
+  notifWrap.appendChild(t);
+  // auto remove
+  setTimeout(()=> {
+    t.style.opacity = '0';
+    setTimeout(()=> t.remove(), 250);
+  }, time);
+}
 
-/* ============================
-   Performance notes:
-   - Most heavy content (iframes) is created only when requested and uses `data-src` + IntersectionObserver.
-   - Event delegation reduces number of listeners.
-   - Dragging uses pointer events and only sets style transforms, minimizing layout thrash.
-   ============================ */
+/* =========================
+   Window management (light)
+   - open/close/minimize
+   - lazy load iframe only when opened
+   ========================= */
+const openStack = []; // z-order stack
+function zIndexFor(id){
+  // bring to front
+  openStack.splice(openStack.indexOf(id),1);
+  openStack.push(id);
+  // set z's
+  openStack.forEach((winId, i) => {
+    const w = document.getElementById(winId);
+    if (w) w.style.zIndex = 100 + (i+1);
+  });
+}
+
+function openWindow(winId, opts={}){
+  const win = document.getElementById(winId);
+  if (!win) return;
+  win.classList.remove('hidden');
+  win.removeAttribute('aria-hidden');
+  // bring to front
+  if (!openStack.includes(winId)) openStack.push(winId);
+  zIndexFor(winId);
+  // animate in
+  win.style.transform = 'translateY(6px) scale(1)';
+  win.style.opacity = '1';
+  // lazy-load iframe/content
+  const body = win.querySelector('[data-body]');
+  if (win.dataset.type === 'iframe' && !body.dataset.loaded) {
+    body.dataset.loaded = '1';
+    lazyLoadIframe(body, opts.src || defaultSrcFor(winId));
+  }
+}
+
+function defaultSrcFor(winId){
+  if (winId === 'win-browser') return 'https://example.com';
+  if (winId === 'win-games') return 'test99.html';
+  return '';
+}
+
+function closeWindow(winId){
+  const win = document.getElementById(winId);
+  if (!win) return;
+  win.classList.add('hidden');
+  win.setAttribute('aria-hidden','true');
+  // clean up iframe to free memory (optional)
+  const body = win.querySelector('[data-body]');
+  if (body && body.firstElementChild && body.firstElementChild.tagName === 'IFRAME') {
+    // preserve src to reuse later if you prefer; here we remove to free memory
+    body.removeChild(body.firstElementChild);
+    delete body.dataset.loaded;
+  }
+  // remove from stack
+  const idx = openStack.indexOf(winId);
+  if (idx > -1) openStack.splice(idx,1);
+  // update z-indexes
+  zIndexFor(openStack[openStack.length-1] || openStack[0] || '');
+}
+
+/* =========================
+   Lazy iframe loader
+   ========================= */
+const tpl = document.getElementById('iframeTpl');
+function lazyLoadIframe(container, src){
+  // small skeleton while loading
+  container.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%"><div class="loader" aria-hidden="true"></div></div>';
+  // create iframe (defer src for a tick so loader shows)
+  requestAnimationFrame(()=>{
+    const frag = tpl.content.cloneNode(true);
+    const iframe = frag.querySelector('iframe');
+    iframe.src = src;
+    iframe.setAttribute('allow', 'camera; microphone; geolocation; display-capture; autoplay');
+    // once loaded, replace loader
+    iframe.addEventListener('load', () => {
+      container.innerHTML = '';
+      container.appendChild(iframe);
+    }, { once:true });
+    // append after small delay (better UX)
+    setTimeout(()=> {
+      container.innerHTML = '';
+      container.appendChild(iframe);
+    }, 600);
+  });
+}
+
+/* =========================
+   Event delegation for dock buttons and window controls
+   ========================= */
+document.addEventListener('click', (ev) => {
+  const openId = ev.target.closest('[data-open]')?.dataset?.open;
+  if (openId) { openWindow(openId); return; }
+
+  const actionBtn = ev.target.closest('.cbtn');
+  if (actionBtn) {
+    const win = actionBtn.closest('.win');
+    if (!win) return;
+    const action = actionBtn.dataset.action;
+    const id = win.id;
+    if (action === 'close') closeWindow(id);
+    if (action === 'min') {
+      win.style.transform = 'translateY(18px) scale(.98)';
+      win.style.opacity = '0';
+      setTimeout(()=> win.classList.add('hidden'), 200);
+      // keep in stack to restore z-order
+    }
+    return;
+  }
+});
+
+/* =========================
+   Dragging (pointer events)
+   - works with mouse/touch/stylus
+   - uses transform for GPU accelerate
+   - keeps positions in dataset to persist if needed
+   ========================= */
+let dragState = null;
+const DRAG_TRESHOLD = 4;
+
+function onPointerDown(e){
+  const handle = e.target.closest('.handle');
+  if(!handle) return;
+  const winId = handle.closest('.win')?.id;
+  if(!winId) return;
+  e.preventDefault();
+  const win = document.getElementById(winId);
+  zIndexFor(winId);
+  // read current transform if present
+  const rect = win.getBoundingClientRect();
+  const start = { x: rect.left, y: rect.top };
+  const pointerStart = { x: e.clientX, y: e.clientY };
+  // disable native drag image
+  if (e.pointerType === 'mouse') (e.target).setPointerCapture?.(e.pointerId);
+
+  dragState = { win, start, pointerStart, id: winId, dragging:false };
+  window.addEventListener('pointermove', onPointerMove);
+  window.addEventListener('pointerup', onPointerUp, { once:true });
+}
+
+function onPointerMove(e){
+  if(!dragState) return;
+  const d = dragState;
+  const dx = e.clientX - d.pointerStart.x;
+  const dy = e.clientY - d.pointerStart.y;
+  if(!d.dragging && Math.hypot(dx,dy) > DRAG_TRESHOLD) d.dragging = true;
+  if(d.dragging){
+    // use translate for smooth GPU animations
+    d.win.style.left = `${d.start.x + dx}px`;
+    d.win.style.top = `${d.start.y + dy}px`;
+  }
+}
+
+function onPointerUp(e){
+  if(!dragState) return;
+  // commit final position
+  // optionally store in localStorage: position persistence
+  dragState = null;
+  window.removeEventListener('pointermove', onPointerMove);
+  // release pointer capture
+}
+
+/* attach pointerdown on document */
+document.addEventListener('pointerdown', onPointerDown);
+
+/* =========================
+   Keyboard shortcuts (simple)
+   ========================= */
+document.addEventListener('keydown', (e) => {
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+    // focus search
+    searchInput.focus();
+    e.preventDefault();
+  }
+  if (e.key === 'Escape') {
+    // close top-most window
+    const top = openStack[openStack.length-1];
+    if (top) closeWindow(top);
+  }
+});
+
+/* =========================
+   Search handler (open browser or run quick actions)
+   ========================= */
+$('#searchBtn').addEventListener('click', () => doSearch(searchInput.value));
+searchInput.addEventListener('keydown', (ev) => { if (ev.key === 'Enter') doSearch(searchInput.value); });
+
+function doSearch(q){
+  q = (q||'').trim();
+  if (!q) { notify('Type something to search.'); return; }
+  // quick app opens
+  const lower = q.toLowerCase();
+  if (lower === 'games' || lower === 'open games') { openWindow('win-games'); notify('Opening Games'); return; }
+  if (lower === 'browser' || lower === 'open browser') { openWindow('win-browser'); notify('Opening Browser'); return; }
+  // otherwise open browser and navigate to search
+  openWindow('win-browser', { src: 'https://www.google.com/search?q=' + encodeURIComponent(q) });
+  notify('Searching: ' + q);
+}
+
+/* =========================
+   Resize handling: reposition windows if offscreen
+   ========================= */
+const safeReposition = () => {
+  document.querySelectorAll('.win').forEach(w => {
+    if (w.classList.contains('hidden')) return;
+    const r = w.getBoundingClientRect();
+    const vw = window.innerWidth, vh = window.innerHeight;
+    let changed = false;
+    let left = parseFloat(w.style.left || r.left);
+    let top = parseFloat(w.style.top || r.top);
+    if (left + r.width > vw - 8) { left = Math.max(8, vw - r.width - 8); changed = true; }
+    if (top + r.height > vh - 8) { top = Math.max(8, vh - r.height - 8); changed = true; }
+    if (left < 8) { left = 8; changed = true; }
+    if (top < 48) { top = 48; changed = true; }
+    if (changed) { w.style.left = left + 'px'; w.style.top = top + 'px'; }
+  });
+};
+window.addEventListener('resize', debounce(safeReposition, 220));
+
+/* =========================
+   Sticky lazy wallpaper switching (localStorage)
+   ========================= */
+(function initWallpaper(){
+  const stored = localStorage.getItem('t9_wallpaper');
+  if (stored) wallpaper.style.backgroundImage = `url("${stored}")`;
+  else wallpaper.style.backgroundImage = `url('abstract.png')`;
+})();
+function setWallpaper(url){ wallpaper.style.backgroundImage = `url("${url}")`; localStorage.setItem('t9_wallpaper', url); }
+
+/* =========================
+   Quick open settings / chat (example: simple modal)
+   ========================= */
+document.getElementById('open-chat').addEventListener('click', ()=> {
+  openWindow('win-browser', { src: 'chat.html' }); // reusing browser window for demo
+});
+document.getElementById('open-settings').addEventListener('click', ()=> {
+  // create a small settings window dynamically if not exists
+  let id = 'win-settings';
+  if (!document.getElementById(id)) {
+    const node = document.createElement('div');
+    node.className = 'win';
+    node.id = id;
+    node.style.left = '30px';
+    node.style.top = '120px';
+    node.innerHTML = `
+      <div class="top"><div class="handle" data-drag="${id}"><span class="title">Settings</span></div>
+      <div class="controls"><button class="cbtn" data-action="close">✕</button></div></div>
+      <div class="body" data-body="${id}" style="padding:14px">
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <label class="muted">Wallpaper URL</label>
+          <input id="wall-url" placeholder="image url or leave default" style="padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:var(--text)">
+          <div style="display:flex;gap:8px">
+            <button id="save-wall" style="padding:8px;border-radius:8px;border:0;cursor:pointer">Save</button>
+            <button id="reset-wall" style="padding:8px;border-radius:8px;border:0;cursor:pointer">Reset</button>
+          </div>
+        </div>
+      </div>`;
+    document.getElementById('desktop').appendChild(node);
+    document.querySelector('#save-wall').addEventListener('click', () => {
+      const v = document.getElementById('wall-url').value.trim();
+      if (v) { setWallpaper(v); notify('Wallpaper changed'); } else notify('Enter a URL first');
+    });
+    document.querySelector('#reset-wall').addEventListener('click', () => {
+      localStorage.removeItem('t9_wallpaper'); setWallpaper('abstract.png'); notify('Wallpaper reset');
+    });
+  }
+  openWindow(id);
+});
+
+/* =========================
+   Small UX: auto-open a tutorial toast on first visit
+   ========================= */
+if (!localStorage.getItem('t9_seen_intro')) {
+  notify('Welcome to T9 OS — press Ctrl/Cmd+K to search. Tap dock icons to open apps.');
+  localStorage.setItem('t9_seen_intro', '1');
+}
+
+/* =========================
+   Simple persistence for open window positions (optional)
+   ========================= */
+window.addEventListener('beforeunload', () => {
+  const state = {};
+  document.querySelectorAll('.win').forEach(w => {
+    const rect = w.getBoundingClientRect();
+    state[w.id] = { left: rect.left, top: rect.top, hidden: w.classList.contains('hidden') };
+  });
+  localStorage.setItem('t9_win_state', JSON.stringify(state));
+});
+(function restoreState(){
+  try {
+    const raw = localStorage.getItem('t9_win_state');
+    if (!raw) return;
+    const state = JSON.parse(raw);
+    Object.keys(state).forEach(id => {
+      const w = document.getElementById(id);
+      if (!w) return;
+      const s = state[id];
+      w.style.left = s.left + 'px';
+      w.style.top = s.top + 'px';
+      if (!s.hidden) openWindow(id);
+    });
+  } catch(e){}
+})();
+
+/* =========================
+   Accessibility: focus management for windows
+   ========================= */
+document.addEventListener('focusin', (ev) => {
+  const win = ev.target.closest('.win');
+  if (win) zIndexFor(win.id);
+});
+
+/* =========================
+   Init: pre-position some windows for nicer first-open feel
+   ========================= */
+(function initPositions(){
+  const b = document.getElementById('win-browser');
+  const g = document.getElementById('win-games');
+  if (b){ b.style.left = (window.innerWidth/2 - 560) + 'px'; b.style.top = '72px'; }
+  if (g){ g.style.left = (window.innerWidth/2 + 20) + 'px'; g.style.top = '120px'; }
+})();
+
+/* =========================
+   Performance note:
+   - animations use transform/opacity
+   - large DOM updates avoided
+   - lazy-loading for iframes/images
+   ========================= */
 
 </script>
 </body>
