@@ -1,73 +1,116 @@
-
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Terminal</title>
-  <style>
-    .textbox {
-      width: 1250px;
-      height: 550px;
-      background-color: #2b2b2b;
-      color:#02f50f;
-      border-radius:15px;
-    }
-  </style>
-    <style>
-    body {
-      background-color:black;
-    }
-  </style> 
-<script>
-  document.addEventListener("keydown", function(event) {
-    if (event.key === "k") {
-      window.open("https://classroom.google.com/?pli=1");
-    }
-  });
-</script>
+<meta charset="UTF-8">
+<title>Fullscreen Terminal Top Input</title>
+<style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    width: 100%;
+    background: black;
+    font-family: monospace;
+    color: #02f50f;
+  }
 
+  .terminal {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+    padding: 20px;
+    box-sizing: border-box;
+  }
+
+  .output {
+    flex: 1;
+    overflow-y: auto;
+    white-space: pre-wrap;
+    margin-bottom: 10px;
+  }
+
+  .input-line {
+    display: flex;
+    align-items: center;
+  }
+
+  .prompt {
+    margin-right: 5px;
+  }
+
+  #commandBox {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: #02f50f;
+    font-family: monospace;
+    font-size: 16px;
+  }
+
+  #commandBox::placeholder {
+    color: #02f50faa;
+  }
+</style>
 </head>
 <body>
-  <textarea class="textbox" id="commandBox"></textarea>
+<div class="terminal">
+  <div class="output" id="output">Welcome! Type "help" for commands.</div>
+  
+  <div class="input-line">
+    <span class="prompt">user/$></span>
+    <input type="text" id="commandBox" placeholder="Type command...">
+  </div>
+</div>
 
-  <script>
-    // Add an event listener to the textbox
-    document.getElementById("commandBox").addEventListener("keydown", function(event) {
-      // Check if the Enter key is pressed
-      if (event.key === "Enter") {
-        // Get the command entered by the user
-        var command = event.target.value.trim().toLowerCase();
+<script>
+const output = document.getElementById('output');
+const input = document.getElementById('commandBox');
 
-        // Check the command and redirect accordingly
-        switch (command) {
-          case "google":
-            window.location.href = "https://www.google.com";
-            break;
-          case "devbytes":
-            window.location.href = "https://www.devbytes.ai";
-            break;
-            case "help":
-            window.location.href = "help.html";
-            break;
-             case "!browser":
-            window.location.href = "uh7gbram.html";
-            break;
-             case "!gms":
-            window.location.href = "gamesos.html";
-            break;
-             case "!apps":
-            window.location.href = "appos.html";
-            break;
-             case "!marks":
-            window.location.href = "java.html";
-            break;
-          default:
-            alert("Invalid command!");
-        }
+// Commands object
+const commands = { 
+  help: 'Available commands: google, !browser, !gms, !apps, !marks, version',
+  google: 'Opening Google...',
+  version: 'version 2.18',
+  '!browser': 'Opening browser page...',
+  '!gms': 'Opening GamesOS...',
+  '!apps': 'Opening AppOS...',
+  '!marks': 'Opening Marks page...'
+};
 
-        // Clear the textbox after executing the command
-        event.target.value = "";
-      }
-    });
-  </script>
+// Optional redirects
+const redirects = {
+  google: 'https://www.google.com',
+  devbytes: 'https://www.devbytes.ai',
+  '!browser': 'uh7gbram.html',
+  '!gms': 'gamesos.html',
+  '!apps': 'appos.html',
+  '!marks': 'java.html',
+};
+
+input.addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') {
+    const cmd = input.value.trim().toLowerCase();
+    input.value = '';
+
+    // Show the command in output
+    output.textContent += `> ${cmd}\n`;
+
+    if (commands[cmd]) {
+      output.textContent += commands[cmd] + '\n';
+      if (redirects[cmd]) window.location.href = redirects[cmd];
+    } else {
+      output.textContent += 'Invalid command!\n';
+    }
+
+    // Scroll to bottom
+    output.scrollTop = output.scrollHeight;
+  }
+});
+</script>
+
+
+
 </body>
 </html>
