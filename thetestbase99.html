@@ -68,30 +68,43 @@
   /* Navbar Styles */
 .navbar {
   position: fixed;
-  top: 50%;
-  left: 10px;
-  transform: translateY(-50%);
-  width: 60px; /* thinner width since it's vertical */
-  height: auto;
   background: linear-gradient(
     145deg,
     rgba(0, 0, 0, 0.842),
     rgba(0, 0, 0, 0.534)
   );
   border: 1px solid rgba(255, 255, 255, 0.2);
-  box-shadow:
-    inset 0 1px 2px rgba(46, 46, 46, 0.3),
-    0 4px 10px rgba(0, 0, 0, 0.4);
+  box-shadow: inset 0 1px 2px rgba(46, 46, 46, 0.3),
+              0 4px 10px rgba(0, 0, 0, 0.4);
   border-radius: 20px;
+  gap: 10px;
   display: flex;
-  flex-direction: column; /* now stack items vertically */
   justify-content: center;
   align-items: center;
-  gap: 10px;
-  padding: 10px 0;
   box-shadow: 0px 4px 12px #31313133;
-  opacity: 0.6;
-  backdrop-filter: blur(8px);
+  opacity: 60%;
+  transition: all 0.4s ease;
+}
+
+/* Horizontal version */
+.navbar.horizontal {
+  bottom: 5px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 23%;
+  height: 45px;
+  flex-direction: row;
+}
+
+/* Vertical version */
+.navbar.vertical {
+  top: 50%;
+  left: 10px;
+  transform: translateY(-50%);
+  width: 60px;
+  height: auto;
+  flex-direction: column;
+  padding: 10px 0;
 }
 
 
@@ -1239,6 +1252,7 @@ requestAnimationFrame(trackFPS);
     <option value="classroom">Google Classroom</option>
     <option value="vocab">Vocabulary.com</option>
   </select>
+<a  onclick="toggleNavbar()" class="round-btn">Toggle Navbar</a>
 
 <style>
    .round-btn {
@@ -1260,6 +1274,32 @@ requestAnimationFrame(trackFPS);
   
 </div>
   
+<script>
+  const navbar = document.getElementById('navbar');
+
+// Load saved state on page load
+window.onload = function() {
+  const savedState = localStorage.getItem('navbarState');
+  if (savedState === 'vertical') {
+    navbar.classList.add('vertical');
+    navbar.classList.remove('horizontal');
+  } else {
+    navbar.classList.add('horizontal');
+    navbar.classList.remove('vertical');
+  }
+};
+
+// Toggle and save
+function toggleNavbar() {
+  navbar.classList.toggle('vertical');
+  navbar.classList.toggle('horizontal');
+
+  // Save new state
+  const newState = navbar.classList.contains('vertical') ? 'vertical' : 'horizontal';
+  localStorage.setItem('navbarState', newState);
+}
+
+</script>
 
 <script>
     const presetSelect = document.getElementById("preset");
