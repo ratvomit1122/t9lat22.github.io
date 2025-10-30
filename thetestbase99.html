@@ -1267,8 +1267,8 @@ requestAnimationFrame(trackFPS);
 <script>
 const navbar = document.getElementById('navbar');
 
-// Function to apply horizontal style
-function applyHorizontal() {
+// Functions to set horizontal/vertical
+function setHorizontal() {
   navbar.style.bottom = '10px';
   navbar.style.left = '50%';
   navbar.style.top = '';
@@ -1279,8 +1279,7 @@ function applyHorizontal() {
   navbar.dataset.orientation = 'horizontal';
 }
 
-// Function to apply vertical style
-function applyVertical() {
+function setVertical() {
   navbar.style.top = '50%';
   navbar.style.left = '10px';
   navbar.style.bottom = '';
@@ -1294,19 +1293,23 @@ function applyVertical() {
 // Toggle function
 function toggleNavbar() {
   if(navbar.dataset.orientation === 'vertical') {
-    applyHorizontal();
+    setHorizontal();
+    localStorage.setItem('navbarOrientation', 'horizontal');
   } else {
-    applyVertical();
+    setVertical();
+    localStorage.setItem('navbarOrientation', 'vertical');
   }
 }
 
-// Initialize default orientation on load
+// Initialize navbar on page load
 window.onload = function() {
-  if(!navbar.dataset.orientation) {
-    applyHorizontal();
+  const saved = localStorage.getItem('navbarOrientation');
+  if(saved === 'vertical') {
+    setVertical();
+  } else {
+    setHorizontal();
   }
 };
-
 </script>
 
 
