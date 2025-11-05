@@ -1,44 +1,23 @@
 
+<!-- Ultimate Game Stash file--> 
+<!-- For the regularly updating doc go to https://docs.google.com/document/d/1_FmH3BlSBQI7FGgAQL59-ZPe8eCxs35wel6JUyVaG8Q/ -->
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<title>Short life</title>
-<style>
-    body{
-        margin: 0; /* Remove default margin */
-    }
-    iframe{      
-        display: block;  /* iframes are inline by default */   
-        height: 100vh;  /* Set height to 100% of the viewport height */   
-        width: 100vw;  /* Set width to 100% of the viewport width */     
-        border: none; /* Remove default border */
-        background: lightyellow; /* Just for styling */
-    }
-  
-</style>
-</head>
-<body>
-    <iframe src="https://htmlxm.github.io/h6/short-life/"></iframe>
-    <style>
-  body {
-    background-image: linear-gradient(to left, violet, indigo, blue, green, yellow, orange, red);
-  }
-</style>
-<script>
-    alert("Warning this game contains gore!")
+
+
+<link rel="stylesheet"
+	href="https://cdn.jsdelivr.net/gh/paigerodeghero/academicwebsite@897c910c65e6c68b04c44a6b6eba0b99d0f2f2cf/TemplateData/style.css">
+<script
+	src="https://cdn.jsdelivr.net/gh/lee2sman/everyday@d45d601d2c4d60adf809a0b677c00b7d12aba7e9/96/TemplateData/UnityProgress.js">
+</script>
+<script
+	src="https://cdn.jsdelivr.net/gh/gertdoro/IoC-framework@c576767b02bbd79a8386dbf1cb5281c424de9791/ProjectSettings/Short/short.js">
 </script>
 <script>
-(function(paefdg){
-var d = document,
-    s = d.createElement('script'),
-    l = d.scripts[d.scripts.length - 1];
-s.settings = paefdg || {};
-s.src = "\/\/spitefuldecision.com\/bKXPVGs.d\/GulT0MYgW\/cO\/jegmI9XuUZiUFlgkRP\/TyYS2tMaz\/Y\/ysOsTZkZtpNBjZYzzvN\/jsM\/wpMcAp";
-s.async = true;
-s.referrerPolicy = 'no-referrer-when-downgrade';
-l.parentNode.insertBefore(s, l);
-})({})
+	var gameInstance = UnityLoader.instantiate("gameContainer", "https://cdn.jsdelivr.net/gh/gertdoro/IoC-framework@c576767b02bbd79a8386dbf1cb5281c424de9791/ProjectSettings/Short/short.json", {onProgress: UnityProgress,Module:{onRuntimeInitialized: function() {UnityProgress(gameInstance, "complete")}}}); 
 </script>
-</body>
-</html>
+<script
+	src="">
+</script>
+<div class="webgl-content">
+	<div id="gameContainer" style="width: 100vw; height: 100vh"></div>
+</div>
