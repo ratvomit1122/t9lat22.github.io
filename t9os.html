@@ -5,15 +5,18 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7134787026595240"
-     crossorigin="anonymous"></script>
 <meta charset="UTF-8">
+<meta http-equiv="Cache-Control" content="max-age=31536000, public">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="stylesheet" href="stars.css">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap" rel="stylesheet">
 <link rel="shortcut icon" type="image/jpg" href="favicon.png"/>
 
 
 <title>T9 OS</title>
+
+</head>
+<body>
+  
 
     
 
@@ -40,55 +43,71 @@
   }
 
   /* Clock Styles */
-  .clock {
-    font: caption;
-    right: 30px;
-    color: white;
-    font-size: 15px;
-    position: fixed;
-    top:5px;
-  }
+.clock {
+  color: white;
+  font-size: 35px;
+  position: fixed;
+  top: 20px;
+  left: 30px;
+  text-shadow: 0 0 10px #00ffff;
+  font-family: 'Orbitron', sans-serif;
+}
+
 
   /* Battery Styles */
   .battery {
     
-  font: caption;
-  right: 185px;
-  color: white;
-  position: absolute;
-  top: 0;
+color: white;
   font-size: 15px;
-  line-height: 1;
-  /* Optional: if you still need fine adjustment */
-  transform: translateY(-5px);
-}
+  position: fixed;
+  top: 45px;
+  left: 30px;
+  text-shadow: 0 0 10px #00ffff;
+  font-family: 'Orbitron', sans-serif;
 
-  
+
+  }
 
   /* Navbar Styles */
-  .navbar {
-    position: fixed;
-    bottom: 10px;
-    left: 0;
-    width: 19%;
-    background-color: #161616;
-    border-radius: 20px 20px 20px 20px;
-    gap: 5px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 45px;
-    opacity:65%;
-    left: 50%;
-    transform: translateX(-50%); 
-    box-shadow: 0px 4px 12px #000000;
-    outline: #f9f9f9;
-    outline-width: 3px;
-    border: 1.5px solid #000000;
+.navbar {
+  position: fixed;
+  top: 50%;
+  left: 10px;
+  transform: translateY(-50%);
+  width: 60px; /* thinner width since it's vertical */
+  height: auto;
+  background: linear-gradient(
+    145deg,
+    rgba(0, 0, 0, 0.842),
+    rgba(0, 0, 0, 0.534)
+  );
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow:
+    inset 0 1px 2px rgba(46, 46, 46, 0.3),
+    0 4px 10px rgba(0, 0, 0, 0.4);
+  border-radius: 100px;
+  display: flex;
+  flex-direction: column; /* now stack items vertically */
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 0;
+  box-shadow: 0px 4px 12px #31313133;
+  opacity: 0.6;
+  backdrop-filter: blur(2px);
+  transition: all 0.1s ease-in-out; 
+}
+.navbar:hover{
+  border-radius: 20px;
+}
+.navbar img{
+  opacity:1;
+}
 
 
-  
-  }
+
+
+
   .close-btn {
     background: none;
     border: none;
@@ -120,9 +139,10 @@
   }
 
   img:hover {
-    transform: translateY(-3px);
     box-shadow: none;
     border-radius: 15px;
+        transform: translateY(-3px);
+
   }
 
   .line {
@@ -141,7 +161,6 @@
     position: fixed;
   }
 
-  /* Toggle Div Styles */
   #hiddenDiv {
     display: none;
     margin-top: 20px;
@@ -154,12 +173,57 @@ border: 1px solid rgb(34, 34, 34);
     position: fixed;
     z-index: 1000;
     border-radius:30px; 
-    width:95%;
+    width:85%;
     height: 77%; 
     overflow-x: hidden;
     overflow-y: auto;
 box-shadow: 2px #141414;
       animation: popIn2 0.5s ease-out forwards;
+
+  }
+   #terminalDiv {
+    display: none;
+    margin-top: 20px;
+    padding: 10px;
+background-color: #1b1b1bbd;
+border: 1px solid rgb(34, 34, 34);   
+    color: white;
+    inset: 0;
+    margin:auto;
+    position: fixed;
+    z-index: 1000;
+    border-radius:30px; 
+    width:85%;
+    height: 77%; 
+    overflow-x: hidden;
+    overflow-y: auto;
+box-shadow: 2px #141414;
+      animation: popIn2 0.5s ease-out forwards;
+
+  }
+    #t9Div {
+    display: none;
+    margin-top: 20px;
+    padding: 10px;
+background: linear-gradient(
+        145deg,
+        rgba(0, 0, 0, 0.842),
+        rgba(0, 0, 0, 0.534)
+      );
+border: 1px solid rgb(34, 34, 34);   
+    color: white;
+    inset: 0;
+    margin:auto;
+    position: fixed;
+    z-index: 1000;
+    border-radius:30px; 
+    width:25%;
+    height: 40%; 
+    overflow-x: hidden;
+    overflow-y: auto;
+box-shadow: 2px #141414;
+      animation: popIn2 0.5s ease-out forwards;
+      top:310px;
 
   }
   #settingsDiv {
@@ -332,7 +396,7 @@ border: 1px solid rgb(34, 34, 34);
     position: fixed;
     z-index: 1000;
     border-radius:30px; 
-    width:95%;
+    width:90%;
     height: 80%; 
     overflow-x: hidden;
     overflow-y: auto;
@@ -484,7 +548,10 @@ border: 1px solid rgba(255, 255, 255, 0.15);
 
 
 <!-- Navbar -->
-<div class="navbar">
+<div id="navbar" class="navbar">
+  <a onclick="t9()">
+    <img src="favicon.png">
+  </a>
   <a id="toggleDivButton">
     <img src="gameicon.png">
   </a>
@@ -533,7 +600,7 @@ border: 1px solid rgba(255, 255, 255, 0.15);
 <div id="collabDiv">
   <button class="close-btn" onclick="document.getElementById('collabDiv').style.display = 'none';">●</button>
   <h1 class="gtext"> Partners </h1>
-  <p color="white" style="text-align: center;">They are partners not sponsers</p>
+  <p color="white" style="text-align: center;"></p>
 
           
      <a href="https://sites.google.com/view/wtex/home?authuser=0">
@@ -559,9 +626,9 @@ border: 1px solid rgba(255, 255, 255, 0.15);
 <div id="updateDiv">
   <button class="close-btn" onclick="document.getElementById('updateDiv').style.display = 'none';">●</button>
   <h1 class="gtext"> Updates</h1>
-<h1 style="text-align: center;">Version 2.21 (Beta)</h1>
-        <h3 style="text-align: center; color:white;">New update: T9 OS v2.5 is coming maybe tommorow or today</h3>
-                <h3 style="text-align: center; color:white;">Sorry for not updating in a while but I think youll like the new update</h3>
+<h1 style="text-align: center;">Version 2.50 </h1>
+        <h3 style="text-align: center; color:white;">New update: Fixed a bunch of bugs new UI changes new wallpaper.</h3>
+                <h3 style="text-align: center; color:white;">New UI, New terminal, and Fixing blocked games</h3>
 
 
 
@@ -592,11 +659,25 @@ border: 1px solid rgba(255, 255, 255, 0.15);
 
 
 
-      <h2 style="    transform: translateX(-50%); top:20px; position:fixed; left:50%; text-align:center; color:white; ">People Online: <span id="count">0</span></h2>
+      <h2 style="transform: translateX(-50%); top:20px; position:fixed; left:50%; text-align:center; color:white; ">CPU  usage:   <span id="cpu"></span></h2>
+<img src="memory.png" style="width:30px; bottom:0; position: fixed; transform: translateX(-50%); left:50%;">
+ 
+<script>
+  function updateStats() {
+    let cpuPercent = Math.floor(Math.random() * 100);
+    document.getElementById('cpu').textContent = cpuPercent + '%';
+  }
 
+  setInterval(updateStats, 1000);
+</script>
 
+<style>
+  #cpu{
+      font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+      text-shadow: white 10px;
+  }
+</style>
     
-
 
 
 
@@ -653,6 +734,31 @@ backdrop-filter: blur(7px);
            
 </div>
 
+<div id="terminalDiv">
+  <button class="close-btn" onclick="document.getElementById('terminalDiv').style.display = 'none';">●</button>
+        <h3 style="  left: 50%; color:white; top:-9.5px; position: absolute;   transform: translateX(-50%);" >Terminal</h3>
+
+
+
+ 
+<iframe class="frame3" src="terminal.html"></iframe>
+  <style>
+    .frame3{
+      width:100%;
+      height:95%;
+      bottom:10px;
+      position: absolute;
+      border:none;
+      border-radius:0px 0px 20px 20px;
+      left: 0;
+      bottom: 0;
+    }
+   
+  </style>
+ 
+           
+</div>
+
 <div id="hacksDiv">
   <button class="close-btn" onclick="document.getElementById('hacksDiv').style.display = 'none';">●</button>
   <h1 class="gtext"> Bookmarklets </h1>
@@ -697,6 +803,12 @@ backdrop-filter: blur(7px);
     div.style.display = div.style.display === 'block' ? 'none' : 'block';
   }
 </script>
+<script>
+  function t9(){
+    const div = document.getElementById('t9Div');
+    div.style.display = div.style.display === 'block' ? 'none' : 'block';
+  }
+</script>
 
 <div id="emulatorDiv">
   <button class="close-btn" onclick="document.getElementById('emulatorDiv').style.display = 'none';">×</button>
@@ -735,7 +847,84 @@ backdrop-filter: blur(7px);
           
 </div>
 
+<div id="t9Div">
+  <button class="close-btn2" onclick="document.getElementById('t9Div').style.display = 'none';">●</button>
+      <h4 style="  left: 50%; color:white; top:-9.5px; position: absolute;   transform: translateX(-50%);" >T9 OS</h4>
 
+
+  &nbsp;&nbsp;&nbsp;&nbsp; 
+  
+  <div class="btn-container">
+    <a onclick="terminal()"><img class="t9btn" src="terminal.png"></a>
+  </div>
+<script>
+  function terminal() {
+    const div = document.getElementById('terminalDiv');
+    if (div.style.display === 'block') {
+      div.style.display = 'none';
+    } else {
+      div.style.display = 'block';
+    }
+    document.getElementById('t9Div').style.display = 'none';
+  }
+</script>
+
+
+
+
+</script>
+</script>
+  <style>
+    .btn-container {
+      display: flex;
+      gap: 10px; /* space between buttons */
+      position: absolute;
+      top: 30px;
+      left: 30px;
+    }
+
+    .t9btn {
+      width: 30px;
+      height: 30px;
+      border-radius: 15px;
+      transition: all 0.3s ease;
+      font-family: sans-serif;
+      font-size: 15px;
+      border: #ffffff 0.2px solid;
+      display: inline-block;
+      cursor: pointer;
+    }
+  </style>
+  </a>
+<style>
+  .warn{
+    top:0;
+    font-family: sans-serif;
+    position: absolute;
+    right:0;
+  }
+   .close-btn2 {
+    background: none;
+    border: none;
+    color: rgb(255, 0, 0);
+    font-size: 24px;
+    cursor: pointer;
+    padding: 0;
+    font-size:20px;
+    top:0;
+} 
+
+  </style>
+
+  <p class="warn"></p>
+
+
+           
+        
+       
+
+          
+</div>
 <div id="searchDiv">
   <button class="close-btn2" onclick="document.getElementById('searchDiv').style.display = 'none';">●</button>
       <button class="full-btn" onclick="fullscreenIframe2()">●</button>
@@ -838,18 +1027,25 @@ backdrop-filter: blur(7px);
 <style>
   .tnav {
     top:0;
-    left:0;
     height:25px;
-    width:100%;
-    opacity:50%;
+    opacity:50%; 
     background-color:black;
     position:fixed;
+    left:50%;
+transform: translateX(-50%);
+    width:25%;
+    border-radius: 0px 0px 15px 15px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
     
   }
   .timg{
     width:17px;
     transform: translateY(-3px);
     gap:70px;
+
   }
   .timg:hover{
     transform: translateY(-4x);
@@ -886,7 +1082,7 @@ backdrop-filter: blur(7px);
       border:none;
       border-radius:0px 0px 20px 20px;
       left:0;
-      border-top: 8px white;
+      border-top: 1px solid rgb(37, 37, 37);
     }
     .back {
     background: none;
@@ -990,9 +1186,7 @@ requestAnimationFrame(trackFPS);
   </a>
 
     
-    <a onclick="sound()">
-    <img class="timg" src="music.png">
-  </a>
+    
 
   
     <a onclick="hacks()">
@@ -1001,11 +1195,18 @@ requestAnimationFrame(trackFPS);
 
  
 
-  <h2 class="battery" id="batteryPercentage"></h2>
-  <div class="clock" id="time"></div>
+
 
 
 </div>
+  <h2 class="battery" id="batteryPercentage"></h2>
+  <div class="clock" id="time"></div>
+<style>
+  .timeBattery{
+    background-color:black;
+    opacity: 50%;
+  }
+</style>
 
 <img src="logo-new.png" id="logo">
 
@@ -1017,7 +1218,10 @@ requestAnimationFrame(trackFPS);
   
    <label class="label" for="background-select">Select Background:</label>
 <select id="background-select">
-  <option value="abstract.png">Default</option>
+  <option value="t9os6.png">Default</option>
+                      <option value="abstract.png">T9 Abstract</option>
+
+                  <option value="red.jpg">Red Abstract</option>
                   <option value="halloween.png">halloween</option>
 
                   <option value="purplecity2.png">T9 OS city</option>
@@ -1047,8 +1251,19 @@ requestAnimationFrame(trackFPS);
       <option value="pbWaves.jpg">Purple Blue Abstract</option>
 
 </select>
+
+
+  
 <a   onclick="openGame()"  class="round-btn">Hide url</a>
 <a  id="toggleBTN" class="round-btn">Toggle logo</a>
+   <label class="label" for="preset">Select Tab Cloak:</label>
+
+ <select style="padding:10px 20px; border-radius:10px; font-family: sans-serif; text-align: center;" id="preset">
+    <option value="default">Default (T9 OS)</option>
+    <option value="google">Google</option>
+    <option value="classroom">Google Classroom</option>
+    <option value="vocab">Vocabulary.com</option>
+  </select>
 
 <style>
    .round-btn {
@@ -1070,6 +1285,34 @@ requestAnimationFrame(trackFPS);
   
 </div>
   
+
+
+
+<script>
+    const presetSelect = document.getElementById("preset");
+
+    window.addEventListener("DOMContentLoaded", () => {
+      const saved = localStorage.getItem("cloak_preset") || "default";
+      presetSelect.value = saved;
+    });
+
+    presetSelect.addEventListener("change", () => {
+      localStorage.setItem("cloak_preset", presetSelect.value);
+      console.log("✅ Preset saved:", presetSelect.value);
+    });
+  </script>
+
+<script>
+  // If no background is saved yet, set default
+  if (!localStorage.getItem("bg")) {
+    localStorage.setItem("bg", "url('t9os6.png') no-repeat center center fixed");
+  }
+
+  // Always apply the saved background
+  document.body.style.background = localStorage.getItem("bg");
+  document.body.style.backgroundSize = "cover"; // makes sure image fits screen
+</script>
+
 <script>
   function updateTime() {
   var date = new Date();
@@ -1145,42 +1388,51 @@ requestAnimationFrame(trackFPS);
 
 
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-    import { getDatabase, ref, onValue, push, onDisconnect, set } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+  import { getDatabase, ref, onValue, push, onDisconnect, set } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
 
-    // 🔥 Your Firebase config
-    const firebaseConfig = {
-      apiKey: "AIzaSyDB4VU2JNQGO5pMgXGaasIiY6kFxgsb-84",
-      authDomain: "chat-99dfe.firebaseapp.com",
-      databaseURL: "https://chat-99dfe-default-rtdb.firebaseio.com",
-      projectId: "chat-99dfe",
-      storageBucket: "chat-99dfe.firebasestorage.app",
-      messagingSenderId: "17277094525",
-      appId: "1:17277094525:web:989d19d04fdde769de7f14",
-      measurementId: "G-NEXJFPJPCP"
-    };
+  // 🔥 Your Firebase config
+  const firebaseConfig = {
+    apiKey: "AIzaSyDB4VU2JNQGO5pMgXGaasIiY6kFxgsb-84",
+    authDomain: "chat-99dfe.firebaseapp.com",
+    databaseURL: "https://chat-99dfe-default-rtdb.firebaseio.com",
+    projectId: "chat-99dfe",
+    storageBucket: "chat-99dfe.firebasestorage.app",
+    messagingSenderId: "17277094525",
+    appId: "1:17277094525:web:989d19d04fdde769de7f14",
+    measurementId: "G-NEXJFPJPCP"
+  };
 
-    // Initialize Firebase
-    const app = initializeApp(firebaseConfig);
-    const db = getDatabase(app);
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
 
-    // Reference for connections
-    const connectionsRef = ref(db, "connections");
+  // Reference for connections
+  const connectionsRef = ref(db, "connections");
 
-    // Create a new unique connection for THIS user
-    const myConnection = push(connectionsRef);
+  // Human detection
+  let isHuman = false;
+  window.addEventListener("mousemove", () => { isHuman = true; }, { once: true });
+  window.addEventListener("touchstart", () => { isHuman = true; }, { once: true });
 
-    // Mark myself as connected
+  // Create a new unique connection for THIS user if human
+  let myConnection;
+  function connectIfHuman() {
+    if (!isHuman) return; // skip bots
+    myConnection = push(connectionsRef);
     set(myConnection, true);
-
-    // Remove me when I disconnect
     onDisconnect(myConnection).remove();
+  }
 
-    // Update live user count
-    onValue(connectionsRef, (snapshot) => {
-      document.getElementById("count").innerText = snapshot.size ?? snapshot.numChildren();
-    });
-  </script>
+  // Wait a short time for human interaction
+  setTimeout(connectIfHuman, 3000); // 3 seconds delay
+
+  // Update live user count
+  onValue(connectionsRef, (snapshot) => {
+    document.getElementById("count").innerText = snapshot.numChildren();
+  });
+</script>
+
 
 <script>
   function emulator(){
@@ -1486,12 +1738,13 @@ if (selectedBackground) {
     }
   }
 </style>
-
-</head>
-
-
-
+<p style="color:#acacac; position: fixed; bottom: -3px; left: 10px; opacity: 0.6;">Version 2.5</p>
 
 </body>
+
+
+
 </html>
+
+
 
