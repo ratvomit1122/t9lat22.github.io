@@ -555,6 +555,9 @@ border: 1px solid rgba(255, 255, 255, 0.15);
   <a id="toggleDivButton">
     <img src="gameicon.png">
   </a>
+   <a onclick="ai()">
+    <img src="chat2.png">
+  </a>
   <a onclick="s()">
     <img  src="search.png">
   </a>
@@ -566,6 +569,7 @@ border: 1px solid rgba(255, 255, 255, 0.15);
     <a onclick="Chat()">
     <img src="chat2.png">
   </a>
+  
 
 
 </div>
@@ -627,7 +631,7 @@ border: 1px solid rgba(255, 255, 255, 0.15);
   <button class="close-btn" onclick="document.getElementById('updateDiv').style.display = 'none';">●</button>
   <h1 class="gtext"> Updates</h1>
 <h1 style="text-align: center;">Version 2.50 </h1>
-        <h3 style="text-align: center; color:white;">New update: New T9 AI coming soon (if yall get in trouble using my AI thats your fault buddy)</h3>
+        <h3 style="text-align: center; color:white;">New update: New T9 AI </h3>
                 <h3 style="text-align: center; color:white;">I got some of the old vercel links up so you can use t9os.vercel.app t9osclass.vercel.app learningbooks.vercel.app.</h3>
 
 
@@ -1162,6 +1166,83 @@ requestAnimationFrame(trackFPS);
            
 </div>
 
+<div id="aiDiv">
+  <button class="close-btn" onclick="document.getElementById('aiDiv').style.display = 'none';">●</button>
+    <button class="full-btn" onclick="fullscreenIframeAI()">●</button>
+
+<h3 style="  left: 50%; color:white; top:-9.5px; position: absolute;   transform: translateX(-50%);      " >AI</h3>
+<h3  id="fpsCounter" style="  left: 80%; color:white; top:-9.5px; position: absolute;   transform: translateX(-80%);      " ></h3>
+ 
+
+
+
+<iframe id="frame5" src="/ai/index.html"></iframe>
+  <style>
+    #frame5{
+      width:100%;
+      height:95%;
+      bottom:0;
+      position: absolute;
+      border:none;
+      border-radius:0px 0px 20px 20px;
+      left:0;
+      border-top: 1px solid rgb(37, 37, 37);
+    }
+    .back {
+    background: none;
+    border: none;
+    color: rgb(255, 255, 255);
+    font-size: 24px;
+    cursor: pointer;
+    padding: 0;
+    font-size:20px;
+        transform: translateY(2px);
+        top:-2px;
+
+}
+     #ChatDiv {
+    display: none;
+    margin-top: 20px;
+    padding: 10px;
+     background: rgba(0,0,0,0.4);   
+backdrop-filter: blur(7px);   
+    color: white;
+    inset: 0;
+    margin:auto;
+    position: fixed;
+    z-index: 1000;
+    border-radius:20px; 
+    opacity:85%; 
+    width:85%;
+    height: 73%; 
+    overflow-x: hidden;
+    overflow-y: auto;
+                box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+
+      animation: popIn 0.5s ease-out forwards;
+
+  }
+  </style>
+
+  
+ 
+  <script>
+    function fullscreenIframeAI() {
+      let iframe = document.getElementById("frame5");
+      if (iframe.requestFullscreen) {
+        iframe.requestFullscreen();
+      } else if (iframe.mozRequestFullScreen) { 
+        iframe.mozRequestFullScreen();
+      } else if (iframe.webkitRequestFullscreen) { 
+        iframe.webkitRequestFullscreen();
+      } else if (iframe.msRequestFullscreen) { 
+        iframe.msRequestFullscreen();
+      }
+    }
+  </script>
+           
+</div>
+
 <div class="tnav">
 
    
@@ -1448,6 +1529,12 @@ requestAnimationFrame(trackFPS);
 <script>
   function sound(){
     const div = document.getElementById('soundDiv');
+    div.style.display = div.style.display === 'block' ? 'none' : 'block';
+  }
+</script>
+<script>
+  function ai(){
+    const div = document.getElementById('aiDiv');
     div.style.display = div.style.display === 'block' ? 'none' : 'block';
   }
 </script>
