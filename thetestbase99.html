@@ -1850,6 +1850,35 @@ if (selectedBackground) {
 </style>
 <p style="color:#acacac; position: fixed; bottom: -3px; left: 10px; opacity: 0.6;">Version 2.5</p>
 
+
+   <script>
+        document.querySelectorAll('#settingsDiv').forEach(box => {
+            box.addEventListener('pointerdown', e => {
+                e.preventDefault();
+                box.style.cursor = 'grabbing';
+                let offsetX = e.clientX - box.getBoundingClientRect().left;
+                let offsetY = e.clientY - box.getBoundingClientRect().top;
+
+                function handleMove(e) {
+                    let newX = e.clientX - offsetX;
+                    let newY = e.clientY - offsetY;
+                    
+                    box.style.left = `${Math.max(0, Math.min(newX, window.innerWidth - box.offsetWidth))}px`;
+                    box.style.top = `${Math.max(0, Math.min(newY, window.innerHeight - box.offsetHeight))}px`;
+                }
+
+                function handleUp() {
+                    box.style.cursor = 'grab';
+                    window.removeEventListener('pointermove', handleMove);
+                    window.removeEventListener('pointerup', handleUp);
+                }
+
+                window.addEventListener('pointermove', handleMove);
+                window.addEventListener('pointerup', handleUp);
+            });
+        });
+    </script>
+
 </body>
 
 
