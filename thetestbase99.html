@@ -1877,17 +1877,15 @@ function parseTranslate(transform) {
   return [0,0];
 }
 
-// *** THE FIX FOR THE JUMPING ISSUE IS HERE ***
 // Function to convert CSS inset/transform based position to fixed left/top
 function normalizePosition(win) {
   const cs = getComputedStyle(win);
-  // Optimization: only normalize if the element is not already positioned with left/top
   if (win.style.inset === 'auto' && cs.transform === 'none') return;
   
   const rect = win.getBoundingClientRect();
   const [tx,ty] = parseTranslate(cs.transform);
   
-  // Calculate the final position considering initial position (rect.left/top) and any transform offset
+  // Calculate final absolute position, accounting for scroll
   const finalX = rect.left + tx + window.scrollX;
   const finalY = rect.top + ty + window.scrollY;
 
@@ -1895,9 +1893,8 @@ function normalizePosition(win) {
   win.style.top  = Math.round(finalY) + 'px';
   win.style.inset='auto';
   win.style.margin='0';
-  win.style.transform='none'; // Clear transform after applying its effect to left/top
+  win.style.transform='none';
 }
-// ***********************************************
 
 windows.forEach(win=>{
   let dragging=false, resizing=false, resizeDir='';
@@ -1941,13 +1938,20 @@ windows.forEach(win=>{
   });
 
   win.addEventListener('pointerdown', e=>{
-    if (e.button!==0) return; // Only respond to left click
-    
-    // 🔥 FIX: Normalize position BEFORE calculating offsets or starting drag/resize
-    normalizePosition(win); 
+    if (e.button!==0) return;
     
     const rect = win.getBoundingClientRect();
     const dir = getResizeDir(e);
+    
+    const isDragZone = (e.clientY - rect.top <= DRAG_HEIGHT);
+    
+    // 🔥 CRITICAL FIX: Only run normalization and capture if the click is in a drag or resize zone
+    if (dir || isDragZone) {
+      normalizePosition(win); 
+    } else {
+      // If the user clicks in the middle of the window (neither drag nor resize), do nothing.
+      return; 
+    }
     
     if (dir) {
       // START RESIZING
@@ -1959,7 +1963,7 @@ windows.forEach(win=>{
       return;
     }
     
-    if (e.clientY-rect.top<=DRAG_HEIGHT) {
+    if (isDragZone) {
       // START DRAGGING
       dragging=true;
       grabOffset.x=e.clientX - win.offsetLeft;
@@ -1972,11 +1976,9 @@ windows.forEach(win=>{
 
   document.addEventListener('pointermove', e=>{
     if (dragging) {
-      // DRAGGING LOGIC
       let nx = e.clientX - grabOffset.x;
       let ny = e.clientY - grabOffset.y;
       
-      // Constrain position to visible window
       nx = Math.max(0, Math.min(nx, window.innerWidth - win.offsetWidth));
       ny = Math.max(0, Math.min(ny, window.innerHeight - win.offsetHeight));
       
@@ -1985,7 +1987,6 @@ windows.forEach(win=>{
     }
     
     if (resizing) {
-      // RESIZING LOGIC (Only S, SE, SW directions are active based on getResizeDir)
       const dx = e.clientX - start.startX;
       const dy = e.clientY - start.startY;
       
@@ -2000,7 +2001,6 @@ windows.forEach(win=>{
       
       // --- CONSTRAINTS ---
       
-      // Minimum Width
       if (newW < MIN_W) {
         if (resizeDir.includes('w')) {
           newL = start.startL + (start.startW - MIN_W);
@@ -2008,12 +2008,10 @@ windows.forEach(win=>{
         newW = MIN_W;
       }
       
-      // Minimum Height
       if (newH < MIN_H) {
         newH = MIN_H;
       }
       
-      // Screen Boundary Constraints (Left/Right)
       if (newL < 0) {
         if (resizeDir.includes('w')) newW += newL;
         newL = 0;
@@ -2022,8 +2020,6 @@ windows.forEach(win=>{
         newW = Math.max(MIN_W, window.innerWidth - newL);
       }
       
-      // Screen Boundary Constraints (Top/Bottom)
-      // Since N-resizing is disabled, we only need to constrain the bottom edge.
       if (newT + newH > window.innerHeight) {
         newH = Math.max(MIN_H, window.innerHeight - newT);
       }
@@ -2036,7 +2032,6 @@ windows.forEach(win=>{
   });
 
   document.addEventListener('pointerup', e=>{
-    // Release capture and reset state variables
     if (dragging || resizing) {
       try { win.releasePointerCapture(e.pointerId); } catch {}
     }
