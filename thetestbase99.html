@@ -1866,7 +1866,6 @@ function parseTranslate(transform) {
   if (!transform || transform === 'none') return [0,0];
   const m = transform.match(/matrix\(([^)]+)\)/);
   if (m) {
-    // parts[4] is the X translation, parts[5] is the Y translation
     const parts = m[1].split(',').map(s=>parseFloat(s.trim()));
     return [parts[4]||0, parts[5]||0];
   }
@@ -1878,6 +1877,7 @@ function parseTranslate(transform) {
   return [0,0];
 }
 
+// *** THE FIX FOR THE JUMPING ISSUE IS HERE ***
 // Function to convert CSS inset/transform based position to fixed left/top
 function normalizePosition(win) {
   const cs = getComputedStyle(win);
@@ -1897,16 +1897,16 @@ function normalizePosition(win) {
   win.style.margin='0';
   win.style.transform='none'; // Clear transform after applying its effect to left/top
 }
+// ***********************************************
 
 windows.forEach(win=>{
   let dragging=false, resizing=false, resizeDir='';
   let grabOffset={x:0,y:0};
   let start={};
 
-  // --- MODIFIED: Only allow resizing on the bottom edge and bottom corners (S, SE, SW) ---
+  // Only allow resizing on the bottom edge and bottom corners (S, SE, SW)
   function getResizeDir(e) {
     const r = win.getBoundingClientRect();
-    // Calculate cursor position relative to the window's top-left corner
     const x = e.clientX - r.left;
     const y = e.clientY - r.top;
     let dir = '';
@@ -1914,22 +1914,16 @@ windows.forEach(win=>{
     // Check for bottom resize (South)
     if (y > r.height - RESIZE_EDGE) {
       dir += 's';
-      // Check for bottom-right (SouthEast)
-      if (x > r.width - RESIZE_EDGE) dir += 'e';
-      // Check for bottom-left (SouthWest)
-      else if (x < RESIZE_EDGE) dir += 'w';
+      if (x > r.width - RESIZE_EDGE) dir += 'e'; // SouthEast
+      else if (x < RESIZE_EDGE) dir += 'w'; // SouthWest
     }
-    // Note: 'n' (top) and pure 'e'/'w' (sides) resizing are intentionally excluded per your request
-    
     return dir;
   }
-  // ------------------------------------------------------------------------------------------
 
   // Cursor feedback for drag/resize zones
   win.addEventListener('pointermove', e=>{
     if (dragging||resizing) return;
     const dir=getResizeDir(e);
-    // Only define cursors for the allowed directions (S, SE, SW)
     const cursors={'s':'ns-resize', 'se':'nwse-resize', 'sw':'nesw-resize'};
     
     if (dir) {
@@ -1949,7 +1943,7 @@ windows.forEach(win=>{
   win.addEventListener('pointerdown', e=>{
     if (e.button!==0) return; // Only respond to left click
     
-    // Crucial: Normalize position before any drag or resize starts
+    // 🔥 FIX: Normalize position BEFORE calculating offsets or starting drag/resize
     normalizePosition(win); 
     
     const rect = win.getBoundingClientRect();
@@ -1958,7 +1952,6 @@ windows.forEach(win=>{
     if (dir) {
       // START RESIZING
       resizing=true; resizeDir=dir;
-      // Store starting dimensions and position
       start={startX:e.clientX,startY:e.clientY,startW:win.offsetWidth,
              startH:win.offsetHeight,startL:win.offsetLeft,startT:win.offsetTop};
       win.setPointerCapture(e.pointerId); 
@@ -1969,7 +1962,6 @@ windows.forEach(win=>{
     if (e.clientY-rect.top<=DRAG_HEIGHT) {
       // START DRAGGING
       dragging=true;
-      // Calculate offset from window edge to cursor click point (prevents initial jump/glitch)
       grabOffset.x=e.clientX - win.offsetLeft;
       grabOffset.y=e.clientY - win.offsetTop;
       win.setPointerCapture(e.pointerId);
@@ -1984,7 +1976,7 @@ windows.forEach(win=>{
       let nx = e.clientX - grabOffset.x;
       let ny = e.clientY - grabOffset.y;
       
-      // Constrain position to visible window (prevents screen overflow)
+      // Constrain position to visible window
       nx = Math.max(0, Math.min(nx, window.innerWidth - win.offsetWidth));
       ny = Math.max(0, Math.min(ny, window.innerHeight - win.offsetHeight));
       
@@ -1993,72 +1985,49 @@ windows.forEach(win=>{
     }
     
     if (resizing) {
-      // RESIZING LOGIC
+      // RESIZING LOGIC (Only S, SE, SW directions are active based on getResizeDir)
       const dx = e.clientX - start.startX;
       const dy = e.clientY - start.startY;
       
       let newW=start.startW, newH=start.startH, newL=start.startL, newT=start.startT;
       
-      // Horizontal Resizing (East/West)
       if (resizeDir.includes('e')) newW = start.startW + dx;
       if (resizeDir.includes('w')) {
         newW = start.startW - dx; 
         newL = start.startL + dx;
       }
-
-      // Vertical Resizing (South/North)
       if (resizeDir.includes('s')) newH = start.startH + dy;
-      // The 'n' case is left here for completeness but won't be triggered by getResizeDir
-      if (resizeDir.includes('n')) {
-        newH = start.startH - dy; 
-        newT = start.startT + dy;
-      }
       
-      // --- ROBUST CONSTRAINTS (Fixes Glitching at Boundaries) ---
+      // --- CONSTRAINTS ---
       
-      // 1. Minimum Width Constraint
+      // Minimum Width
       if (newW < MIN_W) {
         if (resizeDir.includes('w')) {
-          // If resizing West, reset L based on min W
           newL = start.startL + (start.startW - MIN_W);
         }
         newW = MIN_W;
       }
       
-      // 2. Minimum Height Constraint
+      // Minimum Height
       if (newH < MIN_H) {
-        if (resizeDir.includes('n')) {
-          // If resizing North, reset T based on min H
-          newT = start.startT + (start.startH - MIN_H);
-        }
         newH = MIN_H;
       }
       
-      // 3. Screen Boundary Constraints (Prevents going off-screen)
-      
-      // Left boundary (X<0) check
+      // Screen Boundary Constraints (Left/Right)
       if (newL < 0) {
-        if (resizeDir.includes('w')) newW += newL; // Adjust width if dragging W past 0
+        if (resizeDir.includes('w')) newW += newL;
         newL = 0;
       }
-      
-      // Top boundary (Y<0) check
-      if (newT < 0) {
-        if (resizeDir.includes('n')) newH += newT; // Adjust height if dragging N past 0
-        newT = 0;
-      }
-
-      // Right boundary check
       if (newL + newW > window.innerWidth) {
         newW = Math.max(MIN_W, window.innerWidth - newL);
       }
       
-      // Bottom boundary check
+      // Screen Boundary Constraints (Top/Bottom)
+      // Since N-resizing is disabled, we only need to constrain the bottom edge.
       if (newT + newH > window.innerHeight) {
         newH = Math.max(MIN_H, window.innerHeight - newT);
       }
       
-      // Apply the final calculated position and dimensions
       win.style.width  = Math.round(newW) + 'px';
       win.style.height = Math.round(newH) + 'px';
       win.style.left   = Math.round(newL) + 'px';
@@ -2083,7 +2052,7 @@ windows.forEach(win=>{
 
 
 
-<!--FIXED SCRIP 10-->
+<!--FIXED SCRIP 11-->
 
 
 
