@@ -1853,8 +1853,7 @@ if (selectedBackground) {
 
 
 <script>
-const DRAG_HEIGHT = 50;
-const RESIZE_MARGIN = 20;
+const DRAG_HEIGHT = 50; // top area used for dragging
 
 const divs = [
   document.getElementById('settingsDiv'),
@@ -1866,51 +1865,65 @@ const divs = [
 ];
 
 divs.forEach(box => {
+    let dragging = false;
+    let offsetX = 0;
+    let offsetY = 0;
 
-  let isDragging = false;
-  let dragOffsetX = 0;
-  let dragOffsetY = 0;
+    // Convert CSS-centered (inset/margin auto) position to fixed left/top
+    function convertToAbsolute() {
+        if (box.style.inset === "auto") return; // already converted
 
-  box.addEventListener("pointerdown", e => {
-    const rect = box.getBoundingClientRect();
+        const rect = box.getBoundingClientRect();
 
-    // Only drag when clicking the top bar
-    if (e.clientY - rect.top <= DRAG_HEIGHT) {
-      isDragging = true;
-      box.setPointerCapture(e.pointerId);
+        box.style.left = rect.left + "px";
+        box.style.top = rect.top + "px";
 
-      // FIX: Correct offset calculation
-      dragOffsetX = e.pageX - box.offsetLeft;
-      dragOffsetY = e.pageY - box.offsetTop;
+        // Override CSS only AT DRAG TIME (not in stylesheet)
+        box.style.inset = "auto";
+        box.style.margin = "0";
     }
-  });
 
-  document.addEventListener("pointermove", e => {
-    if (!isDragging) return;
+    box.addEventListener("pointerdown", e => {
+        const rect = box.getBoundingClientRect();
 
-    let newX = e.pageX - dragOffsetX;
-    let newY = e.pageY - dragOffsetY;
+        // Only drag from the top header zone
+        if (e.clientY - rect.top > DRAG_HEIGHT) return;
 
-    // Keep inside screen
-    newX = Math.max(0, Math.min(newX, window.innerWidth - box.offsetWidth));
-    newY = Math.max(0, Math.min(newY, window.innerHeight - box.offsetHeight));
+        convertToAbsolute(); // apply transition from centered to left/top
 
-    // FIX: Direct positioning, no drifting
-    box.style.left = newX + "px";
-    box.style.top = newY + "px";
-  });
+        dragging = true;
+        box.setPointerCapture(e.pointerId);
 
-  document.addEventListener("pointerup", e => {
-    isDragging = false;
-    try { box.releasePointerCapture(e.pointerId); } catch {}
-  });
+        // Calculate offset exactly, preventing drift
+        offsetX = e.clientX - box.offsetLeft;
+        offsetY = e.clientY - box.offsetTop;
+    });
 
+    document.addEventListener("pointermove", e => {
+        if (!dragging) return;
+
+        let newX = e.clientX - offsetX;
+        let newY = e.clientY - offsetY;
+
+        // keep inside viewport
+        newX = Math.max(0, Math.min(newX, window.innerWidth - box.offsetWidth));
+        newY = Math.max(0, Math.min(newY, window.innerHeight - box.offsetHeight));
+
+        box.style.left = newX + "px";
+        box.style.top = newY + "px";
+    });
+
+    document.addEventListener("pointerup", e => {
+        dragging = false;
+        try { box.releasePointerCapture(e.pointerId); } catch {}
+    });
 });
 </script>
 
 
 
-<!--FIXED SCRIP 4-->
+
+<!--FIXED SCRIP 5-->
 
 
 
