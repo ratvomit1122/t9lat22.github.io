@@ -1854,7 +1854,11 @@ if (selectedBackground) {
 
 <script>
   function makeSettingsDraggableResizable() {
-    const box = document.getElementById('settingsDiv');
+      const boxes = [
+      document.getElementById('settingsDiv'),
+      document.getElementById('updateDiv'),
+      document.getElementById('hiddenDiv')
+    ];
     let isDragging = false;
     let isResizing = false;
     let startX, startY;
