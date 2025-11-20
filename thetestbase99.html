@@ -1853,7 +1853,7 @@ if (selectedBackground) {
 
 
 <script>
-  function makeDraggableAndResizable() {
+  function makeResizable() {
     const boxes = [
       document.getElementById('settingsDiv'),
       document.getElementById('updateDiv'),
@@ -1861,12 +1861,10 @@ if (selectedBackground) {
     ];
 
     boxes.forEach(box => {
-      if (!box) return;
+      if (!box) return; // Skip if div doesn't exist
       
-      let isDragging = false;
       let isResizing = false;
       let startX, startY;
-      let startLeft, startTop;
       let startWidth, startHeight;
 
       box.addEventListener('mousedown', function(e) {
@@ -1883,23 +1881,12 @@ if (selectedBackground) {
           startHeight = box.offsetHeight;
           box.style.cursor = 'nwse-resize';
           e.preventDefault();
-          return;
         }
-        
-        // Only allow dragging from top 30px
-        if (mouseY > 30) return;
-        
-        isDragging = true;
-        startX = e.clientX;
-        startY = e.clientY;
-        startLeft = box.offsetLeft;
-        startTop = box.offsetTop;
-        box.style.cursor = 'move';
-        e.preventDefault();
       });
 
+      // Change cursor when hovering over resize corner
       box.addEventListener('mousemove', function(e) {
-        if (isDragging || isResizing) return;
+        if (isResizing) return;
         
         const rect = box.getBoundingClientRect();
         const mouseX = e.clientX - rect.left;
@@ -1907,36 +1894,12 @@ if (selectedBackground) {
         
         if (mouseX > rect.width - 15 && mouseY > rect.height - 15) {
           box.style.cursor = 'nwse-resize';
-        } else if (mouseY <= 30) {
-          box.style.cursor = 'move';
         } else {
           box.style.cursor = 'default';
         }
       });
 
       document.addEventListener('mousemove', function(e) {
-        if (isDragging) {
-          const deltaX = e.clientX - startX;
-          const deltaY = e.clientY - startY;
-          let newLeft = startLeft + deltaX;
-          let newTop = startTop + deltaY;
-
-          // Keep within screen bounds
-          if (newLeft < 0) newLeft = 0;
-          if (newTop < 0) newTop = 0;
-          if (newLeft + box.offsetWidth > window.innerWidth) {
-            newLeft = window.innerWidth - box.offsetWidth;
-          }
-          if (newTop + box.offsetHeight > window.innerHeight) {
-            newTop = window.innerHeight - box.offsetHeight;
-          }
-
-          box.style.left = newLeft + 'px';
-          box.style.top = newTop + 'px';
-          box.style.margin = '0';
-          box.style.inset = 'auto';
-        }
-        
         if (isResizing) {
           const deltaX = e.clientX - startX;
           const deltaY = e.clientY - startY;
@@ -1953,7 +1916,6 @@ if (selectedBackground) {
       });
 
       document.addEventListener('mouseup', function() {
-        isDragging = false;
         isResizing = false;
         box.style.cursor = 'default';
       });
@@ -1961,7 +1923,7 @@ if (selectedBackground) {
   }
 
   // Initialize
-  makeDraggableAndResizable();
+  makeResizable();
 </script>
 <!--FIXED SCRIP 22--> 
 
