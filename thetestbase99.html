@@ -26,19 +26,23 @@
 
 @import url('https://fonts.googleapis.com/css?family=Luckiest+Guy');
 
-body {
-  /* Keep your gradient here as a fallback */
+ body {
+
   background: linear-gradient(to bottom, #000000, #3a0057, #550075);
+
   background-repeat: no-repeat;
-  background-size: cover; 
-  
-  /* Structural CSS */
+
+  background-size: cover;   /* make sure images cover the whole screen */
+
   margin: 0;
+
   padding: 0;
+
   font-family: Arial, sans-serif;
+
   text-decoration: none;
-  height: 100vh;
-}
+
+} 
 
   a{
     outline:none;
@@ -1373,146 +1377,41 @@ backdrop-filter: blur(7px);
   
 
 
+
 <script>
-// ---------------- CUSTOM BACKGROUND UPLOADER V8 (No Class, Multi-Background Inline Fix) ---------------- //
+// ---------------- CUSTOM BACKGROUND UPLOADER ---------------- //
 
-const DB_NAME = 'userBackgroundDB';
-const STORE_NAME = 'backgroundStore';
-const DB_VERSION = 1;
-const IMG_KEY = 'customBG'; 
-let currentObjectUrl = null;
+document.getElementById("bgUpload").addEventListener("change", (ev) => {
+  const file = ev.target.files[0];
+  if (!file) return;
 
-// The gradient CSS you provided, stored as a string variable
-const GRADIENT_CSS = 'linear-gradient(to bottom, #000000, #3a0057, #550075)';
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const imgData = e.target.result;
+    localStorage.setItem("customBG", imgData);
 
-
-// --- 1. Database Helper Functions (Same as before) ---
-// (Functions openDB, saveBlob, getBlob, deleteBlob remain identical)
-
-function openDB() {
-    return new Promise((resolve, reject) => {
-        const request = indexedDB.open(DB_NAME, DB_VERSION);
-        request.onupgradeneeded = (e) => {
-            const db = e.target.result;
-            if (!db.objectStoreNames.contains(STORE_NAME)) {
-                db.createObjectStore(STORE_NAME);
-            }
-        };
-        request.onsuccess = (e) => resolve(e.target.result);
-        request.onerror = (e) => reject(new Error(`IndexedDB error: ${e.target.errorCode}`));
-    });
-}
-async function saveBlob(blob) {
-    const db = await openDB();
-    return new Promise((resolve, reject) => {
-        const tx = db.transaction(STORE_NAME, 'readwrite');
-        const store = tx.objectStore(STORE_NAME);
-        const request = store.put(blob, IMG_KEY);
-        tx.oncomplete = () => resolve();
-        tx.onerror = (e) => reject(new Error(`Transaction error: ${e.target.error}`));
-    });
-}
-async function getBlob() {
-    const db = await openDB();
-    return new Promise((resolve, reject) => {
-        const tx = db.transaction(STORE_NAME, 'readonly');
-        const store = tx.objectStore(STORE_NAME);
-        const request = store.get(IMG_KEY);
-        request.onsuccess = (e) => resolve(e.target.result);
-        request.onerror = (e) => reject(new Error(`Transaction error: ${e.target.error}`));
-    });
-}
-async function deleteBlob() {
-    const db = await openDB();
-    return new Promise((resolve, reject) => {
-        const tx = db.transaction(STORE_NAME, 'readwrite');
-        const store = tx.objectStore(STORE_NAME);
-        const request = store.delete(IMG_KEY);
-        tx.oncomplete = () => resolve();
-        tx.onerror = (e) => reject(new Error(`Transaction error: ${e.target.error}`));
-    });
-}
-
-
-// --- 2. Main Application Logic (UPDATED to use inline multi-background) ---
-
-async function applyCustomBG() {
-  if (currentObjectUrl) {
-    URL.revokeObjectURL(currentObjectUrl);
-  }
-  try {
-    const blob = await getBlob();
-    if (blob) {
-      currentObjectUrl = URL.createObjectURL(blob);
-      
-      const imageUrl = `url(${currentObjectUrl})`;
-      
-      // FIX: Apply the image AND the gradient as two separate layers.
-      // Image is the first layer (on top), gradient is the second (bottom).
-      document.body.style.backgroundImage = `${imageUrl}, ${GRADIENT_CSS}`;
-      
-      // FIX: Apply 'contain' ONLY to the first image layer to prevent pixelation, 
-      // and 'cover' to the second layer (the gradient) to fill the screen.
-      document.body.style.backgroundSize = `contain, cover`;
-      
-      // Center the image layer, start the gradient at 0 0.
-      document.body.style.backgroundPosition = `center, 0 0`; 
-      
-      // Do not repeat the image layer.
-      document.body.style.backgroundRepeat = `no-repeat`;
-      
-    } else {
-      // If no image, revert to using only the gradient defined in your original CSS
-      document.body.style.backgroundImage = ''; 
-      document.body.style.backgroundSize = '';
-      document.body.style.backgroundPosition = '';
-      document.body.style.backgroundRepeat = '';
-    }
-  } catch (error) {
-    console.error("Failed to apply background:", error);
-    document.body.style.backgroundImage = '';
-  }
-}
-
-// --- 3. Event Listeners (Same as before) ---
-window.addEventListener("DOMContentLoaded", () => {
-    document.getElementById("bgUpload").addEventListener("change", async (ev) => {
-        const file = ev.target.files[0];
-        if (!file || !file.type.startsWith('image/')) {
-            if (file) alert("Please upload a valid image file.");
-            ev.target.value = null;
-            return;
-        }
-        document.body.style.cursor = 'wait'; 
-        try {
-            await saveBlob(file); 
-            await applyCustomBG();
-            alert("Custom background applied! 🎉");
-        } catch (error) {
-            console.error("Failed to process or save image:", error);
-            const errorMsg = error.message.includes('QuotaExceededError') 
-                             ? "Storage quota exceeded." 
-                             : `Error: ${error.message}`;
-            alert(`Sorry, there was an error: ${errorMsg}`);
-        } finally {
-            document.body.style.cursor = 'default';
-            ev.target.value = null;
-        }
-    });
-
-    document.getElementById("removeCustomBG").addEventListener("click", async () => {
-        try {
-            await deleteBlob();
-            location.reload(); 
-        } catch (error) {
-            console.error("Failed to remove background:", error);
-            alert("Error removing background.");
-        }
-    });
-    
-    // Apply background on load
     applyCustomBG();
+    alert("Custom background applied! 🎉");
+  };
+  reader.readAsDataURL(file);
 });
+
+document.getElementById("removeCustomBG").addEventListener("click", () => {
+  localStorage.removeItem("customBG");
+  location.reload();
+});
+
+function applyCustomBG() {
+  const custom = localStorage.getItem("customBG");
+  if (custom) {
+    document.body.style.backgroundImage = `url(${custom})`;
+    document.body.style.backgroundSize = "cover";
+    document.body.style.backgroundRepeat = "no-repeat";
+  }
+}
+
+// Apply if exists when page loads
+window.addEventListener("DOMContentLoaded", applyCustomBG);
 
 // ------------------------------------------------------------ //
 </script>
