@@ -1341,8 +1341,10 @@ backdrop-filter: blur(7px);
     <option value="classroom">Google Classroom</option>
     <option value="vocab">Vocabulary.com</option>
   </select>
-<input type="file" id="bgUpload" accept="image/*">
-<button id="removeCustomBG">Remove Custom Background</button>
+<label class="label">Upload Custom Background:</label><br>
+<input type="file" id="bgUpload" accept="image/*" style="padding:10px;">
+<button id="removeCustomBG" class="round-btn" style="background:#ff4d4d;color:white;">Remove Custom</button>
+<br><br>
 
 
 <style>
@@ -1368,57 +1370,41 @@ backdrop-filter: blur(7px);
 
 
 <script>
-// ---------------- CUSTOM BACKGROUND UPLOADER (HQ FIX) ---------------- //
+// ---------------- CUSTOM BACKGROUND UPLOADER ---------------- //
 
 document.getElementById("bgUpload").addEventListener("change", (ev) => {
   const file = ev.target.files[0];
   if (!file) return;
 
-  // ❌ Block low quality / tiny images (prevents pixelation)
-  if (file.size < 300000) { // 300KB minimum
-    alert("Image quality is too low! Please upload a higher resolution image.");
-    return;
-  }
-
   const reader = new FileReader();
   reader.onload = (e) => {
     const imgData = e.target.result;
     localStorage.setItem("customBG", imgData);
+
     applyCustomBG();
     alert("Custom background applied! 🎉");
   };
   reader.readAsDataURL(file);
 });
 
-// ❌ Remove custom BG + return to gradient
 document.getElementById("removeCustomBG").addEventListener("click", () => {
   localStorage.removeItem("customBG");
   location.reload();
 });
 
-// 🎨 Apply custom background without pixelation
 function applyCustomBG() {
   const custom = localStorage.getItem("customBG");
   if (custom) {
     document.body.style.backgroundImage = `url(${custom})`;
     document.body.style.backgroundSize = "cover";
     document.body.style.backgroundRepeat = "no-repeat";
-    document.body.style.backgroundPosition = "center";
-
-    // 🟣 Fix pixelation + keep it sharp even when zoomed
-    document.body.style.imageRendering = "auto";
-    document.body.style.filter = "blur(0px)";
-
-    // 🌌 Keep gradient behind if the image doesn’t fill screen
-    document.body.style.backgroundColor = "transparent";
-    document.body.style.backgroundBlendMode = "overlay";
   }
 }
 
-// Apply if exists on page load
+// Apply if exists when page loads
 window.addEventListener("DOMContentLoaded", applyCustomBG);
 
-// -------------------------------------------------------------------- //
+// ------------------------------------------------------------ //
 </script>
 
 
