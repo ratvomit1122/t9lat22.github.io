@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Web Browser</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+  * {
+    box-sizing: border-box;
+    font-family: system-ui, Arial, sans-serif;
+  }
+
+  body {
+    margin: 0;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background: #1e1e1e;
+  }
+
+  /* ===== Top Bar ===== */
+  #toolbar {
+    display: flex;
+    align-items: center;
+    padding: 6px;
+    background: #2b2b2b;
+    gap: 6px;
+  }
+
+  button {
+    background: #3a3a3a;
+    color: white;
+    border: none;
+    padding: 6px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+
+  button:hover {
+    background: #4a4a4a;
+  }
+
+  #url {
+    flex: 1;
+    padding: 8px;
+    border-radius: 8px;
+    border: none;
+    outline: none;
+    background: #111;
+    color: white;
+  }
+
+  /* ===== Iframe ===== */
+  #iframe {
+    flex: 1;
+    border: none;
+    width: 100%;
+    background: black;
+  }
+
+  /* ===== Bottom Bar ===== */
+  #status {
+    padding: 4px 10px;
+    font-size: 12px;
+    background: #222;
+    color: #aaa;
+  }
+</style>
+</head>
+
+<body>
+
+<!-- ===== Toolbar ===== -->
+<div id="toolbar">
+  <button id="back">◀</button>
+  <button id="forward">▶</button>
+  <button id="reload">⟳</button>
+  <button id="home">⌂</button>
+
+  <form id="search" style="flex:1">
+    <input id="url" type="text" placeholder="Search or enter URL">
+  </form>
+</div>
+
+<!-- ===== Page ===== -->
+<iframe id="iframe"></iframe>
+
+<!-- ===== Status ===== -->
+<div id="status">Ready</div>
+
+<script src="https://cdn.jsdelivr.net/gh/soap-phia/tinyjet@latest/tinyjet/scramjet.all.js" defer></script>
+
+<script type="module">
+import * as BareMux from "https://cdn.jsdelivr.net/npm/@mercuryworkshop/bare-mux/dist/index.mjs";
+
+const { ScramjetController } = $scramjetLoadController();
+const scramjet = new ScramjetController({
+  files: {
+    wasm: "https://cdn.jsdelivr.net/gh/soap-phia/tinyjet@latest/tinyjet/wasm.wasm",
+    all: "https://cdn.jsdelivr.net/gh/soap-phia/tinyjet@latest/tinyjet/scramjet.all.js",
+    sync: "https://cdn.jsdelivr.net/gh/soap-phia/tinyjet@latest/tinyjet/scramjet.sync.js"
+  }
+});
+
+scramjet.init();
+navigator.serviceWorker.register("/sw.js");
+
+const connection = new BareMux.BareMuxConnection("/bareworker.js");
+await connection.setTransport(
+  "https://cdn.jsdelivr.net/npm/@mercuryworkshop/epoxy-transport/dist/index.mjs",
+  [{ wisp: "wss://gointospace.app/wisp/" }]
+);
+
+const iframe = document.getElementById("iframe");
+const urlInput = document.getElementById("url");
+const status = document.getElementById("status");
+
+/* ===== URL Fixer ===== */
+function fixUrl(input) {
+  try {
+    return new URL(input).toString();
+  } catch {}
+
+  try {
+    let u = new URL("http://" + input);
+    if (u.hostname.includes(".")) return u.toString();
+  } catch {}
+
+  return "https://search.brave.com/search?q=" + encodeURIComponent(input);
+}
+
+/* ===== Navigation ===== */
+function navigate(input) {
+  const fixed = fixUrl(input);
+  const encoded = scramjet.encodeUrl(fixed);
+  iframe.src = encoded;
+  status.textContent = "Loading: " + fixed;
+}
+
+/* ===== Events ===== */
+document.getElementById("search").addEventListener("submit", e => {
+  e.preventDefault();
+  navigate(urlInput.value);
+});
+
+document.getElementById("back").onclick = () => iframe.contentWindow.history.back();
+document.getElementById("forward").onclick = () => iframe.contentWindow.history.forward();
+document.getElementById("reload").onclick = () => iframe.contentWindow.location.reload();
+document.getElementById("home").onclick = () => navigate("https://example.com");
+
+/* ===== Load Status ===== */
+iframe.addEventListener("load", () => {
+  status.textContent = "Loaded";
+});
+
+/* ===== Load Home ===== */
+navigate("https://example.com");
+</script>
+
+</body>
+</html>
