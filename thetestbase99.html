@@ -1922,13 +1922,15 @@ if (selectedBackground) {
    
 </style>
 
+
 <script>
 const win = document.getElementById("hiddenDiv");
 let isPositioned = false;
-let dragListeners = {};
-let resizeListeners = {};
+
+// GLOBAL STATE
 let globalDragging = false;
 let globalResizing = false;
+let startX = 0, startY = 0, startWidth = 0, startHeight = 0, startLeft = 0, startTop = 0;
 
 /* ---------- WATCHER ---------- */
 const watcher = new MutationObserver(() => {
@@ -1957,43 +1959,32 @@ watcher.observe(win, { attributes: true, attributeFilter: ["style", "class"] });
 
 /* ---------- DRAG ---------- */
 function enableDrag() {
-  if (dragListeners.mousedown) {
-    win.removeEventListener("mousedown", dragListeners.mousedown);
-  }
-
-  dragListeners.mousedown = function(e) {
+  win.addEventListener("mousedown", function(e) {
     if (e.target.classList.contains("resizer") || ["INPUT","TEXTAREA","SELECT"].includes(e.target.tagName)) return;
-
     e.preventDefault();
-    e.stopPropagation();
-
     globalDragging = true;
-    const startX = e.clientX;
-    const startY = e.clientY;
-    const startLeft = parseInt(win.style.left) || 0;
-    const startTop = parseInt(win.style.top) || 0;
 
-    win.style.userSelect = "none";
+    startX = e.clientX;
+    startY = e.clientY;
+    startLeft = parseInt(win.style.left) || 0;
+    startTop = parseInt(win.style.top) || 0;
+
     win.style.cursor = "move";
-  };
-
-  win.addEventListener("mousedown", dragListeners.mousedown);
+    document.body.style.userSelect = "none";
+  });
 }
 
 /* ---------- RESIZE ---------- */
 function enableResize() {
-  // Remove old resizer
-  const existingResizer = win.querySelector('.resizer');
-  if (existingResizer) existingResizer.remove();
+  let rz = win.querySelector(".resizer");
+  if (!rz) {
+    rz = document.createElement("div");
+    rz.className = "resizer";
+    rz.style.cssText = "position:absolute;right:0;bottom:0;width:15px;height:15px;cursor:nwse-resize;background:rgba(0,0,0,0.1);z-index:100;";
+    win.appendChild(rz);
+  }
 
-  // Create new resizer
-  const rz = document.createElement("div");
-  rz.className = "resizer";
-  rz.style.cssText = "position:absolute;right:0;bottom:0;width:15px;height:15px;cursor:nwse-resize;background:rgba(0,0,0,0.1);z-index:100;";
-  win.appendChild(rz);
-
-  // Resize start
-  rz.addEventListener("mousedown", e => {
+  rz.addEventListener("mousedown", function(e) {
     e.preventDefault();
     e.stopPropagation();
 
@@ -2009,12 +2000,9 @@ function enableResize() {
   });
 }
 
-// Global mousemove — drag & resize
-document.addEventListener("mousemove", e => {
-  // DRAG
+// GLOBAL MOUSEMOVE HANDLER
+document.addEventListener("mousemove", function(e) {
   if (globalDragging) {
-    const startLeft = parseInt(win.style.left) || 0;
-    const startTop = parseInt(win.style.top) || 0;
     let newLeft = startLeft + (e.clientX - startX);
     let newTop  = startTop  + (e.clientY - startY);
 
@@ -2025,7 +2013,6 @@ document.addEventListener("mousemove", e => {
     win.style.top  = Math.max(0, Math.min(newTop, maxY)) + "px";
   }
 
-  // RESIZE
   if (globalResizing) {
     let newWidth  = startWidth + (e.clientX - startX);
     let newHeight = startHeight + (e.clientY - startY);
@@ -2038,26 +2025,16 @@ document.addEventListener("mousemove", e => {
   }
 });
 
-// Global mouseup — stop drag & resize
-document.addEventListener("mouseup", () => {
-  if (globalDragging || globalResizing) {
-    globalDragging = false;
-    globalResizing = false;
-    document.body.style.userSelect = "";
-    win.style.cursor = "";
-  }
-});
-
-// Safety: stop if window loses focus
-window.addEventListener("blur", () => {
+// GLOBAL MOUSEUP HANDLER
+document.addEventListener("mouseup", function() {
   globalDragging = false;
   globalResizing = false;
-  document.body.style.userSelect = "";
   win.style.cursor = "";
+  document.body.style.userSelect = "";
 });
 
-// Window resize — keep on screen
-window.addEventListener('resize', () => {
+// WINDOW RESIZE SAFETY
+window.addEventListener("resize", () => {
   if (!isPositioned) return;
 
   requestAnimationFrame(() => {
@@ -2073,14 +2050,6 @@ window.addEventListener('resize', () => {
   });
 });
 </script>
-
-
-
-
-
-
-
-
 
 
 <p style="color:#acacac; position: fixed; bottom: -3px; left: 10px; opacity: 0.6;">Version 2.5</p>
