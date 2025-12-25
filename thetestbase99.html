@@ -1919,150 +1919,104 @@ if (selectedBackground) {
       opacity: 1;
     }
   }
-    #dragHandle {
-      height: 40px;
-      cursor: move;
-      background-color: rgba(255, 255, 255, 0.05);
-      border-radius: 25px 25px 0 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      user-select: none;
-      margin: -10px -10px 10px -10px;
-      padding: 10px;
-    }
-
-    #dragHandle::before {
-      content: "⋮⋮";
-      color: rgba(255, 255, 255, 0.3);
-      font-size: 20px;
-      letter-spacing: 2px;
-    }
-
-    .content {
-      padding: 20px;
-    }
-
-    .resize-handle {
-      position: absolute;
-      background-color: transparent;
-      z-index: 10;
-    }
-
-    .resize-handle.right {
-      right: -5px;
-      top: 0;
-      width: 15px;
-      height: 100%;
-      cursor: ew-resize;
-    }
-
-    .resize-handle.bottom {
-      bottom: -5px;
-      left: 0;
-      width: 100%;
-      height: 15px;
-      cursor: ns-resize;
-    }
-
-    .resize-handle.corner {
-      bottom: -5px;
-      right: -5px;
-      width: 30px;
-      height: 30px;
-      cursor: nwse-resize;
-    }
-
-    .resize-handle.corner::after {
-      content: "";
-      position: absolute;
-      bottom: 5px;
-      right: 5px;
-      width: 10px;
-      height: 10px;
-      border-right: 2px solid rgba(255, 255, 255, 0.3);
-      border-bottom: 2px solid rgba(255, 255, 255, 0.3);
-    }
+   
 </style>
 
  <script>
-    const div = document.getElementById('hiddenDiv');
-    const handle = document.getElementById('dragHandle');
-    let isDragging = false;
-    let isResizing = false;
-    let resizeType = '';
-    let offsetX, offsetY, startWidth, startHeight, startLeft, startTop;
+    // Make hiddenDiv draggable and resizable
+// Usage: Just include this script and make sure you have #hiddenDiv and #dragHandle elements
 
-    // Dragging functionality
-    handle.addEventListener('mousedown', (e) => {
-      isDragging = true;
-      offsetX = e.clientX - div.offsetLeft;
-      offsetY = e.clientY - div.offsetTop;
-      div.style.transform = 'none';
+const div = document.getElementById('hiddenDiv');
+const handle = document.getElementById('dragHandle');
+
+if (!div || !handle) {
+  console.error('Make sure you have elements with id="hiddenDiv" and id="dragHandle"');
+} else {
+  let isDragging = false;
+  let isResizing = false;
+  let resizeType = '';
+  let offsetX, offsetY, startWidth, startHeight;
+
+  // Create resize handles
+  const rightHandle = document.createElement('div');
+  rightHandle.className = 'resize-handle-right';
+  rightHandle.style.cssText = 'position: absolute; right: -5px; top: 0; width: 15px; height: 100%; cursor: ew-resize; z-index: 10;';
+  
+  const bottomHandle = document.createElement('div');
+  bottomHandle.className = 'resize-handle-bottom';
+  bottomHandle.style.cssText = 'position: absolute; bottom: -5px; left: 0; width: 100%; height: 15px; cursor: ns-resize; z-index: 10;';
+  
+  const cornerHandle = document.createElement('div');
+  cornerHandle.className = 'resize-handle-corner';
+  cornerHandle.style.cssText = 'position: absolute; bottom: -5px; right: -5px; width: 30px; height: 30px; cursor: nwse-resize; z-index: 10;';
+  
+  div.appendChild(rightHandle);
+  div.appendChild(bottomHandle);
+  div.appendChild(cornerHandle);
+
+  // Dragging functionality
+  handle.addEventListener('mousedown', (e) => {
+    isDragging = true;
+    offsetX = e.clientX - div.offsetLeft;
+    offsetY = e.clientY - div.offsetTop;
+    div.style.transform = 'none';
+    e.preventDefault();
+  });
+
+  // Resizing functionality
+  rightHandle.addEventListener('mousedown', startResize('right'));
+  bottomHandle.addEventListener('mousedown', startResize('bottom'));
+  cornerHandle.addEventListener('mousedown', startResize('corner'));
+
+  function startResize(type) {
+    return function(e) {
+      e.stopPropagation();
       e.preventDefault();
-    });
+      isResizing = true;
+      resizeType = type;
+      startWidth = div.offsetWidth;
+      startHeight = div.offsetHeight;
+      offsetX = e.clientX;
+      offsetY = e.clientY;
+    };
+  }
 
-    // Resizing functionality
-    document.querySelectorAll('.resize-handle').forEach(resizeHandle => {
-      resizeHandle.addEventListener('mousedown', (e) => {
-        e.stopPropagation();
-        e.preventDefault();
-        isResizing = true;
-        resizeType = resizeHandle.classList.contains('right') ? 'right' :
-                     resizeHandle.classList.contains('bottom') ? 'bottom' : 'corner';
-        
-        startLeft = div.offsetLeft;
-        startTop = div.offsetTop;
-        startWidth = div.offsetWidth;
-        startHeight = div.offsetHeight;
-        offsetX = e.clientX;
-        offsetY = e.clientY;
-      });
-    });
+  document.addEventListener('mousemove', (e) => {
+    if (isDragging) {
+      e.preventDefault();
+      const newLeft = e.clientX - offsetX;
+      const newTop = e.clientY - offsetY;
+      div.style.left = newLeft + 'px';
+      div.style.top = newTop + 'px';
+    }
 
-    document.addEventListener('mousemove', (e) => {
-      if (isDragging) {
-        e.preventDefault();
-        const newLeft = e.clientX - offsetX;
-        const newTop = e.clientY - offsetY;
-        div.style.left = newLeft + 'px';
-        div.style.top = newTop + 'px';
-      }
+    if (isResizing) {
+      e.preventDefault();
+      const deltaX = e.clientX - offsetX;
+      const deltaY = e.clientY - offsetY;
 
-      if (isResizing) {
-        e.preventDefault();
-        const deltaX = e.clientX - offsetX;
-        const deltaY = e.clientY - offsetY;
-
-        if (resizeType === 'right' || resizeType === 'corner') {
-          const newWidth = startWidth + deltaX;
-          if (newWidth > 200) {
-            div.style.width = newWidth + 'px';
-          }
-        }
-        if (resizeType === 'bottom' || resizeType === 'corner') {
-          const newHeight = startHeight + deltaY;
-          if (newHeight > 100) {
-            div.style.height = newHeight + 'px';
-          }
+      if (resizeType === 'right' || resizeType === 'corner') {
+        const newWidth = startWidth + deltaX;
+        if (newWidth > 200) {
+          div.style.width = newWidth + 'px';
         }
       }
-    });
-
-    document.addEventListener('mouseup', () => {
-      isDragging = false;
-      isResizing = false;
-    });
-
-    function toggleDiv() {
-      if (div.style.display === 'none') {
-        div.style.display = 'block';
-      } else {
-        div.style.display = 'none';
+      if (resizeType === 'bottom' || resizeType === 'corner') {
+        const newHeight = startHeight + deltaY;
+        if (newHeight > 100) {
+          div.style.height = newHeight + 'px';
+        }
       }
     }
+  });
+
+  document.addEventListener('mouseup', () => {
+    isDragging = false;
+    isResizing = false;
+  });
+}
   </script>
-  
+
 <p style="color:#acacac; position: fixed; bottom: -3px; left: 10px; opacity: 0.6;">Version 2.5</p>
 
 </body>
