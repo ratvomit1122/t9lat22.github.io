@@ -1925,107 +1925,83 @@ if (selectedBackground) {
 <script>
 const win = document.getElementById("hiddenDiv");
 
-/* ---------- WAIT FOR ANIMATION TO FINISH ---------- */
-win.addEventListener("animationend", () => {
-  const r = win.getBoundingClientRect();
+function centerAndActivate() {
+  win.style.display = "block";
 
-  // Freeze centered position
-  win.style.left = r.left + "px";
-  win.style.top = r.top + "px";
-  win.style.margin = "0";
-  win.style.inset = "unset";
+  // force browser to calculate layout first
+  requestAnimationFrame(() => {
+    const w = win.offsetWidth;
+    const h = win.offsetHeight;
 
-  enableDrag();
-  enableResize();
-}, { once:true });
-
-/* ---------- DRAG ---------- */
-function enableDrag() {
-  let dragging = false, sx, sy, sl, st;
-
-  win.addEventListener("mousedown", e => {
-    if (e.target.classList.contains("resizer")) return;
-    dragging = true;
-    sx = e.clientX;
-    sy = e.clientY;
-    sl = win.offsetLeft;
-    st = win.offsetTop;
-
-    document.addEventListener("mousemove", dragMove);
-    document.addEventListener("mouseup", stopDrag);
-  });
-
-  function dragMove(e) {
-    if (!dragging) return;
-
-    let x = sl + (e.clientX - sx);
-    let y = st + (e.clientY - sy);
-
-    x = Math.max(0, Math.min(x, window.innerWidth - win.offsetWidth));
-    y = Math.max(0, Math.min(y, window.innerHeight - win.offsetHeight));
+    const x = (window.innerWidth - w) / 2;
+    const y = (window.innerHeight - h) / 2;
 
     win.style.left = x + "px";
     win.style.top = y + "px";
-  }
+    win.style.margin = "0";
+    win.style.inset = "unset";
 
-  function stopDrag() {
-    dragging = false;
-    document.removeEventListener("mousemove", dragMove);
-    document.removeEventListener("mouseup", stopDrag);
-  }
+    enableDrag();
+    enableResize();
+  });
+}
+
+/* call this when you open the div */
+window.openHiddenDiv = centerAndActivate;
+
+
+/* ---------- DRAG ---------- */
+function enableDrag() {
+  let dragging=false, sx, sy, sl, st;
+
+  win.onmousedown = e => {
+    if (e.target.className === "resizer") return;
+    dragging=true;
+    sx=e.clientX; sy=e.clientY;
+    sl=win.offsetLeft; st=win.offsetTop;
+
+    document.onmousemove = ev=>{
+      if(!dragging) return;
+      let x=sl+(ev.clientX-sx);
+      let y=st+(ev.clientY-sy);
+      x=Math.max(0,Math.min(x,window.innerWidth-win.offsetWidth));
+      y=Math.max(0,Math.min(y,window.innerHeight-win.offsetHeight));
+      win.style.left=x+"px";
+      win.style.top=y+"px";
+    };
+    document.onmouseup = ()=>dragging=false;
+  };
 }
 
 /* ---------- RESIZE ---------- */
 function enableResize() {
-  const resizer = document.createElement("div");
-  resizer.className = "resizer";
-  win.appendChild(resizer);
+  const r=document.createElement("div");
+  r.className="resizer";
+  win.appendChild(r);
+  r.style.cssText="position:absolute;right:10px;bottom:10px;width:18px;height:18px;cursor:nwse-resize;background:rgba(255,255,255,0.35);border-radius:4px;";
 
-  resizer.style.cssText = `
-    position:absolute;
-    right:10px;
-    bottom:10px;
-    width:18px;
-    height:18px;
-    cursor:nwse-resize;
-    background:rgba(255,255,255,0.35);
-    border-radius:4px;
-  `;
+  let resizing=false,sw,sh,sx,sy;
 
-  let resizing = false, sw, sh, sx, sy;
-
-  resizer.addEventListener("mousedown", e => {
+  r.onmousedown=e=>{
     e.stopPropagation();
-    resizing = true;
-    sw = win.offsetWidth;
-    sh = win.offsetHeight;
-    sx = e.clientX;
-    sy = e.clientY;
+    resizing=true;
+    sw=win.offsetWidth; sh=win.offsetHeight;
+    sx=e.clientX; sy=e.clientY;
 
-    document.addEventListener("mousemove", resizeMove);
-    document.addEventListener("mouseup", stopResize);
-  });
-
-  function resizeMove(e) {
-    if (!resizing) return;
-
-    let w = sw + (e.clientX - sx);
-    let h = sh + (e.clientY - sy);
-
-    w = Math.max(320, Math.min(w, window.innerWidth - win.offsetLeft));
-    h = Math.max(240, Math.min(h, window.innerHeight - win.offsetTop));
-
-    win.style.width = w + "px";
-    win.style.height = h + "px";
-  }
-
-  function stopResize() {
-    resizing = false;
-    document.removeEventListener("mousemove", resizeMove);
-    document.removeEventListener("mouseup", stopResize);
-  }
+    document.onmousemove=ev=>{
+      if(!resizing) return;
+      let w=sw+(ev.clientX-sx);
+      let h=sh+(ev.clientY-sy);
+      w=Math.max(320,Math.min(w,window.innerWidth-win.offsetLeft));
+      h=Math.max(240,Math.min(h,window.innerHeight-win.offsetTop));
+      win.style.width=w+"px";
+      win.style.height=h+"px";
+    };
+    document.onmouseup=()=>resizing=false;
+  };
 }
 </script>
+
 
 
 
