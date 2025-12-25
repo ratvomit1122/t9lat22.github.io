@@ -1918,62 +1918,57 @@ if (selectedBackground) {
 <p style="color:#acacac; position: fixed; bottom: -3px; left: 10px; opacity: 0.6;">Version 2.5</p>
 <p style="color:#acacac; position: fixed; bottom: -3px; left: 100px; opacity: 0.6;">ID:<span id="myId"></span></p>
 
-  <script>
-    /* ================= CONFIG ================= */
-    const OWNER_ID = "1766701613355429984";
-    const ID_KEY = "numericUserID";
-    const BAN_LIST_KEY = "bannedIDs";
-    /* ========================================== */
+<script>
+  const OWNER_ID = "1766701613"; // example shorter owner ID
+  const ID_KEY = "numericUserID";
+  const BAN_LIST_KEY = "bannedIDs";
 
-    function generateNumericID() {
-      return `${Date.now()}${Math.floor(Math.random() * 1_000_000)}`;
-    }
+  function generateNumericID() {
+    const timestamp = Date.now().toString().slice(-6); // last 6 digits
+    const random = Math.floor(Math.random() * 10000).toString().padStart(4,'0'); // 4 digits
+    return random + timestamp; // ~10 digits total
+  }
 
-    // Get or create ID
-    let myID = localStorage.getItem(ID_KEY);
-    if (!myID) {
-      myID = generateNumericID();
-      localStorage.setItem(ID_KEY, myID);
-    }
+  let myID = localStorage.getItem(ID_KEY);
+  if (!myID) {
+    myID = generateNumericID();
+    localStorage.setItem(ID_KEY, myID);
+  }
 
-    document.getElementById("myId").textContent = myID;
+  document.getElementById("myId").textContent = myID;
 
-    // Load bans
-    let bannedIDs = JSON.parse(localStorage.getItem(BAN_LIST_KEY)) || [];
+  let bannedIDs = JSON.parse(localStorage.getItem(BAN_LIST_KEY)) || [];
 
-    // BAN CHECK
-    if (bannedIDs.includes(myID)) {
-      document.getElementById("banOverlay").style.display = "flex";
+  if (bannedIDs.includes(myID)) {
+    document.getElementById("banOverlay").style.display = "flex";
+    document.addEventListener("keydown", e => e.preventDefault(), true);
+    document.addEventListener("mousedown", e => e.preventDefault(), true);
+    document.addEventListener("touchstart", e => e.preventDefault(), true);
+    document.addEventListener("contextmenu", e => e.preventDefault(), true);
+    document.body.style.overflow = "hidden";
+  }
 
-      // HARD LOCK INPUT
-      document.addEventListener("keydown", e => e.preventDefault(), true);
-      document.addEventListener("mousedown", e => e.preventDefault(), true);
-      document.addEventListener("touchstart", e => e.preventDefault(), true);
-      document.addEventListener("contextmenu", e => e.preventDefault(), true);
-      document.body.style.overflow = "hidden";
-    }
+  if (myID === OWNER_ID) {
+    document.getElementById("ownerPanel").classList.remove("hidden");
+  }
 
-    // OWNER CHECK
-    if (myID === OWNER_ID) {
-      document.getElementById("ownerPanel").classList.remove("hidden");
-    }
-
-    function banUser() {
-      const id = document.getElementById("banIdInput").value.trim();
-      if (id && !bannedIDs.includes(id)) {
-        bannedIDs.push(id);
-        localStorage.setItem(BAN_LIST_KEY, JSON.stringify(bannedIDs));
-        alert("User banned");
-      }
-    }
-
-    function unbanUser() {
-      const id = document.getElementById("banIdInput").value.trim();
-      bannedIDs = bannedIDs.filter(b => b !== id);
+  function banUser() {
+    const id = document.getElementById("banIdInput").value.trim();
+    if (id && !bannedIDs.includes(id)) {
+      bannedIDs.push(id);
       localStorage.setItem(BAN_LIST_KEY, JSON.stringify(bannedIDs));
-        alert("User unbanned");
+      alert("User banned");
     }
-  </script>
+  }
+
+  function unbanUser() {
+    const id = document.getElementById("banIdInput").value.trim();
+    bannedIDs = bannedIDs.filter(b => b !== id);
+    localStorage.setItem(BAN_LIST_KEY, JSON.stringify(bannedIDs));
+    alert("User unbanned");
+  }
+</script>
+
 
 
 </body>
