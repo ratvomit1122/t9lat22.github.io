@@ -1919,46 +1919,28 @@ if (selectedBackground) {
 <p style="color:#acacac; position: fixed; bottom: -3px; left: 100px; opacity: 0.6;">ID:<span id="myId"></span></p>
 
 <script>
-  /* ================= CONFIG ================= */
-  const OWNER_ID = "1766701613"; // shorter example owner ID
+  const OWNER_ID = "1766701613"; // example shorter owner ID
   const ID_KEY = "numericUserID";
   const BAN_LIST_KEY = "bannedIDs";
-  /* ========================================== */
 
   function generateNumericID() {
     const timestamp = Date.now().toString().slice(-6); // last 6 digits
     const random = Math.floor(Math.random() * 10000).toString().padStart(4,'0'); // 4 digits
-    return random + timestamp; // ~10 digits
+    return random + timestamp; // ~10 digits total
   }
 
-  // Get or create ID
   let myID = localStorage.getItem(ID_KEY);
   if (!myID) {
     myID = generateNumericID();
     localStorage.setItem(ID_KEY, myID);
   }
 
-  // Display ID
-  document.getElementById("idValue").textContent = myID;
+  document.getElementById("myId").textContent = myID;
 
-  // Load ban list
   let bannedIDs = JSON.parse(localStorage.getItem(BAN_LIST_KEY)) || [];
 
-  // BAN CHECK
-  function lockScreen() {
-    document.body.innerHTML = "";
-    document.body.style.background = "red";
-    document.body.style.color = "white";
-    document.body.style.display = "flex";
-    document.body.style.justifyContent = "center";
-    document.body.style.alignItems = "center";
-    document.body.style.fontSize = "40px";
-    document.body.innerText = "BANNED";
-  }
-
   if (bannedIDs.includes(myID)) {
-    lockScreen();
-    // HARD LOCK INPUT
+    document.getElementById("banOverlay").style.display = "flex";
     document.addEventListener("keydown", e => e.preventDefault(), true);
     document.addEventListener("mousedown", e => e.preventDefault(), true);
     document.addEventListener("touchstart", e => e.preventDefault(), true);
@@ -1966,34 +1948,27 @@ if (selectedBackground) {
     document.body.style.overflow = "hidden";
   }
 
-  // OWNER SHORTCUT: Press "," key to ban/unban
-  document.addEventListener("keydown", (e) => {
-    if (myID !== OWNER_ID) return; // only owner can do this
-    if (e.key === ",") {
-      const action = prompt("Type 'ban' to ban or 'unban' to unban:");
-      if (!action) return;
+  if (myID === OWNER_ID) {
+    document.getElementById("ownerPanel").classList.remove("hidden");
+  }
 
-      const targetID = prompt("Enter the ID to " + action + ":");
-      if (!targetID) return;
-
-      if (action.toLowerCase() === "ban") {
-        if (!bannedIDs.includes(targetID)) {
-          bannedIDs.push(targetID);
-          localStorage.setItem(BAN_LIST_KEY, JSON.stringify(bannedIDs));
-          alert("User banned: " + targetID);
-        } else {
-          alert("User is already banned.");
-        }
-      } else if (action.toLowerCase() === "unban") {
-        bannedIDs = bannedIDs.filter(id => id !== targetID);
-        localStorage.setItem(BAN_LIST_KEY, JSON.stringify(bannedIDs));
-        alert("User unbanned: " + targetID);
-      } else {
-        alert("Invalid action.");
-      }
+  function banUser() {
+    const id = document.getElementById("banIdInput").value.trim();
+    if (id && !bannedIDs.includes(id)) {
+      bannedIDs.push(id);
+      localStorage.setItem(BAN_LIST_KEY, JSON.stringify(bannedIDs));
+      alert("User banned");
     }
-  });
+  }
+
+  function unbanUser() {
+    const id = document.getElementById("banIdInput").value.trim();
+    bannedIDs = bannedIDs.filter(b => b !== id);
+    localStorage.setItem(BAN_LIST_KEY, JSON.stringify(bannedIDs));
+    alert("User unbanned");
+  }
 </script>
+
 
 
 
