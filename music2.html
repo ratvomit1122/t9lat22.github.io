@@ -1,4 +1,3 @@
-
 <!doctype html>
 <html lang="en">
   <head>
@@ -716,6 +715,8 @@
         let isFavorite = false;
         let favorites = JSON.parse(localStorage.getItem('favorites')) || [];
         let currentFavoriteIndex = -1;
+        let isLooping = false;
+        
         async function loadYouTubeAPI(retries = 3, delay = 2000) {
           return new Promise((resolve, reject) => {
             if (window.YT && window.YT.Player) {
@@ -736,6 +737,7 @@
             window.onYouTubeIframeAPIReady = () => resolve();
           });
         }
+        
         async function initPlayer() {
           try {
             await loadYouTubeAPI();
@@ -750,7 +752,7 @@
                 modestbranding: 1,
                 rel: 0,
                 showinfo: 0,
-                autoplay: 0
+                autoplay: 0  // Disable autoplay
               },
               events: {
                 onReady: () => {
@@ -761,12 +763,8 @@
                   document.addEventListener('mousemove', dragSeek);
                   document.addEventListener('mouseup', endSeek);
                   setInterval(updateProgress, 500);
-                  if (favorites.length > 0) {
-                    const lastPlayed = JSON.parse(localStorage.getItem('lastPlayed'));
-                    if (lastPlayed) {
-                      playSong(lastPlayed.title, lastPlayed.artist, lastPlayed.artwork, lastPlayed.genre);
-                    }
-                  }
+                  
+                  // REMOVED: No auto-play of last played song
                 },
                 onStateChange: (event) => {
                   if (event.data === window.YT.PlayerState.PLAYING) {
@@ -794,6 +792,7 @@
             searchResults.innerHTML = '<div class="error-message">Unable to initialize player. Please refresh the page.</div>';
           }
         }
+        
         function toggleMute() {
           if (!player || !playerReady) return;
           if (isMuted) {
@@ -806,6 +805,7 @@
             isMuted = true;
           }
         }
+        
         searchInput.addEventListener('input', function () {
           clearTimeout(searchTimeout);
           searchTimeout = setTimeout(() => {
@@ -817,6 +817,7 @@
             }
           }, 500);
         });
+        
         searchInput.addEventListener('keypress', function (e) {
           if (e.key === 'Enter') {
             clearTimeout(searchTimeout);
@@ -826,6 +827,7 @@
             }
           }
         });
+        
         async function searchSongs(query) {
           searchResults.innerHTML = '<div class="loading">Searching...</div>';
           showSearchResults();
@@ -838,6 +840,7 @@
             searchResults.innerHTML = '<div class="error-message">Search failed. Please try again.</div>';
           }
         }
+        
         function displaySearchResults(results) {
           if (!results || results.length === 0) {
             searchResults.innerHTML = '<div class="loading">No results found</div>';
@@ -866,12 +869,15 @@
             searchResults.appendChild(resultElement);
           });
         }
+        
         function showSearchResults() {
           searchResults.classList.add('active');
         }
+        
         function hideSearchResults() {
           searchResults.classList.remove('active');
         }
+        
         function playSong(title, artist, artwork, genre = '') {
           trackTitle.textContent = title;
           artistName.textContent = artist;
@@ -885,9 +891,16 @@
           localStorage.setItem('lastPlayed', JSON.stringify(currentTrack));
           isFavorite = favorites.some((fav) => fav.title === title && fav.artist === artist);
           favoriteBtn.className = isFavorite ? 'fa-solid fa-heart control-btn' : 'fa-regular fa-heart control-btn';
+          
+          // Set player to not playing state
+          isPlaying = false;
+          playPauseBtn.classList.remove('fa-pause');
+          playPauseBtn.classList.add('fa-play');
+          
           const searchQuery = `${title} ${artist}`;
           getYT(searchQuery);
         }
+        
         function getYT(query) {
           const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(query)}&key=${YT_KEY}&type=video&maxResults=1`;
           fetch(url)
@@ -904,27 +917,31 @@
               searchResults.innerHTML = '<div class="error-message">Failed to search YouTube. Please try again.</div>';
             });
         }
+        
         function loadVid(videoId) {
           if (player && playerReady && player.loadVideoById) {
             player.loadVideoById(videoId);
-            setTimeout(() => {
-              if (!isMuted) player.unMute();
-              player.playVideo();
-            }, 100);
+            // REMOVED: No auto-play after loading
+            // Reset player state
+            isPlaying = false;
+            playPauseBtn.classList.remove('fa-pause');
+            playPauseBtn.classList.add('fa-play');
           } else {
             initPlayer().then(() => {
               if (player && playerReady && player.loadVideoById) {
                 player.loadVideoById(videoId);
-                setTimeout(() => {
-                  if (!isMuted) player.unMute();
-                  player.playVideo();
-                }, 100);
+                // REMOVED: No auto-play after loading
+                // Reset player state
+                isPlaying = false;
+                playPauseBtn.classList.remove('fa-pause');
+                playPauseBtn.classList.add('fa-play');
               } else {
                 searchResults.innerHTML = '<div class="error-message">Unable to initialize player. Please refresh the page.</div>';
               }
             });
           }
         }
+        
         lyricsToggle.addEventListener('click', function () {
           showingLyrics = !showingLyrics;
           if (showingLyrics) {
@@ -942,6 +959,7 @@
             lyricsToggle.innerHTML = '<i class="fa-solid fa-align-left"></i>';
           }
         });
+        
         async function fetchLyrics(artist, title) {
           lyricsContent.textContent = 'Loading lyrics...';
           const cleanArtist = encodeURIComponent(artist.trim());
@@ -1003,6 +1021,7 @@
             lyricsContent.textContent = 'No lyrics available.';
           }
         }
+        
         function togglePlayback() {
           if (!player || !playerReady) return;
           if (isPlaying) {
@@ -1011,21 +1030,25 @@
             player.playVideo();
           }
         }
+        
         function startSeek(e) {
           if (!player || !playerReady) return;
           isDragging = true;
           seekBar.classList.add('active');
           updateSeekPosition(e);
         }
+        
         function dragSeek(e) {
           if (isDragging) updateSeekPosition(e);
         }
+        
         function endSeek() {
           if (isDragging) {
             isDragging = false;
             seekBar.classList.remove('active');
           }
         }
+        
         function updateSeekPosition(e) {
           if (!player || !playerReady || !player.getDuration) return;
           const rect = seekBar.getBoundingClientRect();
@@ -1035,6 +1058,7 @@
           const duration = player.getDuration();
           player.seekTo(percent * duration, true);
         }
+        
         function updateProgress() {
           if (!player || !playerReady || !player.getDuration || isDragging) return;
           try {
@@ -1046,6 +1070,7 @@
             remainingTimeSpan.textContent = '-' + formatTime(duration - currentTime);
           } catch (error) {}
         }
+        
         function formatTime(seconds) {
           const minutes = Math.floor(seconds / 60);
           const secs = Math.floor(seconds % 60)
@@ -1053,24 +1078,28 @@
             .padStart(2, '0');
           return `${minutes}:${secs}`;
         }
+        
         document.addEventListener('click', function (e) {
           if (!searchResults.contains(e.target) && e.target !== searchInput) {
             hideSearchResults();
             favoritesColumn.classList.remove('active');
           }
         });
+        
         function minustenseconds() {
           if (!player || !playerReady || !player.getCurrentTime || !player.getDuration) return;
           const currentTime = player.getCurrentTime();
           const newTime = Math.max(0, currentTime - 10);
           player.seekTo(newTime, true);
         }
+        
         function minusfiveseconds() {
           if (!player || !playerReady || !player.getCurrentTime || !player.getDuration) return;
           const currentTime = player.getCurrentTime();
           const newTime = Math.max(0, currentTime - 5);
           player.seekTo(newTime, true);
         }
+        
         function plusfiveseconds() {
           if (!player || !playerReady || !player.getCurrentTime || !player.getDuration) return;
           const currentTime = player.getCurrentTime();
@@ -1078,6 +1107,7 @@
           const newTime = Math.min(currentTime + 5, duration);
           player.seekTo(newTime, true);
         }
+        
         function plustenseconds() {
           if (!player || !playerReady || !player.getCurrentTime || !player.getDuration) return;
           const currentTime = player.getCurrentTime();
@@ -1085,6 +1115,7 @@
           const newTime = Math.min(currentTime + 10, duration);
           player.seekTo(newTime, true);
         }
+        
         favoriteBtn.addEventListener('click', () => {
           if (favorites.length >= 10) {
             alert('Maximum 10 favorites allowed!');
@@ -1101,10 +1132,12 @@
           favoriteBtn.className = isFavorite ? 'fa-solid fa-heart control-btn' : 'fa-regular fa-heart control-btn';
           updateFavorites();
         });
+        
         favoritesBtn.addEventListener('click', () => {
           favoritesColumn.classList.toggle('active');
           updateFavorites();
         });
+        
         function updateFavorites() {
           favoritesColumn.innerHTML = `
 <div class="favorites-title">Favorites</div>
@@ -1131,6 +1164,7 @@ ${favorites
             newPlayFavoritesBtn.addEventListener('click', playFavorites);
           }
         }
+        
         function removeFavorite(title, artist) {
           favorites = favorites.filter((fav) => fav.title !== title || fav.artist !== artist);
           localStorage.setItem('favorites', JSON.stringify(favorites));
@@ -1139,6 +1173,7 @@ ${favorites
           }
           updateFavorites();
         }
+        
         function skipFavoritePrev(title, artist) {
           const index = favorites.findIndex((fav) => fav.title === title && fav.artist === artist);
           if (index > 0) {
@@ -1159,6 +1194,7 @@ ${favorites
             );
           }
         }
+        
         function skipFavoriteNext(title, artist) {
           const index = favorites.findIndex((fav) => fav.title === title && fav.artist === artist);
           if (index < favorites.length - 1) {
@@ -1179,11 +1215,13 @@ ${favorites
             );
           }
         }
+        
         function playFavorites() {
           if (favorites.length === 0) return;
           currentFavoriteIndex = 0;
           playSong(favorites[0].title, favorites[0].artist, favorites[0].artwork, favorites[0].genre);
         }
+        
         function playNextFavorite() {
           if (currentFavoriteIndex < favorites.length - 1) {
             currentFavoriteIndex++;
@@ -1198,22 +1236,28 @@ ${favorites
             playSong(favorites[0].title, favorites[0].artist, favorites[0].artwork, favorites[0].genre);
           }
         }
+        
         window.addEventListener('DOMContentLoaded', () => {
           document.querySelector('#backward10')?.addEventListener('click', minustenseconds);
           document.querySelector('#backward5')?.addEventListener('click', minusfiveseconds);
           document.querySelector('#forward5')?.addEventListener('click', plusfiveseconds);
           document.querySelector('#forward10')?.addEventListener('click', plustenseconds);
+          
           const loopToggle = document.querySelector('#loopToggle');
-          let isLooping = false;
           loopToggle.addEventListener('click', () => {
             isLooping = !isLooping;
             loopToggle.className = isLooping ? 'fa-solid fa-repeat-1 control-btn' : 'fa-solid fa-repeat control-btn';
           });
+          
+          // Initialize player state
+          isPlaying = false;
+          playPauseBtn.classList.remove('fa-pause');
+          playPauseBtn.classList.add('fa-play');
+          
           updateFavorites();
           initPlayer();
         });
       </script>
-      <script src="/storage/js/settings.js"></script>
     </div>
   </body>
 </html>
