@@ -1969,12 +1969,12 @@ if (!dragHandle) {
   dragHandle.className = "drag-handle";
   dragHandle.style.position = "absolute";
   dragHandle.style.top = "0";
-  dragHandle.style.left = "0";
+  dragHandle.style.left = "50px"; // Start after the buttons
   dragHandle.style.right = "0";
   dragHandle.style.height = "40px";
   dragHandle.style.cursor = "move";
   dragHandle.style.zIndex = "5";
-  dragHandle.style.pointerEvents = "auto";
+  dragHandle.style.pointerEvents = "none"; // ← allow clicks through
   win.appendChild(dragHandle);
 }
 
@@ -2003,7 +2003,6 @@ let startY = 0;
 let startWidth = 0;
 let startHeight = 0;
 let hasBeenPositioned = false;
-let hasMoved = false;
 
 // Disable iframe pointer events during drag/resize
 function disableIframe() {
@@ -2020,18 +2019,12 @@ function enableIframe() {
   });
 }
 
-dragHandle.addEventListener("mousedown", e => {
-  // Don't interfere with buttons or elements with onclick
-  if (e.target.tagName === 'BUTTON' || 
-      e.target.closest('button') || 
-      e.target.hasAttribute('onclick') ||
-      e.target.closest('[onclick]')) {
-    return;
-  }
-  
+// START DRAG FROM TOP BAR ONLY
+win.addEventListener("mousedown", e => {
   const rect = win.getBoundingClientRect();
-  
-  // Convert positioning BEFORE setting isDragging
+  const y = e.clientY - rect.top;
+  if (y > 40 || isResizing) return;   // only titlebar
+
   if (!hasBeenPositioned) {
     win.style.transform = 'none';
     win.style.margin = '0';
@@ -2040,22 +2033,20 @@ dragHandle.addEventListener("mousedown", e => {
     win.style.top = rect.top + 'px';
     hasBeenPositioned = true;
   }
-  
+
   isDragging = true;
-  hasMoved = false;
   disableIframe();
-  
+
   offsetX = e.clientX - rect.left;
   offsetY = e.clientY - rect.top;
-  
+
+  dragHandle.style.pointerEvents = "auto"; // enable drag capture
   e.preventDefault();
-  e.stopPropagation();
 });
 
 resizer.addEventListener("mousedown", e => {
   const rect = win.getBoundingClientRect();
-  
-  // Convert positioning BEFORE setting isResizing
+
   if (!hasBeenPositioned) {
     win.style.transform = 'none';
     win.style.margin = '0';
@@ -2064,25 +2055,24 @@ resizer.addEventListener("mousedown", e => {
     win.style.top = rect.top + 'px';
     hasBeenPositioned = true;
   }
-  
+
   isResizing = true;
   disableIframe();
-  
+
   startX = e.clientX;
   startY = e.clientY;
   startWidth = rect.width;
   startHeight = rect.height;
-  
+
   win.style.width = startWidth + 'px';
   win.style.height = startHeight + 'px';
-  
+
   e.preventDefault();
   e.stopPropagation();
 });
 
 document.addEventListener("mousemove", e => {
   if (isDragging) {
-    hasMoved = true;
     let newLeft = e.clientX - offsetX;
     let newTop = e.clientY - offsetY;
 
@@ -2117,21 +2107,17 @@ document.addEventListener("mousemove", e => {
 });
 
 document.addEventListener("mouseup", () => {
-  if (isDragging || isResizing) {
-    enableIframe();
-  }
+  if (isDragging || isResizing) enableIframe();
+  dragHandle.style.pointerEvents = "none";
   isDragging = false;
   isResizing = false;
-  hasMoved = false;
 });
 
 document.addEventListener("mouseleave", () => {
-  if (isDragging || isResizing) {
-    enableIframe();
-  }
+  if (isDragging || isResizing) enableIframe();
+  dragHandle.style.pointerEvents = "none";
   isDragging = false;
   isResizing = false;
-  hasMoved = false;
 });
 
 window.addEventListener("resize", () => {
@@ -2148,8 +2134,9 @@ window.addEventListener("resize", () => {
     win.style.top = Math.max(0, Math.min(top, maxY)) + "px";
   }
 });
+
 </script>
-<!--Test3-->
+<!--Test4-->
 
 
 
