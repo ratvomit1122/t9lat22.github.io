@@ -2151,6 +2151,88 @@ if (selectedBackground) {
 <!--test2-->
 
 
+<script>
+/* ===============================
+   T9 OS – Hidden Iframe Freeze & Mute
+   =============================== */
+
+const APP_WINDOWS = [
+  "hiddenDiv",
+  "aiDiv",
+  "movieDiv",
+  "terminalDiv",
+  "searchDiv",
+  "ChatDiv",
+  "emulatorDiv",
+  "appsDiv"
+];
+
+const PAUSE_MESSAGE = { type: "pause" };
+const RESUME_MESSAGE = { type: "resume" };
+const MUTE_MESSAGE = { type: "mute" };
+const UNMUTE_MESSAGE = { type: "unmute" };
+
+// Send message to iframe to pause/resume/mute/unmute
+function sendMessage(frame, message) {
+  frame.contentWindow?.postMessage(message, "*");
+}
+
+// Freeze and mute iframe
+function freezeIframe(frame) {
+  sendMessage(frame, PAUSE_MESSAGE);
+  sendMessage(frame, MUTE_MESSAGE);
+  frame.dataset.paused = "true";
+}
+
+// Restore and unmute iframe
+function restoreIframe(frame) {
+  sendMessage(frame, RESUME_MESSAGE);
+  sendMessage(frame, UNMUTE_MESSAGE);
+  delete frame.dataset.paused;
+}
+
+// Freeze/mute all iframes in a container
+function freezeContainer(containerId) {
+  const box = document.getElementById(containerId);
+  if (!box) return;
+
+  box.querySelectorAll("iframe").forEach(frame => freezeIframe(frame));
+}
+
+// Restore/unmute all iframes in a container
+function restoreContainer(containerId) {
+  const box = document.getElementById(containerId);
+  if (!box) return;
+
+  box.querySelectorAll("iframe").forEach(frame => restoreIframe(frame));
+}
+
+// Observe div visibility changes
+APP_WINDOWS.forEach(id => {
+  const box = document.getElementById(id);
+  if (!box) return;
+
+  const observer = new MutationObserver(() => {
+    if (getComputedStyle(box).display === "none") {
+      freezeContainer(id);
+    } else {
+      restoreContainer(id);
+    }
+  });
+
+  observer.observe(box, { attributes: true, attributeFilter: ["style"] });
+});
+
+// Pause/mute everything if browser tab is hidden
+document.addEventListener("visibilitychange", () => {
+  if (document.hidden) {
+    APP_WINDOWS.forEach(freezeContainer);
+  } else {
+    APP_WINDOWS.forEach(restoreContainer);
+  }
+});
+</script>
+
 
 
 
