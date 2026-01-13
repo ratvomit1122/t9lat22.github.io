@@ -757,15 +757,73 @@ border: 1px solid rgba(255, 255, 255, 0.15);
  <span id="wIcon">⌛</span>
   <span id="wCond">Loading</span>
   <span id="wTemp">--°</span>
+  <span id="wCity">Detecting...</span>
+
 <style>
-  #wIcon{font-size:16px}
+/* Weather container */
+#widgetDiv #miniWeather,
+#widgetDiv {
+  box-sizing: border-box;
+}
+
+/* Icon */
+#widgetDiv #wIcon{
+  display:block;
+  font-size:34px;
+  text-align:center;
+  line-height:36px;
+  margin-top:6px;
+  height:36px; /* locks height so it never jumps */
+}
+
+/* Temperature */
+#widgetDiv #wTemp{
+  display:block;
+  text-align:center;
+  font-size:22px;
+  font-weight:bold;
+  height:26px;
+  line-height:26px;
+}
+
+/* Condition text */
+#widgetDiv #wCond{
+  display:block;
+  text-align:center;
+  font-size:11px;
+  letter-spacing:1px;
+  text-transform:uppercase;
+  opacity:.85;
+  height:14px;
+  line-height:14px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+/* City */
+#widgetDiv #wCity{
+  display:block;
+  text-align:center;
+  font-size:10px;
+  opacity:.7;
+  margin-top:2px;
+  height:12px;
+  line-height:12px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
 
 </style>
 <script>
 async function loadWidgetWeather(){
   const loc = await fetch("https://ipapi.co/json/").then(r=>r.json());
+
   const lat = loc.latitude;
   const lon = loc.longitude;
+
+  document.getElementById("wCity").textContent = loc.city;
 
   const data = await fetch(
     `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`
@@ -798,6 +856,7 @@ async function loadWidgetWeather(){
 }
 loadWidgetWeather();
 </script>
+
 
 </div>
 
