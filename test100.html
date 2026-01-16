@@ -3,11 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>T9 AI</title>
-<link rel="icon" href="/assets/images/icons/favicon.ico">
+<title>T9 AI Chatbot</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-
 <style>
 :root{
  --bg:#020512;
@@ -18,9 +16,7 @@
  --text:#e7ecff;
  --muted:#8fa1ff;
 }
-
 *{box-sizing:border-box}
-
 body{
  margin:0;
  height:100vh;
@@ -31,7 +27,6 @@ body{
  color:var(--text);
  font-family:Inter,sans-serif;
 }
-
 .chat-container{
  width:100%;
  height:100%;
@@ -39,7 +34,6 @@ body{
  flex-direction:column;
  background:var(--panel);
 }
-
 .chat-header{
  padding:16px;
  font-weight:600;
@@ -49,7 +43,6 @@ body{
  -webkit-text-fill-color:transparent;
  border-bottom:1px solid var(--border);
 }
-
 .chat-body{
  flex:1;
  padding:16px;
@@ -58,33 +51,28 @@ body{
  flex-direction:column;
  gap:12px;
 }
-
 .message{
  max-width:85%;
  padding:12px 14px;
  border-radius:12px;
  line-height:1.4;
 }
-
 .user-message{
  align-self:flex-end;
  background:linear-gradient(135deg,var(--accent),var(--accent2));
  color:#000;
 }
-
 .ai-message{
  align-self:flex-start;
  background:#0c1333;
  border:1px solid var(--border);
 }
-
 .chat-input{
  display:flex;
  gap:10px;
  padding:14px;
  border-top:1px solid var(--border);
 }
-
 .chat-input input{
  flex:1;
  background:#050a22;
@@ -94,7 +82,6 @@ body{
  border-radius:10px;
  outline:none;
 }
-
 .chat-input button{
  background:linear-gradient(135deg,var(--accent),var(--accent2));
  border:none;
@@ -103,7 +90,6 @@ body{
  color:#000;
  cursor:pointer;
 }
-
 footer{
  text-align:center;
  font-size:12px;
@@ -113,7 +99,6 @@ footer{
 }
 </style>
 </head>
-
 <body>
 
 <div class="chat-container">
@@ -121,7 +106,7 @@ footer{
  <div class="chat-body" id="chatBody"></div>
 
  <div class="chat-input">
-  <input id="aiInput" placeholder="Ask T9 AI anything...">
+  <input id="aiInput" placeholder="Ask T9 AI anything..." autocomplete="off">
   <button id="sendMsg"><i class="fas fa-paper-plane"></i></button>
  </div>
 
@@ -129,62 +114,95 @@ footer{
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-
 <script>
-document.addEventListener("DOMContentLoaded",async()=>{
+document.addEventListener("DOMContentLoaded", () => {
 
-const API_KEYS_URL="https://groq-api-keys.pages.dev/apikeys.txt"
-let apiKeys=[],apiKeyIndex=-1
+  const API_KEY = "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";
+  const chatBody = document.getElementById("chatBody");
+  const aiInput = document.getElementById("aiInput");
+  const sendMsg = document.getElementById("sendMsg");
 
-async function initApiKeys(){
- const t=await (await fetch(API_KEYS_URL)).text()
- apiKeys=t.split(/\r?\n/).filter(Boolean)
-}
-function getKey(){
- apiKeyIndex=(apiKeyIndex+1)%apiKeys.length
- return apiKeys[apiKeyIndex]
-}
-await initApiKeys()
+  // Conversation memory
+  let conversation = JSON.parse(localStorage.getItem("t9_memory")) || [
+    { role: "system", content: "You are T9 AI, a helpful assistant. Remember context and be concise." }
+  ];
 
-const chatBody=document.getElementById("chatBody")
-const aiInput=document.getElementById("aiInput")
-const sendMsg=document.getElementById("sendMsg")
+  function saveMemory(){
+    localStorage.setItem("t9_memory", JSON.stringify(conversation));
+  }
 
-function add(msg,cls){
- const d=document.createElement("div")
- d.className="message "+cls
- d.innerHTML=marked.parse(msg)
- chatBody.appendChild(d)
- chatBody.scrollTop=chatBody.scrollHeight
-}
+  function add(msg, cls){
+    const d = document.createElement("div");
+    d.className = "message " + cls;
+    d.innerHTML = marked.parse(msg);
+    chatBody.appendChild(d);
+    chatBody.scrollTop = chatBody.scrollHeight;
+  }
 
-async function send(){
- const q=aiInput.value.trim()
- if(!q)return
- add(q,"user-message")
- aiInput.value=""
- add("Thinking...","ai-message")
+  // restore chat
+  conversation.forEach(m => {
+    if(m.role==="user") add(m.content,"user-message");
+    if(m.role==="assistant") add(m.content,"ai-message");
+  });
 
- const r=await fetch("https://api.groq.com/openai/v1/chat/completions",{
-  method:"POST",
-  headers:{Authorization:"Bearer "+getKey(),"Content-Type":"application/json"},
-  body:JSON.stringify({
-   model:"llama-3.1-8b-instant",
-   messages:[{role:"user",content:q}]
-  })
- })
+  if(conversation.length === 1){
+    add("Welcome to T9 AI 🌌","ai-message");
+  }
 
- const j=await r.json()
- chatBody.lastChild.remove()
- add(j.choices[0].message.content,"ai-message")
-}
+  async function send(){
+    const q = aiInput.value.trim();
+    if(!q) return;
 
-sendMsg.onclick=send
-aiInput.addEventListener("keydown",e=>{if(e.key==="Enter")send()})
+    add(q,"user-message");
+    aiInput.value = "";
 
-add("Welcome to T9 AI 🌌","ai-message")
-})
+    conversation.push({ role:"user", content:q });
+
+    const thinking = document.createElement("div");
+    thinking.className = "message ai-message";
+    thinking.textContent = "Thinking...";
+    chatBody.appendChild(thinking);
+
+    // trim memory to prevent lag
+    if(conversation.length > 25){
+      conversation = [conversation[0], ...conversation.slice(-24)];
+    }
+
+    try{
+      const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          Authorization: "Bearer " + API_KEY,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          model: "llama-3.1-8b-instant",
+          messages: conversation
+        })
+      });
+
+      if(!res.ok) throw new Error("AI request failed");
+
+      const data = await res.json();
+      if(!data.choices || !data.choices[0]) throw new Error("Bad AI response");
+
+      const reply = data.choices[0].message.content;
+      thinking.remove();
+
+      conversation.push({ role:"assistant", content: reply });
+      saveMemory();
+      add(reply,"ai-message");
+
+    }catch(err){
+      thinking.remove();
+      add("⚠️ AI temporarily unavailable. Try again.","ai-message");
+    }
+  }
+
+  sendMsg.onclick = send;
+  aiInput.addEventListener("keydown", e => { if(e.key === "Enter") send(); });
+
+});
 </script>
-
 </body>
 </html>
