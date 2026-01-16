@@ -595,26 +595,24 @@
           
 
 <style>
-   /* ===== Base ===== */
+  /* ===== Reset / Base ===== */
 * {
   box-sizing: border-box;
 }
 
 html, body {
-  height: 100%;
   margin: 0;
   padding: 0;
+  height: 100%;
 }
 
 body {
-  background-image: url("space2.png");
-  background-size: cover;
-  background-attachment: fixed;
-  font-family: sans-serif;
+  font-family: system-ui, sans-serif;
+  background: url("space2.png") center / cover fixed no-repeat;
   overflow: auto;
 }
 
-/* Hide scrollbar but keep scroll */
+/* Hide scrollbar but allow scrolling */
 body::-webkit-scrollbar {
   width: 0;
   height: 0;
@@ -623,20 +621,26 @@ body::-webkit-scrollbar {
 /* ===== Search Bar ===== */
 #searchBar {
   position: fixed;
-  top: 10px;
+  top: 12px;
   left: 50%;
   transform: translateX(-50%);
   z-index: 1000;
 
-  padding: 10px 22px;
-  border-radius: 16px;
-  border: 2px solid rgba(255,255,255,0.6);
+  width: 320px;
+  max-width: 85%;
 
-  background: rgba(0,0,0,0.4);
+  padding: 12px 24px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.25);
+
+  background: rgba(20,30,50,0.55);
+  backdrop-filter: blur(6px);
+
   color: white;
   text-align: center;
+  font-size: 15px;
 
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  transition: all 0.25s ease;
 }
 
 #searchBar::placeholder {
@@ -645,35 +649,48 @@ body::-webkit-scrollbar {
 
 #searchBar:focus {
   outline: none;
-  border-color: #7fdcff;
-  box-shadow: 0 0 10px rgba(127,220,255,0.4);
+  border-color: #8fdcff;
+  box-shadow: 0 0 18px rgba(140,220,255,0.45);
 }
 
-/* ===== Container ===== */
+/* ===== Grid Layout ===== */
 #imageContainer {
-  margin-top: 80px;
-  padding: 10px;
+  margin-top: 90px;
+  padding: 20px;
+
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 24px;
+
+  justify-items: center;
 }
 
-/* ===== Buttons (Game Images) ===== */
+/* ===== Game Buttons ===== */
 .btn {
-  width: 200px;
-  height: 200px;
+  width: 180px;
+  height: 180px;
   object-fit: cover;
 
-  border-radius: 50%;
+  border-radius: 28px;
   cursor: pointer;
 
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.15);
+
   transition:
-    transform 0.2s ease,
-    border-radius 0.2s ease,
-    filter 0.2s ease;
+    transform 0.25s ease,
+    box-shadow 0.25s ease,
+    border-radius 0.25s ease,
+    filter 0.25s ease;
 }
 
 .btn:hover {
-  transform: translateY(-4px) scale(1.04);
-  border-radius: 40px;
-  filter: brightness(1.1);
+  transform: translateY(-6px) scale(1.05);
+  border-radius: 36px;
+  filter: brightness(1.15);
+  box-shadow:
+    0 12px 35px rgba(0,0,0,0.45),
+    0 0 20px rgba(120,200,255,0.25);
 }
 
 .btn:active {
@@ -682,8 +699,8 @@ body::-webkit-scrollbar {
 
 /* ===== Links ===== */
 a {
-  outline: none;
   text-decoration: none;
+  outline: none;
 }
 
 a:focus {
@@ -694,24 +711,23 @@ a:focus {
 .gtext {
   text-align: center;
   color: white;
-  border-radius: 20px;
+  font-size: 22px;
+  margin-bottom: 10px;
 }
 
-/* ===== Mobile Optimization ===== */
+/* ===== Mobile ===== */
 @media (max-width: 600px) {
+  #imageContainer {
+    gap: 18px;
+  }
+
   .btn {
     width: 140px;
     height: 140px;
-  }
-
-  #searchBar {
-    width: 80%;
+    border-radius: 24px;
   }
 }
 
-
-
- 
 </style>
 
 <script>
