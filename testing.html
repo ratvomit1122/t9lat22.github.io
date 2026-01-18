@@ -628,11 +628,8 @@ border: 1px solid rgba(255, 255, 255, 0.15);
     align-items: center;
 }
 @keyframes popIn {
-  0% { opacity: 0; transform: scale(0.9); }
-  100% { opacity: 0.9; transform: scale(1); }
-}
-.popIn-class {
-  animation: popIn 0.3s ease-out forwards; /* Reduced from 0.5s */
+  0% { opacity: 0; transform: scale(0.8); }
+  100% { opacity: 80%; transform: scale(1); }
 }
 
     
@@ -652,28 +649,13 @@ border: 1px solid rgba(255, 255, 255, 0.15);
 
 }
 
-  /* Chromebook/Mobile optimizations */
-@media (max-width: 1366px), (hover: none) {
-  /* Reduce effects further on lower-end devices */
-  .navbar {
-    backdrop-filter: blur(1px);
-  }
-  
-  #appsDiv, #ChatDiv, #hiddenDiv, #aiDiv {
-    backdrop-filter: blur(2px);
-  }
-  
-  /* Simplify animations */
-  * {
-    animation-duration: 0.25s !important;
-    transition-duration: 0.1s !important;
-  }
+
   
   /* Reduce shadow complexity */
   .navbar, #settingsDiv, #appsDiv {
     box-shadow: 0 8px 24px rgba(0,0,0,0.3) !important;
   }
-}
+
 </style>
 </head>
 <body>
