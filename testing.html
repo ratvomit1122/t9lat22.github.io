@@ -2570,17 +2570,17 @@ wins.forEach(win => {
   // ───────── MOVE ─────────
   document.addEventListener("mousemove",e=>{
     if(isDragging){
-      let x=e.clientX-offsetX,y=e.clientY-offsetY;
-      const maxX=innerWidth-win.offsetWidth,maxY=innerHeight-win.offsetHeight;
-      win.style.left=Math.max(0,Math.min(x,maxX))+"px";
-      win.style.top =Math.max(0,Math.min(y,maxY))+"px";
+      let x=e.clientX-offsetX;
+      let y=e.clientY-offsetY;
+      win.style.left=x+"px";
+      win.style.top=y+"px";
       if(win.id==="hiddenDiv") win.style.willChange="transform";
     }
     if(isResizing){
-      const dx=e.clientX-startX,dy=e.clientY-startY;
-      const l=parseInt(win.style.left)||0,t=parseInt(win.style.top)||0;
-      win.style.width =Math.max(300,Math.min(startWidth +dx,innerWidth -l))+"px";
-      win.style.height=Math.max(200,Math.min(startHeight+dy,innerHeight-t))+"px";
+      const dx=e.clientX-startX;
+      const dy=e.clientY-startY;
+      win.style.width=Math.max(300,startWidth+dx)+"px";
+      win.style.height=Math.max(200,startHeight+dy)+"px";
     }
   });
 
@@ -2594,13 +2594,6 @@ wins.forEach(win => {
   document.addEventListener("mouseup",stopAll);
   document.addEventListener("mouseleave",stopAll);
   window.addEventListener("blur",stopAll);
-
-  // ───────── Keep onscreen ─────────
-  window.addEventListener("resize",()=>{
-    const r=win.getBoundingClientRect();
-    win.style.left=Math.max(0,Math.min(r.left,innerWidth -r.width ))+"px";
-    win.style.top =Math.max(0,Math.min(r.top ,innerHeight-r.height))+"px";
-  });
 });
 </script>
 
