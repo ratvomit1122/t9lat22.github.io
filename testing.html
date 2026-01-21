@@ -2601,7 +2601,137 @@ wins.forEach(win => {
 <!--test2-->
 
 
- 
+<script>
+  const wins = [
+  document.getElementById("hiddenDiv"),
+  document.getElementById("ChatDiv"),
+  document.getElementById("musicDiv"),
+  document.getElementById("searchDiv"),
+  document.getElementById("updateDiv"),
+  document.getElementById("aiDiv"),
+  document.getElementById("terminalDiv"),
+  document.getElementById("emulatorDiv"),
+  document.getElementById("movieDiv")
+];
+
+wins.forEach(win => {
+  if (!win) return;
+
+  // ───────── Drag handle ─────────
+  let dragHandle = win.querySelector(".drag-handle");
+  if (!dragHandle) {
+    dragHandle = document.createElement("div");
+    dragHandle.className = "drag-handle";
+    Object.assign(dragHandle.style,{
+      position:"absolute",top:"0",left:"50px",right:"0",
+      height:"40px",cursor:"move",zIndex:"5",pointerEvents:"none"
+    });
+    win.appendChild(dragHandle);
+  }
+
+  // ───────── Resizer ─────────
+  let resizer = win.querySelector(".resizer");
+  if (!resizer) {
+    resizer = document.createElement("div");
+    resizer.className = "resizer";
+    Object.assign(resizer.style,{
+      position:"absolute",width:"30px",height:"30px",
+      right:"0",bottom:"0",cursor:"nwse-resize",zIndex:"10",
+      background:"rgba(255,255,255,0.1)"
+    });
+    win.appendChild(resizer);
+  }
+
+  let isDragging=false,isResizing=false,offsetX=0,offsetY=0,
+      startX=0,startY=0,startWidth=0,startHeight=0,hasBeenPositioned=false;
+
+  // 🔒 SAFE iframe control
+  function disableIframeTemp(){
+    win.querySelectorAll("iframe").forEach(i=>{
+      i.dataset._pe=i.style.pointerEvents;
+      i.style.pointerEvents="none";
+    });
+  }
+  function enableIframeTemp(){
+    win.querySelectorAll("iframe").forEach(i=>{
+      i.style.pointerEvents=i.dataset._pe||"auto";
+      delete i.dataset._pe;
+    });
+  }
+
+  // ───────── DRAG ─────────
+  win.addEventListener("mousedown",e=>{
+    if(e.target.closest("button,a,input,select,textarea")) return;
+    const r=win.getBoundingClientRect();
+    if(e.clientY-r.top>40||isResizing) return;
+
+    if(!hasBeenPositioned){
+      win.style.transform="none";
+      win.style.margin="0";
+      win.style.inset="auto";
+      win.style.left=r.left+"px";
+      win.style.top=r.top+"px";
+      hasBeenPositioned=true;
+    }
+
+    isDragging=true;
+    offsetX=e.clientX-r.left;
+    offsetY=e.clientY-r.top;
+    disableIframeTemp();
+    dragHandle.style.pointerEvents="auto";
+    e.preventDefault();
+  });
+
+  // ───────── RESIZE ─────────
+  resizer.addEventListener("mousedown",e=>{
+    const r=win.getBoundingClientRect();
+    if(!hasBeenPositioned){
+      win.style.transform="none";win.style.margin="0";win.style.inset="auto";
+      win.style.left=r.left+"px";win.style.top=r.top+"px";
+      hasBeenPositioned=true;
+    }
+    isResizing=true;disableIframeTemp();
+    startX=e.clientX;startY=e.clientY;
+    startWidth=r.width;startHeight=r.height;
+    win.style.width=startWidth+"px";win.style.height=startHeight+"px";
+    e.preventDefault();e.stopPropagation();
+  });
+
+  // ───────── MOVE ─────────
+  document.addEventListener("mousemove",e=>{
+    if(isDragging){
+      let x=e.clientX-offsetX;
+      let y=e.clientY-offsetY;
+      win.style.left=x+"px";
+      win.style.top=y+"px";
+      if(win.id==="hiddenDiv") win.style.willChange="transform";
+    }
+    if(isResizing){
+      const dx=e.clientX-startX;
+      const dy=e.clientY-startY;
+      // ✅ FIXED: Set higher minimum dimensions to prevent covering buttons
+      // Minimum width ensures buttons aren't covered horizontally
+      // Minimum height ensures top bar with buttons remains visible
+      const minWidth = 400;  // Increased from 300
+      const minHeight = 250; // Increased from 200
+      
+      win.style.width=Math.max(minWidth,startWidth+dx)+"px";
+      win.style.height=Math.max(minHeight,startHeight+dy)+"px";
+    }
+  });
+
+  // ───────── FORCE UNFREEZE ─────────
+  function stopAll(){
+    enableIframeTemp();
+    dragHandle.style.pointerEvents="none";
+    isDragging=false;isResizing=false;
+    win.style.willChange="auto";
+  }
+  document.addEventListener("mouseup",stopAll);
+  document.addEventListener("mouseleave",stopAll);
+  window.addEventListener("blur",stopAll);
+});
+</script>
 
 
 
