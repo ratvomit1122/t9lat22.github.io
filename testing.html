@@ -2541,7 +2541,7 @@ wins.forEach(win => {
     
     iframes.forEach(iframe => {
       // Keep iframe below the header area (where buttons are)
-      const headerHeight = 45; // Space for buttons and title
+      const headerHeight = 30; // Reduced space for buttons and title
       
       iframe.style.position = "absolute";
       iframe.style.top = headerHeight + "px";
@@ -2549,7 +2549,7 @@ wins.forEach(win => {
       iframe.style.width = "100%";
       iframe.style.height = `calc(100% - ${headerHeight}px)`;
       iframe.style.border = "none";
-      iframe.style.borderRadius = "0 0 15px 15px";
+      iframe.style.borderRadius = "0px 0px 12px 12px";
     });
   }
 
