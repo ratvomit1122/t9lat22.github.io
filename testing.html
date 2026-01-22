@@ -2476,7 +2476,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
 <!--test2-->
 
-<script>
+  <script>
+const HEADER_HEIGHT = 30; // was 40
+
 const wins = [
 document.getElementById("hiddenDiv"),
 document.getElementById("ChatDiv"),
@@ -2499,7 +2501,8 @@ dragHandle = document.createElement("div");
 dragHandle.className = "drag-handle";
 Object.assign(dragHandle.style,{
 position:"absolute",top:"0",left:"50px",right:"0",
-height:"40px",cursor:"move",zIndex:"5",pointerEvents:"none"
+height: HEADER_HEIGHT + "px",
+cursor:"move",zIndex:"5",pointerEvents:"none"
 });
 win.appendChild(dragHandle);
 }
@@ -2520,8 +2523,8 @@ win.appendChild(resizer);
 // ───────── Ensure iframe container respects header ─────────
 win.querySelectorAll("iframe").forEach(iframe => {
 if (!iframe.style.marginTop) {
-iframe.style.marginTop = "40px"; // Push iframe below header
-iframe.style.height = "calc(100% - 40px)"; // Adjust height accordingly
+iframe.style.marginTop = HEADER_HEIGHT + "px";
+iframe.style.height = "calc(100% - " + HEADER_HEIGHT + "px)";
 iframe.style.display = "block";
 }
 });
@@ -2547,7 +2550,7 @@ delete i.dataset._pe;
 win.addEventListener("mousedown",e=>{
 if(e.target.closest("button,a,input,select,textarea")) return;
 const r=win.getBoundingClientRect();
-if(e.clientY-r.top>40||isResizing) return;
+if(e.clientY-r.top>HEADER_HEIGHT||isResizing) return;
 
 if(!hasBeenPositioned){
 win.style.transform="none";
@@ -2593,9 +2596,8 @@ if(win.id==="hiddenDiv") win.style.willChange="transform";
 if(isResizing){
 const dx=e.clientX-startX;
 const dy=e.clientY-startY;
-// Enforce minimum sizes: width for buttons, height for header + content
 win.style.width=Math.max(300,startWidth+dx)+"px";
-win.style.height=Math.max(100,startHeight+dy)+"px"; // Min 100px (40px header + 60px content)
+win.style.height=Math.max(90,startHeight+dy)+"px";
 }
 });
 
@@ -2611,6 +2613,7 @@ document.addEventListener("mouseleave",stopAll);
 window.addEventListener("blur",stopAll);
 });
 </script>
+
 
 
 
