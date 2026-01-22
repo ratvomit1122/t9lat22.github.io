@@ -2476,7 +2476,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
 <!--test2-->
 
-
 <script>
   const wins = [
   document.getElementById("hiddenDiv"),
@@ -2535,6 +2534,25 @@ wins.forEach(win => {
     });
   }
 
+  // ✅ NEW: Function to adjust iframe positioning based on div size
+  function adjustIframePosition() {
+    const iframes = win.querySelectorAll("iframe");
+    const rect = win.getBoundingClientRect();
+    
+    iframes.forEach(iframe => {
+      // Keep iframe below the header area (where buttons are)
+      const headerHeight = 45; // Space for buttons and title
+      
+      iframe.style.position = "absolute";
+      iframe.style.top = headerHeight + "px";
+      iframe.style.left = "0";
+      iframe.style.width = "100%";
+      iframe.style.height = `calc(100% - ${headerHeight}px)`;
+      iframe.style.border = "none";
+      iframe.style.borderRadius = "0 0 15px 15px";
+    });
+  }
+
   // ───────── DRAG ─────────
   win.addEventListener("mousedown",e=>{
     if(e.target.closest("button,a,input,select,textarea")) return;
@@ -2585,14 +2603,14 @@ wins.forEach(win => {
     if(isResizing){
       const dx=e.clientX-startX;
       const dy=e.clientY-startY;
-      // ✅ FIXED: Set higher minimum dimensions to prevent covering buttons
-      // Minimum width ensures buttons aren't covered horizontally
-      // Minimum height ensures top bar with buttons remains visible
-      const minWidth = 400;  // Increased from 300
-      const minHeight = 250; // Increased from 200
+      const minWidth = 300;
+      const minHeight = 200;
       
       win.style.width=Math.max(minWidth,startWidth+dx)+"px";
       win.style.height=Math.max(minHeight,startHeight+dy)+"px";
+      
+      // ✅ FIX: Adjust iframe position during resize
+      adjustIframePosition();
     }
   });
 
@@ -2602,10 +2620,16 @@ wins.forEach(win => {
     dragHandle.style.pointerEvents="none";
     isDragging=false;isResizing=false;
     win.style.willChange="auto";
+    
+    // ✅ FIX: Ensure iframe position is correct after resize stops
+    adjustIframePosition();
   }
   document.addEventListener("mouseup",stopAll);
   document.addEventListener("mouseleave",stopAll);
   window.addEventListener("blur",stopAll);
+  
+  // ✅ FIX: Set initial iframe position when page loads
+  adjustIframePosition();
 });
 </script>
 
