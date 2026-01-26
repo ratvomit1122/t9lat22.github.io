@@ -1,21 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>T9 Browser</title>
 
-<!-- Ultraviolet -->
 <script src="/uv/uv.bundle.js"></script>
 <script src="/uv/uv.config.js"></script>
 <script src="/baremux/index.js"></script>
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
 
 <style>
 * { box-sizing: border-box; font-family: Inter, system-ui; }
-
 html, body {
     margin: 0;
     width: 100%;
@@ -24,21 +22,22 @@ html, body {
     overflow: hidden;
 }
 
-/* ===== TOP UI ===== */
+/* ===== UI ===== */
 .browser-ui {
     height: 96px;
     background: #2b2b2b;
     display: flex;
     flex-direction: column;
     border-bottom: 1px solid #111;
+    z-index: 10;
 }
 
 .tabs {
     height: 38px;
     display: flex;
     align-items: center;
-    gap: 6px;
     padding: 0 8px;
+    gap: 6px;
     overflow-x: auto;
 }
 
@@ -127,7 +126,7 @@ html, body {
     color: white;
 }
 
-/* ===== VIEW ===== */
+/* ===== CONTENT ===== */
 .viewframe {
     position: absolute;
     top: 96px;
@@ -137,10 +136,7 @@ html, body {
     border: none;
     display: none;
 }
-
-.viewframe.active {
-    display: block;
-}
+.viewframe.active { display: block; }
 
 .ntp {
     position: absolute;
@@ -148,7 +144,7 @@ html, body {
     left: 0;
     width: 100%;
     height: calc(100% - 96px);
-    display: flex;
+    display: none;
     align-items: center;
     justify-content: center;
     color: white;
@@ -181,25 +177,11 @@ html, body {
 </div>
 
 <script>
-/* ===== UV + BAREMUX ===== */
 navigator.serviceWorker?.register("/uv/sw.js")
 
 const connection = new BareMux.BareMuxConnection("/baremux/worker.js")
 connection.setTransport("/libcurl/index.mjs", [{ websocket: "wss://wisp.rhw.one/" }])
 
-async function waitForUVReady() {
-    if ("serviceWorker" in navigator) {
-        await navigator.serviceWorker.ready
-    }
-    let tries = 0
-    while (!connection.transport && tries < 20) {
-        await new Promise(r => setTimeout(r, 150))
-        tries++
-    }
-    await new Promise(r => setTimeout(r, 300))
-}
-
-/* ===== TAB SYSTEM ===== */
 const tabsEl = document.getElementById("tabs")
 const newTabBtn = document.getElementById("newtab")
 const urlInput = document.getElementById("url")
@@ -209,19 +191,29 @@ let tabs = []
 let activeId = null
 let idCounter = 0
 
-function createTab(url = "") {
+function normalize(input) {
+    if (!input.includes(".")) {
+        return "https://search.brave.com/search?q=" + encodeURIComponent(input)
+    }
+    if (!input.startsWith("http")) return "https://" + input
+    return input
+}
+
+/* ===== TABS ===== */
+function createTab(startUrl = "") {
     const id = idCounter++
 
     const iframe = document.createElement("iframe")
     iframe.className = "viewframe"
     iframe.dataset.id = id
     iframe.setAttribute("sandbox","allow-scripts allow-same-origin allow-forms allow-modals allow-popups")
+
     document.body.appendChild(iframe)
 
     const tabBtn = document.createElement("div")
     tabBtn.className = "tab"
     tabBtn.dataset.id = id
-    tabBtn.innerHTML = `<span>New Tab</span><i class="fas fa-xmark"></i>`
+    tabBtn.innerHTML = `<span>T9 Browser</span><i class="fas fa-xmark"></i>`
 
     tabBtn.onclick = e => {
         if (e.target.tagName === "I") closeTab(id)
@@ -229,10 +221,12 @@ function createTab(url = "") {
     }
 
     tabsEl.insertBefore(tabBtn, newTabBtn)
-    tabs.push({ id, iframe, tabBtn, history: [], index: -1 })
+
+    const tab = { id, iframe, tabBtn, history: [], index: -1, reloaded:false }
+    tabs.push(tab)
     activateTab(id)
 
-    if (url) navigate(url)
+    if (startUrl) navigate(startUrl)
 }
 
 function activateTab(id) {
@@ -241,6 +235,15 @@ function activateTab(id) {
         t.iframe.classList.toggle("active", t.id === id)
         t.tabBtn.classList.toggle("active", t.id === id)
     })
+
+    const t = getTab()
+    if (!t || t.history.length === 0) {
+        ntp.style.display = "flex"
+        urlInput.value = ""
+    } else {
+        ntp.style.display = "none"
+        urlInput.value = t.history[t.index]
+    }
 }
 
 function closeTab(id) {
@@ -258,56 +261,61 @@ function getTab() {
 }
 
 /* ===== NAVIGATION ===== */
-function normalize(input) {
-    if (!input.includes(".")) return "https://search.brave.com/search?q=" + encodeURIComponent(input)
-    if (!input.startsWith("http")) return "https://" + input
-    return input
-}
-
-function navigate(input, push = true) {
-    const tab = getTab()
-    if (!tab) return
+function navigate(input, push=true) {
+    const t = getTab()
+    if (!t) return
 
     const url = normalize(input)
+
     if (push) {
-        tab.history = tab.history.slice(0, tab.index+1)
-        tab.history.push(url)
-        tab.index++
+        t.history = t.history.slice(0, t.index+1)
+        t.history.push(url)
+        t.index++
     }
 
-    const encoded = __uv$config.prefix + __uv$config.encodeUrl(url)
-    let retries = 0
-
-    const load = () => tab.iframe.src = encoded
-
-    tab.iframe.onload = () => {
-        try {
-            const txt = tab.iframe.contentDocument?.body?.innerText || ""
-            if (txt.includes("Ultraviolet") && retries < 2) {
-                retries++
-                setTimeout(load, 600)
-            }
-        } catch {}
-    }
-
-    load()
-    urlInput.value = url
+    const proxied = __uv$config.prefix + __uv$config.encodeUrl(url)
+    t.iframe.src = proxied
     ntp.style.display = "none"
+    urlInput.value = url
+
+    // 🔁 auto-reload ONCE if UV errors
+    t.iframe.onerror = () => {
+        if (!t.reloaded) {
+            t.reloaded = true
+            setTimeout(() => t.iframe.src = proxied, 600)
+        }
+    }
 }
 
 /* ===== CONTROLS ===== */
-back.onclick = () => { const t=getTab(); if(t?.index>0){t.index--;navigate(t.history[t.index],false)} }
-forward.onclick = () => { const t=getTab(); if(t && t.index<t.history.length-1){t.index++;navigate(t.history[t.index],false)} }
-reload.onclick = () => { const t=getTab(); if(t) t.iframe.src=t.iframe.src }
-popout.onclick = () => { const t=getTab(); if(t) window.open(t.iframe.src) }
-form.onsubmit = e => { e.preventDefault(); if(urlInput.value) navigate(urlInput.value) }
+back.onclick = () => {
+    const t=getTab()
+    if(!t || t.index<=0) return
+    t.index--
+    navigate(t.history[t.index], false)
+}
+forward.onclick = () => {
+    const t=getTab()
+    if(!t || t.index>=t.history.length-1) return
+    t.index++
+    navigate(t.history[t.index], false)
+}
+reload.onclick = () => {
+    const t=getTab()
+    if(t) t.iframe.src = t.iframe.src
+}
+popout.onclick = () => {
+    const t=getTab()
+    if(t) window.open(t.iframe.src,"_blank")
+}
+form.onsubmit = e => {
+    e.preventDefault()
+    if(urlInput.value.trim()) navigate(urlInput.value)
+}
 newTabBtn.onclick = () => createTab()
 
-/* ===== START DISCORD SAFELY ===== */
-;(async () => {
-    await waitForUVReady()
-    createTab("https://discord.com")
-})()
+/* ===== STARTUP ===== */
+createTab("https://discord.com")
 </script>
 
 </body>
