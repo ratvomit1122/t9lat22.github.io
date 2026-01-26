@@ -383,7 +383,10 @@ document.addEventListener("DOMContentLoaded", () => {
 </script>
 
 <script>
-if (location.hostname === "t9os.space/test22.html" || location.hostname === "www.t9os.space/test22.html") {
+if (
+  (location.hostname === "t9os.space" || location.hostname === "www.t9os.space") &&
+  location.pathname === "/test22.html"
+) {
   const links = [
     "https://learningbooks.vercel.app/test22.html",
     "https://t9os.vercel.app/test22.html",
@@ -394,6 +397,7 @@ if (location.hostname === "t9os.space/test22.html" || location.hostname === "www
   window.location.replace(randomLink);
 }
 </script>
+
 
 </body>
 </html>
