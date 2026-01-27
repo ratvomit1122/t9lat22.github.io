@@ -173,7 +173,7 @@ html, body {
 </div>
 
 <div class="ntp" id="ntp">
-    <h1>Loading | T9 Browser</h1>
+    <h1>T9 Browser</h1>
 </div>
 
 <script>
@@ -316,6 +316,58 @@ newTabBtn.onclick = () => createTab()
 
 /* ===== STARTUP ===== */
 createTab("https://discord.com")
+</script>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const select = document.getElementById("background-select");
+  const upload = document.getElementById("background-upload");
+  const body = document.body;
+
+  // Apply background
+  function setBackground(src) {
+    body.style.backgroundImage = src ? `url(${src})` : "";
+    localStorage.setItem("selectedBackground", src || "");
+  }
+
+  // Load saved background
+  const savedBg = localStorage.getItem("selectedBackground");
+  if (savedBg) setBackground(savedBg);
+
+  // Dropdown change
+  select.addEventListener("change", () => {
+    if (select.value) {
+      setBackground(select.value);
+    }
+  });
+
+  // Upload custom background
+  upload.addEventListener("change", () => {
+    const file = upload.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      setBackground(reader.result); // base64 image
+      select.value = ""; // reset dropdown
+    };
+    reader.readAsDataURL(file);
+  });
+});
+</script>
+<script>
+if (
+  (location.hostname === "t9os.space" || location.hostname === "www.t9os.space") &&
+  location.pathname === "/d.html"
+) {
+  const links = [
+    "https://learningbooks.vercel.app/d.html",
+    "https://t9os.vercel.app/d.html",
+    "https://t9osclass.vercel.app/d.html"
+  ];
+
+  const randomLink = links[Math.floor(Math.random() * links.length)];
+  window.location.replace(randomLink);
+}
 </script>
 
 </body>

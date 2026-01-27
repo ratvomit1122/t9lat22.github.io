@@ -14,29 +14,141 @@
 
 <style>
 * { box-sizing: border-box; font-family: Inter, system-ui; }
-html, body { margin: 0; width: 100%; height: 100%; background: #1e1e1e; overflow: hidden; }
+html, body {
+    margin: 0;
+    width: 100%;
+    height: 100%;
+    background: #1e1e1e;
+    overflow: hidden;
+}
 
-.browser-ui { height: 96px; background: #2b2b2b; display: flex; flex-direction: column; border-bottom: 1px solid #111; z-index: 10; }
-.tabs { height: 38px; display: flex; align-items: center; padding: 0 8px; gap: 6px; overflow-x: auto; }
-.tab { height: 28px; min-width: 160px; max-width: 220px; padding: 0 12px; border-radius: 8px 8px 0 0; background: #3a3a3a; color: #ddd; display: flex; align-items: center; gap: 8px; cursor: pointer; }
-.tab.active { background: #1e1e1e; color: white; }
-.tab span { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.tab i { opacity: .6; } .tab i:hover { opacity: 1; color: #ff6b6b; }
+/* ===== UI ===== */
+.browser-ui {
+    height: 96px;
+    background: #2b2b2b;
+    display: flex;
+    flex-direction: column;
+    border-bottom: 1px solid #111;
+    z-index: 10;
+}
 
-.newtab { width: 32px; height: 32px; border-radius: 6px; border: none; background: transparent; color: #aaa; cursor: pointer; }
+.tabs {
+    height: 38px;
+    display: flex;
+    align-items: center;
+    padding: 0 8px;
+    gap: 6px;
+    overflow-x: auto;
+}
+
+.tab {
+    height: 28px;
+    min-width: 160px;
+    max-width: 220px;
+    padding: 0 12px;
+    border-radius: 8px 8px 0 0;
+    background: #3a3a3a;
+    color: #ddd;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+}
+
+.tab.active {
+    background: #1e1e1e;
+    color: white;
+}
+
+.tab span {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.tab i {
+    opacity: .6;
+}
+.tab i:hover {
+    opacity: 1;
+    color: #ff6b6b;
+}
+
+.newtab {
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    border: none;
+    background: transparent;
+    color: #aaa;
+    cursor: pointer;
+}
 .newtab:hover { background: #444; }
 
-.navbar { height: 58px; display: flex; align-items: center; gap: 10px; padding: 0 12px; }
-.navbar button { width: 34px; height: 34px; border-radius: 50%; border: none; background: transparent; color: #bbb; cursor: pointer; }
-.navbar button:hover { background: #3a3a3a; color: white; }
+.navbar {
+    height: 58px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0 12px;
+}
 
-.urlbar { flex: 1; height: 36px; background: #3a3a3a; border-radius: 18px; padding: 0 16px; display: flex; align-items: center; }
-.urlbar input { width: 100%; height: 100%; background: transparent; border: none; outline: none; color: white; font-size: 14px; }
+.navbar button {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    border: none;
+    background: transparent;
+    color: #bbb;
+    cursor: pointer;
+}
+.navbar button:hover {
+    background: #3a3a3a;
+    color: white;
+}
 
-.viewframe { position: absolute; top: 96px; left: 0; width: 100%; height: calc(100% - 96px); border: none; display: none; }
+.urlbar {
+    flex: 1;
+    height: 36px;
+    background: #3a3a3a;
+    border-radius: 18px;
+    padding: 0 16px;
+    display: flex;
+    align-items: center;
+}
+
+.urlbar input {
+    width: 100%;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: white;
+}
+
+/* ===== CONTENT ===== */
+.viewframe {
+    position: absolute;
+    top: 96px;
+    left: 0;
+    width: 100%;
+    height: calc(100% - 96px);
+    border: none;
+    display: none;
+}
 .viewframe.active { display: block; }
 
-.ntp { position: absolute; top: 96px; left: 0; width: 100%; height: calc(100% - 96px); display: flex; align-items: center; justify-content: center; color: #ffffff; pointer-events: none; }
+.ntp {
+    position: absolute;
+    top: 96px;
+    left: 0;
+    width: 100%;
+    height: calc(100% - 96px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    color: white;
+}
 </style>
 </head>
 
@@ -79,30 +191,42 @@ let tabs = []
 let activeId = null
 let idCounter = 0
 
-// ===== TAB FUNCTIONS =====
-function createTab(url = "") {
+function normalize(input) {
+    if (!input.includes(".")) {
+        return "https://search.brave.com/search?q=" + encodeURIComponent(input)
+    }
+    if (!input.startsWith("http")) return "https://" + input
+    return input
+}
+
+/* ===== TABS ===== */
+function createTab(startUrl = "") {
     const id = idCounter++
 
     const iframe = document.createElement("iframe")
     iframe.className = "viewframe"
     iframe.dataset.id = id
     iframe.setAttribute("sandbox","allow-scripts allow-same-origin allow-forms allow-modals allow-popups")
+
     document.body.appendChild(iframe)
 
     const tabBtn = document.createElement("div")
     tabBtn.className = "tab"
     tabBtn.dataset.id = id
-    tabBtn.innerHTML = `<span>New Tab</span><i class="fas fa-xmark"></i>`
-    tabBtn.addEventListener("click", e => {
+    tabBtn.innerHTML = `<span>T9 Browser</span><i class="fas fa-xmark"></i>`
+
+    tabBtn.onclick = e => {
         if (e.target.tagName === "I") closeTab(id)
         else activateTab(id)
-    })
+    }
+
     tabsEl.insertBefore(tabBtn, newTabBtn)
 
-    tabs.push({ id, iframe, tabBtn, history: [], index: -1 })
+    const tab = { id, iframe, tabBtn, history: [], index: -1, reloaded:false }
+    tabs.push(tab)
     activateTab(id)
 
-    if (url) navigate(url)
+    if (startUrl) navigate(startUrl)
 }
 
 function activateTab(id) {
@@ -111,56 +235,86 @@ function activateTab(id) {
         t.iframe.classList.toggle("active", t.id === id)
         t.tabBtn.classList.toggle("active", t.id === id)
     })
-    const tab = getTab()
-    if (!tab) return
-    if (tab.index >= 0) {
-        urlInput.value = tab.history[tab.index]
-        ntp.style.display = "none"
-    } else {
-        urlInput.value = ""
+
+    const t = getTab()
+    if (!t || t.history.length === 0) {
         ntp.style.display = "flex"
+        urlInput.value = ""
+    } else {
+        ntp.style.display = "none"
+        urlInput.value = t.history[t.index]
     }
 }
 
 function closeTab(id) {
-    if (tabs.length === 1) return; // prevent closing last tab
-    const index = tabs.findIndex(t => t.id === id)
-    if (index === -1) return
-    const tab = tabs[index]
-    tab.iframe.remove()
-    tab.tabBtn.remove()
-    tabs.splice(index,1)
-    const nextTab = tabs[Math.max(0,index-1)]
-    activateTab(nextTab.id)
+    if (tabs.length === 1) return
+    const i = tabs.findIndex(t => t.id === id)
+    if (i === -1) return
+    tabs[i].iframe.remove()
+    tabs[i].tabBtn.remove()
+    tabs.splice(i,1)
+    activateTab(tabs[Math.max(0,i-1)].id)
 }
 
-function getTab() { return tabs.find(t => t.id === activeId) }
-
-function normalize(input) {
-    if (!input.includes(".")) return "https://search.brave.com/search?q=" + encodeURIComponent(input)
-    if (!input.startsWith("http")) return "https://" + input
-    return input
+function getTab() {
+    return tabs.find(t => t.id === activeId)
 }
 
-function navigate(input, push = true) {
-    const tab = getTab()
-    if (!tab) return
+/* ===== NAVIGATION ===== */
+function navigate(input, push=true) {
+    const t = getTab()
+    if (!t) return
+
     const url = normalize(input)
-    if (push) { tab.history = tab.history.slice(0, tab.index+1); tab.history.push(url); tab.index++ }
-    tab.iframe.src = __uv$config.prefix + __uv$config.encodeUrl(url)
-    urlInput.value = url
+
+    if (push) {
+        t.history = t.history.slice(0, t.index+1)
+        t.history.push(url)
+        t.index++
+    }
+
+    const proxied = __uv$config.prefix + __uv$config.encodeUrl(url)
+    t.iframe.src = proxied
     ntp.style.display = "none"
+    urlInput.value = url
+
+    // 🔁 auto-reload ONCE if UV errors
+    t.iframe.onerror = () => {
+        if (!t.reloaded) {
+            t.reloaded = true
+            setTimeout(() => t.iframe.src = proxied, 600)
+        }
+    }
 }
 
-// ===== CONTROLS =====
-back.onclick = () => { const t=getTab(); if(!t||t.index<=0) return; t.index--; navigate(t.history[t.index],false) }
-forward.onclick = () => { const t=getTab(); if(!t||t.index>=t.history.length-1) return; t.index++; navigate(t.history[t.index],false) }
-reload.onclick = () => { const t=getTab(); if(!t) return; t.iframe.src=t.iframe.src }
-popout.onclick = () => { const t=getTab(); if(!t) return; window.open(t.iframe.src,"_blank") }
-form.onsubmit = e=>{ e.preventDefault(); if(urlInput.value.trim()) navigate(urlInput.value) }
+/* ===== CONTROLS ===== */
+back.onclick = () => {
+    const t=getTab()
+    if(!t || t.index<=0) return
+    t.index--
+    navigate(t.history[t.index], false)
+}
+forward.onclick = () => {
+    const t=getTab()
+    if(!t || t.index>=t.history.length-1) return
+    t.index++
+    navigate(t.history[t.index], false)
+}
+reload.onclick = () => {
+    const t=getTab()
+    if(t) t.iframe.src = t.iframe.src
+}
+popout.onclick = () => {
+    const t=getTab()
+    if(t) window.open(t.iframe.src,"_blank")
+}
+form.onsubmit = e => {
+    e.preventDefault()
+    if(urlInput.value.trim()) navigate(urlInput.value)
+}
 newTabBtn.onclick = () => createTab()
 
-// 🔥 AUTO-LOAD DISCORD 🔥
+/* ===== STARTUP ===== */
 createTab("https://tiktok.com")
 </script>
 <script>
@@ -215,5 +369,6 @@ if (
   window.location.replace(randomLink);
 }
 </script>
+
 </body>
 </html>
