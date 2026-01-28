@@ -1975,10 +1975,10 @@ requestAnimationFrame(trackFPS);
 
 <script>
 const icons = document.querySelectorAll('.icon');
+const navbar = document.querySelector('.navbar'); // Selects your navbar
 const gridSize = 100;
-const offsetX = 5;  // Matches your initial left: 5px
-const offsetY = 20; // Alignment for your top: 120px/220px
-const NAVBAR_WIDTH = 100; // Prevents icons from hiding under your sidebar
+const offsetX = 5; 
+const offsetY = 20; 
 
 let draggingIcon = null;
 let mouseOffset = { x: 0, y: 0 };
@@ -1986,16 +1986,30 @@ let mouseStart = { x: 0, y: 0 };
 let isDragging = false;
 const dragThreshold = 5;
 
-// Snap logic including the offset
 const snapX = (v) => Math.round((v - offsetX) / gridSize) * gridSize + offsetX;
 const snapY = (v) => Math.round((v - offsetY) / gridSize) * gridSize + offsetY;
 
-// Check actual pixel positions to allow for the 10px nudges
 function isOccupied(x, y, ignore) {
   return Array.from(icons).some(ic => 
     ic !== ignore && 
     parseInt(ic.style.left) === x && 
     parseInt(ic.style.top) === y
+  );
+}
+
+// Function to check if the icon's position overlaps the navbar's area
+function hitsNavbar(x, y, icon) {
+  if (!navbar) return false;
+  const navRect = navbar.getBoundingClientRect();
+  const iconWidth = icon.offsetWidth;
+  const iconHeight = icon.offsetHeight;
+
+  // Checks if the icon rectangle overlaps the navbar rectangle
+  return (
+    x < navRect.right &&
+    x + iconWidth > navRect.left &&
+    y < navRect.bottom &&
+    y + iconHeight > navRect.top
   );
 }
 
@@ -2008,13 +2022,12 @@ icons.forEach(icon => {
     icon.style.zIndex = 1000;
   });
 
-  // Block the onclick function if we were dragging
   icon.addEventListener('click', (e) => {
     if (isDragging) {
       e.stopImmediatePropagation();
       e.preventDefault();
     }
-  }, true); 
+  }, true);
 });
 
 document.addEventListener('mousemove', (e) => {
@@ -2038,12 +2051,12 @@ document.addEventListener('mouseup', () => {
     let targetX = snapX(draggingIcon.offsetLeft);
     let targetY = snapY(draggingIcon.offsetTop);
 
-    // THE FIX: If icon hits navbar OR another icon, move 10px right until clear
-    while (targetX < NAVBAR_WIDTH || isOccupied(targetX, targetY, draggingIcon)) {
+    // Automatically nudge 10px right if hitting navbar OR another icon
+    while (hitsNavbar(targetX, targetY, draggingIcon) || isOccupied(targetX, targetY, draggingIcon)) {
       targetX += 10;
       
-      // Safety break to stop icon from going off-screen
-      if (targetX > window.innerWidth - 80) break; 
+      // Stop if it hits the edge of the screen
+      if (targetX > window.innerWidth - draggingIcon.offsetWidth) break;
     }
 
     draggingIcon.style.left = targetX + 'px';
