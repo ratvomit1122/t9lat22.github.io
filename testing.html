@@ -1902,9 +1902,8 @@ requestAnimationFrame(trackFPS);
 const icons = document.querySelectorAll('.icon');
 const gridSize = 100; // grid spacing in px
 let isDragging = false;
-let dragStartMouse = { x: 0, y: 0 };
-let dragStartPosition = null;
 let draggingIcon = null;
+let mouseOffset = { x: 0, y: 0 };
 
 // Helper: snap to grid
 function snap(value) {
@@ -1928,8 +1927,12 @@ icons.forEach(icon => {
     e.preventDefault();
     draggingIcon = icon;
     isDragging = true;
-    dragStartMouse = { x: e.clientX, y: e.clientY };
-    dragStartPosition = { x: icon.offsetLeft, y: icon.offsetTop };
+
+    // Calculate offset between mouse and top-left of icon
+    const rect = icon.getBoundingClientRect();
+    mouseOffset.x = e.clientX - rect.left;
+    mouseOffset.y = e.clientY - rect.top;
+
     icon.style.zIndex = 1000; // bring to front
   });
 });
@@ -1938,11 +1941,8 @@ icons.forEach(icon => {
 document.addEventListener('mousemove', (e) => {
   if (!isDragging || !draggingIcon) return;
 
-  let dx = e.clientX - dragStartMouse.x;
-  let dy = e.clientY - dragStartMouse.y;
-
-  let newX = dragStartPosition.x + dx;
-  let newY = dragStartPosition.y + dy;
+  let newX = e.clientX - mouseOffset.x;
+  let newY = e.clientY - mouseOffset.y;
 
   // Keep inside screen boundaries
   const maxX = window.innerWidth - draggingIcon.offsetWidth;
@@ -1961,10 +1961,10 @@ document.addEventListener('mouseup', () => {
   let snappedX = snap(draggingIcon.offsetLeft);
   let snappedY = snap(draggingIcon.offsetTop);
 
-  // If the snapped spot is occupied, return icon to original position
+  // If the snapped spot is occupied, return icon to previous place
   if (isOccupied(snappedX, snappedY, draggingIcon)) {
-    draggingIcon.style.left = dragStartPosition.x + 'px';
-    draggingIcon.style.top = dragStartPosition.y + 'px';
+    draggingIcon.style.left = snap(draggingIcon.offsetLeft - mouseOffset.x) + 'px';
+    draggingIcon.style.top = snap(draggingIcon.offsetTop - mouseOffset.y) + 'px';
   } else {
     draggingIcon.style.left = snappedX + 'px';
     draggingIcon.style.top = snappedY + 'px';
@@ -1978,6 +1978,7 @@ document.addEventListener('mouseup', () => {
 // Prevent text selection while dragging
 document.addEventListener('selectstart', e => e.preventDefault());
 </script>
+
 
 
 
