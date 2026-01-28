@@ -1977,10 +1977,9 @@ requestAnimationFrame(trackFPS);
 
 <script>
   const icons = document.querySelectorAll('.icon');
-const navbar = document.querySelector('.navbar'); // Ensure your navbar has class="navbar"
 const gridSize = 100;
-const offsetX = 5; 
-const offsetY = 20; 
+const offsetX = 5;  // Matches your HTML left: 5px
+const offsetY = 20; // Matches your HTML top: 120px/220px grid logic
 
 let draggingIcon = null;
 let mouseOffset = { x: 0, y: 0 };
@@ -1988,28 +1987,17 @@ let mouseStart = { x: 0, y: 0 };
 let isDragging = false;
 const dragThreshold = 5;
 
+// Precision snapping functions
 const snapX = (v) => Math.round((v - offsetX) / gridSize) * gridSize + offsetX;
 const snapY = (v) => Math.round((v - offsetY) / gridSize) * gridSize + offsetY;
 
-// Checks if a spot is taken by another icon (using a 50px buffer)
+// Check for collisions using snapped coordinates
 function isOccupied(x, y, ignore) {
-  return Array.from(icons).some(ic => {
-    if (ic === ignore) return false;
-    const icX = parseInt(ic.style.left) || 0;
-    const icY = parseInt(ic.style.top) || 0;
-    return Math.abs(icX - x) < 50 && Math.abs(icY - y) < 50;
-  });
-}
-
-// Checks if the icon is currently under the navbar
-function hitsNavbar(x, y, icon) {
-  if (!navbar) return false;
-  const navRect = navbar.getBoundingClientRect();
-  const buffer = 15; // Extra space so the icon doesn't touch the edge
-  
-  // If the navbar is on the left, we check if the icon's left side 
-  // is less than the navbar's right edge
-  return x < (navRect.right + buffer);
+  return Array.from(icons).some(ic => 
+    ic !== ignore && 
+    parseInt(ic.style.left) === x && 
+    parseInt(ic.style.top) === y
+  );
 }
 
 icons.forEach(icon => {
@@ -2021,24 +2009,30 @@ icons.forEach(icon => {
     icon.style.zIndex = 1000;
   });
 
+  // Captures and blocks the click if the mouse moved (dragging)
   icon.addEventListener('click', (e) => {
     if (isDragging) {
       e.stopImmediatePropagation();
       e.preventDefault();
     }
-  }, true);
+  }, true); 
 });
 
 document.addEventListener('mousemove', (e) => {
   if (!draggingIcon) return;
+
   const dx = e.clientX - mouseStart.x;
   const dy = e.clientY - mouseStart.y;
-  if (!isDragging && Math.hypot(dx, dy) > dragThreshold) isDragging = true;
-  
+
+  if (!isDragging && Math.hypot(dx, dy) > dragThreshold) {
+    isDragging = true;
+  }
+
   if (!isDragging) return;
 
-  let x = e.clientX - mouseOffset.x;
-  let y = e.clientY - mouseOffset.y;
+  // Real-time movement logic
+  let x = Math.min(Math.max(e.clientX - mouseOffset.x, 0), window.innerWidth - draggingIcon.offsetWidth);
+  let y = Math.min(Math.max(e.clientY - mouseOffset.y, 0), window.innerHeight - draggingIcon.offsetHeight);
 
   draggingIcon.style.left = x + 'px';
   draggingIcon.style.top = y + 'px';
@@ -2048,21 +2042,20 @@ document.addEventListener('mouseup', () => {
   if (!draggingIcon) return;
 
   if (isDragging) {
-    let targetX = snapX(draggingIcon.offsetLeft);
-    let targetY = snapY(draggingIcon.offsetTop);
+    const targetX = snapX(draggingIcon.offsetLeft);
+    const targetY = snapY(draggingIcon.offsetTop);
 
-    // AUTOMATIC NUDGE: 
-    // If it hits the navbar OR another icon, move 10px right until it finds a hole
-    while (hitsNavbar(targetX, targetY, draggingIcon) || isOccupied(targetX, targetY, draggingIcon)) {
-      targetX += 10;
-      
-      // Safety: Stop if we go off screen
-      if (targetX > window.innerWidth - 80) break;
+    if (isOccupied(targetX, targetY, draggingIcon)) {
+      // Snap back to original grid spot if blocked
+      draggingIcon.style.left = snapX(mouseStart.x - mouseOffset.x) + 'px';
+      draggingIcon.style.top = snapY(mouseStart.y - mouseOffset.y) + 'px';
+    } else {
+      // Lock into new grid spot
+      draggingIcon.style.left = targetX + 'px';
+      draggingIcon.style.top = targetY + 'px';
     }
 
-    draggingIcon.style.left = targetX + 'px';
-    draggingIcon.style.top = targetY + 'px';
-
+    // Delay resetting the flag so 'click' event doesn't trigger 's()'
     setTimeout(() => { isDragging = false; }, 50);
   }
 
@@ -2071,7 +2064,7 @@ document.addEventListener('mouseup', () => {
 });
 
 document.addEventListener('selectstart', e => e.preventDefault());
-</script> 
+  </script>
 
 
 
