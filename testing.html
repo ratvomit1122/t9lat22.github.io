@@ -1904,13 +1904,15 @@ const gridSize = 100; // grid spacing in px
 let isDragging = false;
 let draggingIcon = null;
 let mouseOffset = { x: 0, y: 0 };
+let mouseStart = { x: 0, y: 0 };
+const dragThreshold = 5; // pixels to start dragging
 
-// Helper: snap to grid
+// Snap helper
 function snap(value) {
   return Math.round(value / gridSize) * gridSize;
 }
 
-// Helper: check if a position is occupied
+// Check if spot is occupied
 function isOccupied(x, y, ignoreIcon = null) {
   for (const ic of icons) {
     if (ic === ignoreIcon) continue;
@@ -1926,25 +1928,40 @@ icons.forEach(icon => {
   icon.addEventListener('mousedown', (e) => {
     e.preventDefault();
     draggingIcon = icon;
-    isDragging = true;
+    mouseStart = { x: e.clientX, y: e.clientY };
 
-    // Calculate offset between mouse and top-left of icon
     const rect = icon.getBoundingClientRect();
     mouseOffset.x = e.clientX - rect.left;
     mouseOffset.y = e.clientY - rect.top;
 
-    icon.style.zIndex = 1000; // bring to front
+    // Bring to front visually
+    icon.style.zIndex = 1000;
+  });
+
+  // Optional: allow normal click if not dragging
+  icon.addEventListener('click', (e) => {
+    if (isDragging) e.stopImmediatePropagation(); // prevent click if dragging
   });
 });
 
 // ----- Mouse move -----
 document.addEventListener('mousemove', (e) => {
-  if (!isDragging || !draggingIcon) return;
+  if (!draggingIcon) return;
+
+  const dx = e.clientX - mouseStart.x;
+  const dy = e.clientY - mouseStart.y;
+
+  // Only start dragging if moved enough pixels
+  if (!isDragging && Math.hypot(dx, dy) > dragThreshold) {
+    isDragging = true;
+  }
+
+  if (!isDragging) return;
 
   let newX = e.clientX - mouseOffset.x;
   let newY = e.clientY - mouseOffset.y;
 
-  // Keep inside screen boundaries
+  // Keep inside screen
   const maxX = window.innerWidth - draggingIcon.offsetWidth;
   const maxY = window.innerHeight - draggingIcon.offsetHeight;
   newX = Math.min(Math.max(newX, 0), maxX);
@@ -1956,18 +1973,20 @@ document.addEventListener('mousemove', (e) => {
 
 // ----- Mouse up -----
 document.addEventListener('mouseup', () => {
-  if (!isDragging || !draggingIcon) return;
+  if (!draggingIcon) return;
 
-  let snappedX = snap(draggingIcon.offsetLeft);
-  let snappedY = snap(draggingIcon.offsetTop);
+  if (isDragging) {
+    let snappedX = snap(draggingIcon.offsetLeft);
+    let snappedY = snap(draggingIcon.offsetTop);
 
-  // If the snapped spot is occupied, return icon to previous place
-  if (isOccupied(snappedX, snappedY, draggingIcon)) {
-    draggingIcon.style.left = snap(draggingIcon.offsetLeft - mouseOffset.x) + 'px';
-    draggingIcon.style.top = snap(draggingIcon.offsetTop - mouseOffset.y) + 'px';
-  } else {
-    draggingIcon.style.left = snappedX + 'px';
-    draggingIcon.style.top = snappedY + 'px';
+    if (isOccupied(snappedX, snappedY, draggingIcon)) {
+      // Return to original spot
+      draggingIcon.style.left = snap(draggingIcon.offsetLeft - mouseOffset.x) + 'px';
+      draggingIcon.style.top = snap(draggingIcon.offsetTop - mouseOffset.y) + 'px';
+    } else {
+      draggingIcon.style.left = snappedX + 'px';
+      draggingIcon.style.top = snappedY + 'px';
+    }
   }
 
   draggingIcon.style.zIndex = '';
@@ -1978,6 +1997,7 @@ document.addEventListener('mouseup', () => {
 // Prevent text selection while dragging
 document.addEventListener('selectstart', e => e.preventDefault());
 </script>
+
 
 
 
