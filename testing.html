@@ -2844,7 +2844,7 @@ window.addEventListener("blur",stopAll);
 </script>
 
 <script>
-  /**
+/**
  * T9 OS Performance Optimizer for Chromebooks
  * Reduces lag without affecting visual appearance
  */
@@ -2909,14 +2909,11 @@ window.addEventListener("blur",stopAll);
   }
 
   // ============================================
-  // 4. OPTIMIZE DRAG/DROP ICON CHECKING
+  // 4. DRAG/DROP - NO THROTTLING
   // ============================================
   
-  // Throttle the collision detection check
-  const originalIsOccupied = window.isOccupied;
-  if (typeof originalIsOccupied === 'function') {
-    window.isOccupied = throttle(originalIsOccupied, 50);
-  }
+  // Removed throttling here - it caused laggy dragging
+  // Drag operations need to be smooth and responsive
 
   // ============================================
   // 5. REDUCE FIREBASE POLLING
@@ -3106,15 +3103,10 @@ window.addEventListener("blur",stopAll);
   }
 
   // ============================================
-  // 14. OPTIMIZE ICON DRAGGING
+  // 14. ICON DRAGGING - NO THROTTLING
   // ============================================
   
-  // Reduce mousemove event frequency during icon drag
-  const iconDragHandler = document.querySelector('.icon');
-  if (iconDragHandler) {
-    document.removeEventListener('mousemove', iconDragHandler);
-    document.addEventListener('mousemove', throttle(iconDragHandler, 16)); // ~60fps
-  }
+  // Removed throttling here - smooth dragging is more important than slight CPU savings
 
   // ============================================
   // 15. CHROMEBOOK-SPECIFIC OPTIMIZATIONS
