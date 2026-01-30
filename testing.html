@@ -1017,7 +1017,7 @@ loadWidgetWeather();
 
 <div id="terminalDiv">
   <button class="close-btn" onclick="document.getElementById('terminalDiv').style.display = 'none';">●</button>
-      <button class="full-btn" onclick="fullscreenIframeTerminal()">●</button>
+      <button class="full-btn" onclick="fullscreenIframeter()">●</button>
 
     <button class="back" style="top:7px; left: 50px; position: fixed; color:white;"    onclick="document.getElementById('frame3').src = 'terminal.html';">←</button>
 
@@ -1041,7 +1041,7 @@ loadWidgetWeather();
    
   </style>
      <script>
-    function fullscreenIframeTerminal() {
+    function fullscreenIframeter() {
       let iframe = document.getElementById("frame3");
       if (iframe.requestFullscreen) {
         iframe.requestFullscreen();
