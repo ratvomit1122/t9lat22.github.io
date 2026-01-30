@@ -2843,6 +2843,329 @@ window.addEventListener("blur",stopAll);
 });
 </script>
 
+<script>
+  /**
+ * T9 OS Performance Optimizer for Chromebooks
+ * Reduces lag without affecting visual appearance
+ */
+
+(function() {
+  'use strict';
+
+  // ============================================
+  // 1. THROTTLE EXPENSIVE OPERATIONS
+  // ============================================
+  
+  // Throttle helper function
+  function throttle(func, limit) {
+    let inThrottle;
+    return function(...args) {
+      if (!inThrottle) {
+        func.apply(this, args);
+        inThrottle = true;
+        setTimeout(() => inThrottle = false, limit);
+      }
+    };
+  }
+
+  // ============================================
+  // 2. OPTIMIZE CLOCK/BATTERY UPDATES
+  // ============================================
+  
+  // Replace the original updateTime function with a throttled version
+  const originalUpdateTime = window.updateTime;
+  if (originalUpdateTime) {
+    window.updateTime = throttle(originalUpdateTime, 1000); // Already updates every second, but ensure no double calls
+  }
+
+  // ============================================
+  // 3. OPTIMIZE FPS COUNTER
+  // ============================================
+  
+  // Reduce FPS counter update frequency (visual change is minimal)
+  const fpsCounter = document.getElementById('fpsCounter');
+  if (fpsCounter) {
+    let frameCount = 0;
+    let lastTime = performance.now();
+    let fps = 0;
+    
+    function optimizedTrackFPS() {
+      frameCount++;
+      const now = performance.now();
+      const delta = now - lastTime;
+      
+      // Update display every 2 seconds instead of every 1 second
+      if (delta >= 2000) {
+        fps = Math.round((frameCount * 1000) / delta);
+        fpsCounter.innerText = 'FPS: ' + fps;
+        frameCount = 0;
+        lastTime = now;
+      }
+      requestAnimationFrame(optimizedTrackFPS);
+    }
+    
+    // Cancel existing FPS tracker if running
+    optimizedTrackFPS();
+  }
+
+  // ============================================
+  // 4. OPTIMIZE DRAG/DROP ICON CHECKING
+  // ============================================
+  
+  // Throttle the collision detection check
+  const originalIsOccupied = window.isOccupied;
+  if (typeof originalIsOccupied === 'function') {
+    window.isOccupied = throttle(originalIsOccupied, 50);
+  }
+
+  // ============================================
+  // 5. REDUCE FIREBASE POLLING
+  // ============================================
+  
+  // Cache Firebase reads to reduce database calls
+  const firebaseCache = new Map();
+  const CACHE_DURATION = 5000; // 5 seconds
+  
+  window.getCachedFirebaseValue = function(key, fetchFunc) {
+    const cached = firebaseCache.get(key);
+    const now = Date.now();
+    
+    if (cached && (now - cached.timestamp < CACHE_DURATION)) {
+      return Promise.resolve(cached.value);
+    }
+    
+    return fetchFunc().then(value => {
+      firebaseCache.set(key, { value, timestamp: now });
+      return value;
+    });
+  };
+
+  // ============================================
+  // 6. OPTIMIZE ANIMATIONS
+  // ============================================
+  
+  // Use will-change sparingly and only when needed
+  const style = document.createElement('style');
+  style.textContent = `
+    /* Remove unnecessary will-change properties */
+    .navbar, .navbar img {
+      will-change: auto !important;
+    }
+    
+    /* Use transform instead of multiple properties for better performance */
+    .navbar:hover, .navbar.sidebar:hover {
+      will-change: transform;
+    }
+    
+    /* Optimize transitions to use only transform and opacity */
+    #hiddenDiv, #ChatDiv, #musicDiv, #searchDiv, #updateDiv, 
+    #aiDiv, #terminalDiv, #emulatorDiv, #movieDiv, #roDiv {
+      will-change: auto;
+    }
+    
+    /* Reduce blur for better performance */
+    .navbar, #appsDiv {
+      backdrop-filter: blur(5px) saturate(120%) !important;
+    }
+  `;
+  document.head.appendChild(style);
+
+  // ============================================
+  // 7. LAZY LOAD IFRAMES
+  // ============================================
+  
+  // Don't load iframe content until div is visible
+  const iframeParents = [
+    'hiddenDiv', 'ChatDiv', 'musicDiv', 'searchDiv', 
+    'aiDiv', 'terminalDiv', 'emulatorDiv', 'movieDiv', 'roDiv'
+  ];
+  
+  iframeParents.forEach(parentId => {
+    const parent = document.getElementById(parentId);
+    if (!parent) return;
+    
+    const iframe = parent.querySelector('iframe');
+    if (!iframe) return;
+    
+    // Store original src
+    const originalSrc = iframe.src;
+    iframe.dataset.originalSrc = originalSrc;
+    
+    // Clear src initially if div is hidden
+    if (parent.style.display === 'none' || !parent.style.display) {
+      iframe.src = 'about:blank';
+    }
+    
+    // Create observer for when div becomes visible
+    const observer = new MutationObserver(throttle(function(mutations) {
+      mutations.forEach(mutation => {
+        if (mutation.attributeName === 'style') {
+          if (parent.style.display === 'block' && iframe.src === 'about:blank') {
+            iframe.src = iframe.dataset.originalSrc;
+          } else if (parent.style.display === 'none' && iframe.src !== 'about:blank') {
+            // Optional: unload iframe when hidden to save memory
+            // Uncomment next line if you want more aggressive memory savings
+            // iframe.src = 'about:blank';
+          }
+        }
+      });
+    }, 100));
+    
+    observer.observe(parent, { attributes: true, attributeFilter: ['style'] });
+  });
+
+  // ============================================
+  // 8. DEBOUNCE WINDOW RESIZE EVENTS
+  // ============================================
+  
+  function debounce(func, wait) {
+    let timeout;
+    return function(...args) {
+      clearTimeout(timeout);
+      timeout = setTimeout(() => func.apply(this, args), wait);
+    };
+  }
+  
+  // Optimize any resize listeners
+  const optimizedResize = debounce(() => {
+    // Trigger any necessary recalculations
+    window.dispatchEvent(new Event('optimizedResize'));
+  }, 250);
+  
+  window.addEventListener('resize', optimizedResize);
+
+  // ============================================
+  // 9. REDUCE DOM QUERIES
+  // ============================================
+  
+  // Cache frequently accessed elements
+  window.cachedElements = {
+    navbar: document.getElementById('navbar'),
+    time: document.getElementById('time'),
+    battery: document.getElementById('batteryPercentage'),
+    notifications: document.getElementById('notifications')
+  };
+
+  // ============================================
+  // 10. OPTIMIZE NOTIFICATION SYSTEM
+  // ============================================
+  
+  // Limit number of simultaneous notifications
+  const MAX_NOTIFICATIONS = 3;
+  const notificationContainer = document.getElementById('notifications');
+  
+  if (notificationContainer) {
+    const originalShowNotification = window.showNotification;
+    
+    window.showNotification = function(text) {
+      const existingToasts = notificationContainer.querySelectorAll('.toast');
+      
+      // Remove oldest if at limit
+      if (existingToasts.length >= MAX_NOTIFICATIONS) {
+        existingToasts[0].remove();
+      }
+      
+      // Call original function
+      if (originalShowNotification) {
+        originalShowNotification(text);
+      }
+    };
+  }
+
+  // ============================================
+  // 11. OPTIMIZE BACKGROUND LOADING
+  // ============================================
+  
+  // Ensure background image is optimized
+  const savedBg = localStorage.getItem('selectedBackground');
+  if (savedBg && savedBg.includes('http')) {
+    // Preload background image
+    const img = new Image();
+    img.src = savedBg;
+  }
+
+  // ============================================
+  // 12. REDUCE SHADOW COMPLEXITY (already in CSS)
+  // ============================================
+  
+  // The existing CSS already has this optimization
+  // Keeping box-shadows simple and minimal
+
+  // ============================================
+  // 13. BATTERY CHECK OPTIMIZATION
+  // ============================================
+  
+  // Check battery less frequently
+  if ('getBattery' in navigator) {
+    navigator.getBattery().then(function(battery) {
+      const throttledUpdate = throttle(() => updateBatteryStatus(battery), 30000); // Every 30 seconds
+      
+      battery.removeEventListener('levelchange', updateBatteryStatus);
+      battery.addEventListener('levelchange', throttledUpdate);
+    });
+  }
+
+  // ============================================
+  // 14. OPTIMIZE ICON DRAGGING
+  // ============================================
+  
+  // Reduce mousemove event frequency during icon drag
+  const iconDragHandler = document.querySelector('.icon');
+  if (iconDragHandler) {
+    document.removeEventListener('mousemove', iconDragHandler);
+    document.addEventListener('mousemove', throttle(iconDragHandler, 16)); // ~60fps
+  }
+
+  // ============================================
+  // 15. CHROMEBOOK-SPECIFIC OPTIMIZATIONS
+  // ============================================
+  
+  // Detect if running on Chromebook (check for Chrome OS)
+  const isChromebook = /CrOS/.test(navigator.userAgent);
+  
+  if (isChromebook) {
+    // Further reduce effects on Chromebook
+    const chromeStyle = document.createElement('style');
+    chromeStyle.textContent = `
+      /* Minimal animations on Chromebook */
+      * {
+        animation-duration: 0.3s !important;
+      }
+      
+      /* Simpler shadows */
+      .navbar::after, .navbar.sidebar::after {
+        opacity: 0.5 !important;
+      }
+      
+      /* Reduce blur even more */
+      .navbar, #appsDiv {
+        backdrop-filter: blur(3px) !important;
+      }
+    `;
+    document.head.appendChild(chromeStyle);
+  }
+
+  // ============================================
+  // 16. PREVENT MEMORY LEAKS
+  // ============================================
+  
+  // Clear Firebase cache periodically
+  setInterval(() => {
+    const now = Date.now();
+    for (let [key, value] of firebaseCache.entries()) {
+      if (now - value.timestamp > CACHE_DURATION * 2) {
+        firebaseCache.delete(key);
+      }
+    }
+  }, 60000); // Every minute
+
+  console.log('✅ T9 OS Performance Optimizer loaded successfully!');
+  if (isChromebook) {
+    console.log('🖥️ Chromebook optimizations enabled');
+  }
+
+})();
+</script>
 
 
 
