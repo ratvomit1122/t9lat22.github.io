@@ -2,6 +2,7 @@
 
 
 
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -10,7 +11,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap" rel="stylesheet">
 <link rel="shortcut icon" type="image/jpg" href="favicon.png"/>
-
 
 <title>T9 OS</title>
 
@@ -166,7 +166,7 @@ color: white;
     margin-top: 20px;
     padding: 10px;
 background-color: #1b1b1bbd;
-border: 1px solid rgb(34, 34, 34);   
+  border: 1px solid rgba(255, 255, 255, 0.2);
     color: white;
     inset: 0;
     margin:auto;
@@ -186,7 +186,7 @@ box-shadow: 2px #141414;
     margin-top: 20px;
     padding: 10px;
 background-color: #1b1b1bbd;
-border: 1px solid rgb(34, 34, 34);   
+  border: 1px solid rgba(255, 255, 255, 0.2);
     color: white;
     inset: 0;
     margin:auto;
@@ -241,6 +241,26 @@ box-shadow: 2px #141414;
       animation: popIn2 0.5s ease-out forwards;
 
   }
+   #musicDiv {
+    display: none;
+    margin-top: 20px;
+    padding: 10px;
+background-color: #1b1b1bbd;
+border: 1px solid rgb(34, 34, 34);   
+    color: white;
+    inset: 0;
+    margin:auto;
+    position: fixed;
+    z-index: 1000;
+    border-radius:30px; 
+    width:85%;
+    height: 77%; 
+    overflow-x: hidden;
+    overflow-y: auto;
+box-shadow: 2px #141414;
+      animation: popIn2 0.5s ease-out forwards;
+
+  }
     #t9Div {
     display: none;
     margin-top: 20px;
@@ -263,7 +283,7 @@ border: 1px solid rgb(34, 34, 34);
     overflow-y: auto;
 box-shadow: 2px #141414;
       animation: popIn2 0.5s ease-out forwards;
-      top:310px;
+      top:155px;
 
   }
   #settingsDiv {
@@ -330,6 +350,7 @@ border: 1px solid rgba(255, 255, 255, 0.15);
     padding: 10px;
     background: rgba(0,0,0,0.4);    
 backdrop-filter: blur(7px);   
+border: 1px solid rgba(255, 255, 255, 0.15);   
     color: white;
    right:50px;
    top:50px;
@@ -429,7 +450,7 @@ border: 1px solid rgba(255, 255, 255, 0.15);
     margin-top: 20px;
     padding: 10px;
 background-color: #1b1b1bbd;
-border: 1px solid rgb(34, 34, 34);   
+border: 1px solid rgba(255, 255, 255, 0.15);   
     color: white;
     inset: 0;
     margin:auto;
@@ -601,7 +622,10 @@ border: 1px solid rgba(255, 255, 255, 0.15);
   <a onclick="movie()">
     <img src="movie2.png">
   </a>
-  <a href="https://tableschairs.vercel.app/" target="_blank">
+   <a onclick="music()">
+    <img src="music3.png">
+  </a>
+  <a onclick="s()">
     <img  src="search.png">
   </a>
   
@@ -653,9 +677,7 @@ border: 1px solid rgba(255, 255, 255, 0.15);
      <a href="https://ratgames.vercel.app/">
      <img class="btn" src="rat.gif">
           </a>
-           <a href="https://blackoutgames.pages.dev/">
-     <img class="btn" src="zenith.png">
-          </a>
+          
            <a href="https://1anime.app">
      <img class="btn" src="anime-partner.png">
           </a>
@@ -663,6 +685,11 @@ border: 1px solid rgba(255, 255, 255, 0.15);
            <a href="https://ducky-ea0.pages.dev">
      <img class="btn" src="duckmath.png">
           </a>
+
+            <a href="https://demonzero.space/">
+     <img class="btn" src="demon.png">
+          </a>
+     
      
         
        
@@ -672,9 +699,11 @@ border: 1px solid rgba(255, 255, 255, 0.15);
 
 <div id="updateDiv">
   <button class="close-btn" onclick="document.getElementById('updateDiv').style.display = 'none';">●</button>
-  <h1 class="gtext"> Updates</h1>
-<h1 style="text-align: center;">Version 2.60 </h1>
-        <h3 style="text-align: center; color:white;">New update: added a bunch of games including Grand Theft Auto: Vice City</h3>
+
+<h1 style="text-align: center;">Version 2.61</h1>
+
+                        <h3 style="text-align: center; color:white;">T9 OS V3 coming soon. Its gonna have more games, looks better, better functionality and more.</h3>
+
                 <h3 style="text-align: center; color:white;">Links: t9os.vercel.app t9osclass.vercel.app learningbooks.vercel.app. More links in the link docs</h3>
 
 
@@ -682,18 +711,17 @@ border: 1px solid rgba(255, 255, 255, 0.15);
 
 
 
-        <h3 style="text-align: center; color:white;">Make sure to join our discord server for updates and sneak peeks!</h3>
-
-
-        <h3 style="text-align: center; color:white;">If you would like to help out T9 OS please join our patreon membership. Thank you!</h3>
-
+        <h3 style="text-align: center; color:white;">If you would like to help out T9 OS please donate to our Ko-Fi, It helps us buy domains/links, Servers if needed, and more. Thank you!</h3>
+                <h3 style="text-align: center; color:white;">Donaters get early access to updates, go on the wll of fame, and gets special perks on dc server.</h3>
 
 
 
 
-  <a style="background-color: white; padding:10px 20px; color:black; border-radius: 10px; text-align: center; font-family: sans-serif; text-decoration: none; " href="https://www.patreon.com/c/T9OS"  target="_blank">Support us!</a>
 
-    <a style="background-color: 	#7289da; padding:10px 20px; color:rgb(255, 255, 255); border-radius: 10px; text-align: center; font-family: sans-serif; text-decoration: none; " href="https://discord.com/invite/tknXENDkzY"  target="_blank">Join server!</a>
+
+  <a style="background-color: white; padding:10px 20px; color:black; border-radius: 10px; text-align: center; font-family: sans-serif; text-decoration: none; " href="https://ko-fi.com/t9oss"  target="_blank">Donate!</a>
+
+    <a style="background-color: 	#7289da; padding:10px 20px; color:rgb(255, 255, 255); border-radius: 10px; text-align: center; font-family: sans-serif; text-decoration: none; " href="https://dsc.gg/t9os"  target="_blank">Join server!</a>
 
 
 
@@ -746,7 +774,7 @@ border: 1px solid rgba(255, 255, 255, 0.15);
 
 
  
-<iframe class="frame" src="chat2.html"></iframe>
+<iframe class="frame" src="chat3.html"></iframe>
   <style>
     .frame{
       width:100%;
@@ -761,7 +789,8 @@ border: 1px solid rgba(255, 255, 255, 0.15);
     display: none;
     margin-top: 20px;
     padding: 10px;
-     background: rgba(0, 0, 0, 0.822);   
+background-color: #1b1b1bbd;
+       border: 1px solid rgba(255, 255, 255, 0.2);
     color: white;
     inset: 0;
     margin:auto;
@@ -852,7 +881,6 @@ border: 1px solid rgba(255, 255, 255, 0.15);
   <button class="close-btn" onclick="document.getElementById('hacksDiv').style.display = 'none';">●</button>
   <h1 class="gtext"> Bookmarklets </h1>
   <p color="white" style="text-align: center;">Drag the buttons to ur bookmarks bar .</p>
-    <p color="white" style="text-align: center;">For Blooket hacks do not drag it instead click on it and follow the instructions.</p>
 
 
           <a href="javascript:(function(x,y){if(!window.click){window.click=!0,document.body.style.cursor='crosshair';var cps=prompt('Autoclicker CPS: (Under 200 recommended)');if(!cps||isNaN(cps)?(alert(%27You entered something wrong. Try running the script again.%27),end()):alert(%27Autoclicker activated at %27+cps+%27 CPS! Do [ctrl+e] to stop.%27),addEventListener(%27mousemove%27,e=>{x=e.clientX,y=e.clientY}),addEventListener(%27keydown%27,e=>{%27e%27===e.key&&e.ctrlKey&&(alert(%27Autoclicker deactivated! Click the bookmark again to reactivate!%27),end())}),window.click)var int=setInterval(function(){var e=document.elementFromPoint(x,y);e&&e.click()},1e3/cps);function end(){clearInterval(int),window.click=!1,document.body.style.cursor=%27default%27}}})();">
@@ -861,9 +889,7 @@ border: 1px solid rgba(255, 255, 255, 0.15);
 <a href="javascript:if(document.body.contentEditable !== 'true') {    document.body.contentEditable = 'true'; document.designMode='on'; void 0} else {    document.body.contentEditable = 'false'; document.designMode='off'; void 0}">
       <button class="btn" >Edit Anything</button>
       </a>
-   <a href="blk.html">
-      <button class="btn" >Blooket Hacks</button>
-      </a>
+  
         <script>
         const buttons = document.querySelectorAll('.btn');
 
@@ -1045,7 +1071,7 @@ border: 1px solid rgba(255, 255, 255, 0.15);
 
   <p class="warn"></p>
 
-  <iframe id="frame3" class="frame" src="https://wewdedeeferfefef.vercel.app/"></iframe>
+  <iframe id="frame3" class="frame" src="https://98sxnh-8080.csb.app"></iframe>
   <style>
     .frame{
       width:100%;
@@ -1124,6 +1150,7 @@ border: 1px solid rgba(255, 255, 255, 0.15);
 transform: translateX(-50%);
     width:25%;
     border-radius: 0px 0px 15px 15px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -1151,21 +1178,17 @@ transform: translateX(-50%);
              
 </div>
 <div id="hiddenDiv">
-  <button class="close-btn" onclick="document.getElementById('hiddenDiv').style.display = 'none';">●</button>
+<button class="close-btn" onclick="document.getElementById('hiddenDiv').style.display = 'none';">●</button>
     <button class="full-btn" onclick="fullscreenIframe()">●</button>
 
   <button class="back" style="top:10px; left: 50px; position: fixed; color:white;"    onclick="document.getElementById('frame2').src = 'test99.html';">←</button>
 <h3 style="  left: 50%; color:white; top:-9.5px; position: absolute;   transform: translateX(-50%);      " >Games</h3>
 <h3  id="fpsCounter" style="  left: 80%; color:white; top:-9.5px; position: absolute;   transform: translateX(-80%);      " ></h3>
  
- <div class="resize-handle right"></div>
-    <div class="resize-handle bottom"></div>
-    <div class="resize-handle corner"></div>
 
 
 
 <iframe id="frame2" src="test99.html"></iframe>
-
   <style>
     #frame2{
       width:100%;
@@ -1213,41 +1236,6 @@ backdrop-filter: blur(7px);
   }
   </style>
 
-<style>
-    #hiddenDiv iframe {
-      pointer-events: none;
-    }
-
-    #hiddenDiv.dragging iframe,
-    #hiddenDiv.resizing iframe {
-      pointer-events: none;
-    }
-
-    .drag-handle {
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 40px;
-      cursor: move;
-      z-index: 5;
-    }
-
-    .resizer {
-      position: absolute;
-      width: 30px;
-      height: 30px;
-      right: 0;
-      bottom: 0;
-      cursor: nwse-resize;
-      z-index: 10;
-      background: rgba(255, 255, 255, 0.1);
-    }
-</style>
-
-
-
-
   <script>
 let lastTime = performance.now();
 let frameCount = 0;
@@ -1287,6 +1275,49 @@ requestAnimationFrame(trackFPS);
            
 </div>
 
+<div id="musicDiv">
+  <button class="close-btn" onclick="document.getElementById('musicDiv').style.display = 'none';">●</button>
+    <button class="full-btn" onclick="fullscreenIframeMusic()">●</button>
+
+<h3 style="  left: 50%; color:white; top:-9.5px; position: absolute;   transform: translateX(-50%);      " >Music</h3>
+ 
+
+
+
+<iframe id="frameMusic" src="music2.html"></iframe>
+  <style>
+    #frameMusic{
+      width:100%;
+      height:95%;
+      bottom:0;
+      position: absolute;
+      border:none;
+      border-radius:0px 0px 20px 20px;
+      left:0;
+      border-top: 1px solid rgb(37, 37, 37);
+    }
+  
+  </style>
+
+    <script>
+    function fullscreenIframeMusic() {
+      let iframe = document.getElementById("frameMusic");
+      if (iframe.requestFullscreen) {
+        iframe.requestFullscreen();
+      } else if (iframe.mozRequestFullScreen) { 
+        iframe.mozRequestFullScreen();
+      } else if (iframe.webkitRequestFullscreen) { 
+        iframe.webkitRequestFullscreen();
+      } else if (iframe.msRequestFullscreen) { 
+        iframe.msRequestFullscreen();
+      }
+    }
+  </script>
+
+
+ 
+           
+</div>
 <div id="aiDiv">
   <button class="close-btn" onclick="document.getElementById('aiDiv').style.display = 'none';">●</button>
     <button class="full-btn" onclick="fullscreenIframeAI()">●</button>
@@ -1425,6 +1456,9 @@ backdrop-filter: blur(7px);
 <select id="background-select">
   <option value="t9os6.png">Default</option>
                       <option value="abstract.png">T9 Abstract</option>
+
+                                                  <option value="silver2.gif">Silver Surfer live </option>
+
                             <option value="silver.jpeg">Silver Surfer</option>
                           <option value="naruto.png">Naruto</option>
                   <option value="red.jpg">Red Abstract</option>
@@ -1676,6 +1710,12 @@ backdrop-filter: blur(7px);
   }
 </script>
 <script>
+  function music(){
+    const div = document.getElementById('musicDiv');
+    div.style.display = div.style.display === 'block' ? 'none' : 'block';
+  }
+</script>
+<script>
   function movie(){
     const div = document.getElementById('movieDiv');
     div.style.display = div.style.display === 'block' ? 'none' : 'block';
@@ -1860,7 +1900,7 @@ if (selectedBackground) {
 <script>
 
   if (!localStorage.getItem("bg")) {
-    localStorage.setItem("bg", "url('abstract.png') no-repeat center center fixed");
+    localStorage.setItem("bg", "url('t9os6.png') no-repeat center center fixed");
   }
 
  
@@ -1955,169 +1995,257 @@ if (selectedBackground) {
       opacity: 1;
     }
   }
-   
 </style>
+<p style="color:#acacac; position: fixed; bottom: -3px; left: 10px; opacity: 0.6;">Version 2.6</p>
+<p style="color:#acacac; position: fixed; bottom: -3px; left: 100px; opacity: 0.6;" id="myId">ID: <span id="idValue"></span></p>
+
+<!-- Include Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+<script>
+  // ========== CONFIG ==========
+  const OWNER_ID = "0635354315"; // your owner ID
+  const ID_KEY = "numericUserID";
+  // ============================
+
+  // Your Firebase config
+  const firebaseConfig = {
+    apiKey: "AIzaSyD74Fi2RKsvv1sXTAEIiTYrRKCv22MRhh8",
+    authDomain: "t9oschat.firebaseapp.com",
+    databaseURL: "https://t9oschat-default-rtdb.firebaseio.com",
+    projectId: "t9oschat",
+    storageBucket: "t9oschat.firebasestorage.app",
+    messagingSenderId: "930534704832",
+    appId: "1:930534704832:web:c154890c3b5f36736f8f25",
+    measurementId: "G-STPKYT658F"
+  };
+
+  // Initialize Firebase
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
+
+  // Generate numeric ID (~10 digits)
+  function generateNumericID() {
+    const timestamp = Date.now().toString().slice(-6);
+    const random = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
+    return random + timestamp;
+  }
+
+  // Protect critical functions
+  (function() {
+    'use strict';
+    
+    // Store original localStorage methods
+    const originalSetItem = Storage.prototype.setItem;
+    const originalRemoveItem = Storage.prototype.removeItem;
+    const originalClear = Storage.prototype.clear;
+    
+    let isLocked = false;
+    let myID = null;
+
+    // Function to lock screen
+    function lockScreen() {
+      if (isLocked) return;
+      isLocked = true;
+      
+      // Clear the page
+      document.body.innerHTML = "";
+      document.body.style.cssText = "background: red; color: white; display: flex; flex-direction: column; justify-content: center; align-items: center; font-size: 40px; overflow: hidden; margin: 0; height: 100vh; text-align:center;";
+
+      // SHOW BANNED + ID
+      document.body.innerHTML = `
+        <div>BANNED</div>
+                <div>appeal ban at dsc.gg/t9os </div>
+
+        <div style="font-size:22px;margin-top:15px;opacity:0.85;">
+          Your ID: <b>${myID}</b>
+        </div>
+      `;
+
+      // Prevent all interactions
+      const preventAll = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        return false;
+      };
+      
+      ['keydown', 'keyup', 'keypress', 'mousedown', 'mouseup', 'click', 
+       'touchstart', 'touchend', 'contextmenu', 'beforeunload'].forEach(event => {
+        document.addEventListener(event, preventAll, true);
+        window.addEventListener(event, preventAll, true);
+      });
+
+      // Prevent localStorage manipulation
+      Storage.prototype.setItem = function() { return; };
+      Storage.prototype.removeItem = function() { return; };
+      Storage.prototype.clear = function() { return; };
+      
+      Object.freeze(localStorage);
+      Object.freeze(sessionStorage);
+      
+      window.onbeforeunload = () => true;
+      history.pushState(null, null, location.href);
+      window.onpopstate = () => history.go(1);
+      
+      window.db = null;
+      window.firebase = null;
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      // Get or create user ID using original methods
+      myID = originalSetItem.call(localStorage, ID_KEY, localStorage.getItem(ID_KEY) || generateNumericID()) || localStorage.getItem(ID_KEY);
+      if (!myID) {
+        myID = generateNumericID();
+        originalSetItem.call(localStorage, ID_KEY, myID);
+      }
+
+      // Show ID
+      const idSpan = document.getElementById("idValue");
+      if (idSpan) idSpan.textContent = myID;
+
+      // Monitor localStorage changes - prevent ID tampering
+      const checkInterval = setInterval(() => {
+        const currentID = localStorage.getItem(ID_KEY);
+        if (currentID !== myID) {
+          originalSetItem.call(localStorage, ID_KEY, myID);
+        }
+        
+        if (isLocked) {
+          lockScreen();
+        }
+      }, 100);
+
+      // Check banned list from Firebase
+      const bannedRef = db.ref("bannedIDs");
+      bannedRef.on("value", (snapshot) => {
+        const bannedIDs = snapshot.val() || [];
+        if (bannedIDs.includes(myID)) {
+          lockScreen();
+        }
+      });
+
+      // Owner shortcut: press "," to ban/unban
+      document.addEventListener("keydown", async (e) => {
+        if (myID !== OWNER_ID) return;
+        if (e.key === ",") {
+          const action = prompt("Type 'ban' to ban or 'unban' to unban:");
+          if (!action) return;
+          const targetID = prompt("Enter the ID to " + action + ":");
+          if (!targetID) return;
+
+          const snapshot = await bannedRef.get();
+          let bannedIDs = snapshot.val() || [];
+
+          if (action.toLowerCase() === "ban") {
+            if (!bannedIDs.includes(targetID)) {
+              bannedIDs.push(targetID);
+              await bannedRef.set(bannedIDs);
+              alert("User banned: " + targetID);
+            } else {
+              alert("User is already banned.");
+            }
+          } else if (action.toLowerCase() === "unban") {
+            bannedIDs = bannedIDs.filter(id => id !== targetID);
+            await bannedRef.set(bannedIDs);
+            alert("User unbanned: " + targetID);
+          } else {
+            alert("Invalid action.");
+          }
+        }
+      });
+    });
+  })();
+</script>
+
+<!--test2-->
 
 
 <script>
-const wins = [
-  document.getElementById("hiddenDiv"),
-  document.getElementById("ChatDiv"),
-  document.getElementById("movieDiv")
+/* ===============================
+   T9 OS – Hidden Iframe Freeze & Mute
+   =============================== */
+
+const APP_WINDOWS = [
+  "hiddenDiv",
+  "aiDiv",
+  "movieDiv",
+  "terminalDiv",
+  "searchDiv",
+  "ChatDiv",
+  "emulatorDiv",
+  "appsDiv"
 ];
 
-wins.forEach(win => {
-  if (!win) return;
+const PAUSE_MESSAGE = { type: "pause" };
+const RESUME_MESSAGE = { type: "resume" };
+const MUTE_MESSAGE = { type: "mute" };
+const UNMUTE_MESSAGE = { type: "unmute" };
 
-  // Create drag handle
-  let dragHandle = win.querySelector(".drag-handle");
-  if (!dragHandle) {
-    dragHandle = document.createElement("div");
-    dragHandle.className = "drag-handle";
-    dragHandle.style.position = "absolute";
-    dragHandle.style.top = "0";
-    dragHandle.style.left = "50px";
-    dragHandle.style.right = "0";
-    dragHandle.style.height = "40px";
-    dragHandle.style.cursor = "move";
-    dragHandle.style.zIndex = "5";
-    dragHandle.style.pointerEvents = "none";
-    win.appendChild(dragHandle);
-  }
+// Send message to iframe to pause/resume/mute/unmute
+function sendMessage(frame, message) {
+  frame.contentWindow?.postMessage(message, "*");
+}
 
-  // Create resizer
-  let resizer = win.querySelector(".resizer");
-  if (!resizer) {
-    resizer = document.createElement("div");
-    resizer.className = "resizer";
-    resizer.style.position = "absolute";
-    resizer.style.width = "30px";
-    resizer.style.height = "30px";
-    resizer.style.right = "0";
-    resizer.style.bottom = "0";
-    resizer.style.cursor = "nwse-resize";
-    resizer.style.zIndex = "10";
-    resizer.style.background = "rgba(255, 255, 255, 0.1)";
-    win.appendChild(resizer);
-  }
+// Freeze and mute iframe
+function freezeIframe(frame) {
+  sendMessage(frame, PAUSE_MESSAGE);
+  sendMessage(frame, MUTE_MESSAGE);
+  frame.dataset.paused = "true";
+}
 
-  let isDragging = false;
-  let isResizing = false;
-  let offsetX = 0;
-  let offsetY = 0;
-  let startX = 0;
-  let startY = 0;
-  let startWidth = 0;
-  let startHeight = 0;
-  let hasBeenPositioned = false;
+// Restore and unmute iframe
+function restoreIframe(frame) {
+  sendMessage(frame, RESUME_MESSAGE);
+  sendMessage(frame, UNMUTE_MESSAGE);
+  delete frame.dataset.paused;
+}
 
-  function disableIframe() {
-    win.querySelectorAll("iframe").forEach(i => i.style.pointerEvents = "none");
-  }
-  function enableIframe() {
-    win.querySelectorAll("iframe").forEach(i => i.style.pointerEvents = "auto");
-  }
+// Freeze/mute all iframes in a container
+function freezeContainer(containerId) {
+  const box = document.getElementById(containerId);
+  if (!box) return;
 
-  // Titlebar drag only (ignores buttons & inputs)
-  win.addEventListener("mousedown", e => {
-    if (e.target.closest("button, a, input, select, textarea")) return;
+  box.querySelectorAll("iframe").forEach(frame => freezeIframe(frame));
+}
 
-    const rect = win.getBoundingClientRect();
-    const y = e.clientY - rect.top;
-    if (y > 40 || isResizing) return;
+// Restore/unmute all iframes in a container
+function restoreContainer(containerId) {
+  const box = document.getElementById(containerId);
+  if (!box) return;
 
-    if (!hasBeenPositioned) {
-      win.style.transform = "none";
-      win.style.margin = "0";
-      win.style.inset = "auto";
-      win.style.left = rect.left + "px";
-      win.style.top = rect.top + "px";
-      hasBeenPositioned = true;
-    }
+  box.querySelectorAll("iframe").forEach(frame => restoreIframe(frame));
+}
 
-    isDragging = true;
-    disableIframe();
-    offsetX = e.clientX - rect.left;
-    offsetY = e.clientY - rect.top;
-    dragHandle.style.pointerEvents = "auto";
-    e.preventDefault();
-  });
+// Observe div visibility changes
+APP_WINDOWS.forEach(id => {
+  const box = document.getElementById(id);
+  if (!box) return;
 
-  resizer.addEventListener("mousedown", e => {
-    const rect = win.getBoundingClientRect();
-
-    if (!hasBeenPositioned) {
-      win.style.transform = "none";
-      win.style.margin = "0";
-      win.style.inset = "auto";
-      win.style.left = rect.left + "px";
-      win.style.top = rect.top + "px";
-      hasBeenPositioned = true;
-    }
-
-    isResizing = true;
-    disableIframe();
-    startX = e.clientX;
-    startY = e.clientY;
-    startWidth = rect.width;
-    startHeight = rect.height;
-    win.style.width = startWidth + "px";
-    win.style.height = startHeight + "px";
-    e.preventDefault();
-    e.stopPropagation();
-  });
-
-  document.addEventListener("mousemove", e => {
-    if (isDragging) {
-      let newLeft = e.clientX - offsetX;
-      let newTop = e.clientY - offsetY;
-
-      const maxX = window.innerWidth - win.offsetWidth;
-      const maxY = window.innerHeight - win.offsetHeight;
-
-      win.style.left = Math.max(0, Math.min(newLeft, maxX)) + "px";
-      win.style.top  = Math.max(0, Math.min(newTop, maxY)) + "px";
-    }
-
-    if (isResizing) {
-      const dx = e.clientX - startX;
-      const dy = e.clientY - startY;
-
-      const left = parseInt(win.style.left) || 0;
-      const top  = parseInt(win.style.top)  || 0;
-
-      win.style.width  = Math.max(300, Math.min(startWidth  + dx, window.innerWidth  - left)) + "px";
-      win.style.height = Math.max(200, Math.min(startHeight + dy, window.innerHeight - top )) + "px";
+  const observer = new MutationObserver(() => {
+    if (getComputedStyle(box).display === "none") {
+      freezeContainer(id);
+    } else {
+      restoreContainer(id);
     }
   });
 
-  document.addEventListener("mouseup", () => {
-    if (isDragging || isResizing) enableIframe();
-    dragHandle.style.pointerEvents = "none";
-    isDragging = false;
-    isResizing = false;
-  });
-
-  document.addEventListener("mouseleave", () => {
-    if (isDragging || isResizing) enableIframe();
-    dragHandle.style.pointerEvents = "none";
-    isDragging = false;
-    isResizing = false;
-  });
-
-  window.addEventListener("resize", () => {
-    const r = win.getBoundingClientRect();
-    win.style.left = Math.max(0, Math.min(r.left, window.innerWidth  - r.width )) + "px";
-    win.style.top  = Math.max(0, Math.min(r.top,  window.innerHeight - r.height)) + "px";
-  });
+  observer.observe(box, { attributes: true, attributeFilter: ["style"] });
 });
 
+// Pause/mute everything if browser tab is hidden
+document.addEventListener("visibilitychange", () => {
+  if (document.hidden) {
+    APP_WINDOWS.forEach(freezeContainer);
+  } else {
+    APP_WINDOWS.forEach(restoreContainer);
+  }
+});
 </script>
-<!--Test5-->
 
 
 
-<p style="color:#acacac; position: fixed; bottom: -3px; left: 10px; opacity: 0.6;">Version 2.5</p>
+
 
 </body>
 

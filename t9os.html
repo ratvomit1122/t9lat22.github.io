@@ -2,7 +2,6 @@
 
 
 
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -11,6 +10,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap" rel="stylesheet">
 <link rel="shortcut icon" type="image/jpg" href="favicon.png"/>
+
 
 <title>T9 OS</title>
 
@@ -21,13 +21,13 @@
     
 
 
+  
 
 <style>
 
 @import url('https://fonts.googleapis.com/css?family=Luckiest+Guy');
 
   body {
-  background: linear-gradient(to bottom, #000000, #3a0057, #550075);
   background-repeat: no-repeat;
   background-size: cover;   /* make sure images cover the whole screen */
   margin: 0;
@@ -68,41 +68,108 @@ color: white;
 
   }
 
-  /* Navbar Styles */
-.navbar {
-  position: fixed;
-  top: 50%;
-  left: 10px;
-  transform: translateY(-50%);
-  width: 60px; /* thinner width since it's vertical */
-  height: auto;
-  background: linear-gradient(
-    145deg,
-    rgba(0, 0, 0, 0.842),
-    rgba(0, 0, 0, 0.534)
-  );
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  box-shadow:
-    inset 0 1px 2px rgba(46, 46, 46, 0.3),
-    0 4px 10px rgba(0, 0, 0, 0.4);
-  border-radius: 100px;
-  display: flex;
-  flex-direction: column; /* now stack items vertically */
-  justify-content: center;
-  align-items: center;
-  gap: 10px;
-  padding: 10px 0;
-  box-shadow: 0px 4px 12px #31313133;
-  opacity: 0.6;
-  backdrop-filter: blur(2px);
-  transition: all 0.1s ease-in-out; 
-}
-.navbar:hover{
-  border-radius: 20px;
-}
-.navbar img{
-  opacity:1;
-}
+ .navbar {
+      position: fixed;
+      bottom: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      height: 56px;
+         background: linear-gradient(160deg,
+        rgba(255,255,255,0.08),
+        rgba(0,0,0,0.65)
+      );
+      border: 1px solid rgba(255,255,255,0.25);
+      border-radius: 16px;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 12px;
+      padding: 0 10px;
+      backdrop-filter: blur(2px) saturate(140%);
+       box-shadow: 
+    0 12px 28px rgba(0,0,0,0.45),
+    0 0 0 1px rgba(255,255,255,0.15) inset;
+      transition: height 0.2s ease, border-radius 0.2s ease, border-color 0.2s ease;
+      opacity: 0.92;
+      z-index: 9999;
+      will-change: height, border-radius;
+
+    }
+
+    .navbar:hover {
+      height: 64px;
+      border-radius: 20px;
+      border-color: rgba(0,180,255,0.6);
+    }
+
+    .navbar::after {
+      content: "";
+      position: absolute;
+      inset: -2px;
+      border-radius: inherit;
+      pointer-events: none;
+      background: radial-gradient(circle at center,  rgba(255,255,255,0.08), transparent 70%);
+      opacity: 1;
+      transition: opacity 0.2s ease;
+    }
+
+    .navbar:hover::after {
+      opacity: 1;
+      background: radial-gradient(circle at center, rgba(255, 255, 255, 0.08), transparent 70%);
+    }
+
+    .navbar img {
+      width: 30px;
+      height: 30px;
+      transition: transform 0.15s ease;
+      filter: drop-shadow(0 4px 6px rgba(0,0,0,.6));
+      cursor: pointer;
+      will-change: transform;
+    }
+
+    .navbar img:hover {
+      transform: scale(1.25) translateY(-3px);
+    }
+    .navbar img:active{
+        transform: scale(0.97);
+    }
+
+      .navbar.sidebar {
+      position: fixed;
+      top: 50%;
+      left: 12px;
+      bottom: auto;
+      transform: translateY(-50%);
+      width: 64px;
+      height: auto;
+      flex-direction: column;
+      gap: 14px;
+      padding: 12px 0;
+      border-radius: 18px;
+      transition: width 0.25s cubic-bezier(.2,.8,.2,1), border-radius 0.25s cubic-bezier(.2,.8,.2,1), top 0.3s ease, left 0.3s ease, bottom 0.3s ease, height 0.3s ease, transform 0.3s ease;
+    }
+
+    .navbar.sidebar:hover {
+      width: 72px;
+      height: auto;
+      border-radius: 24px;
+    }
+
+    .navbar.sidebar img:hover {
+      transform: scale(1.25) translateX(3px);
+    }
+
+    .navbar.sidebar::after {
+      inset: 0;
+      box-shadow: 0 0 0 0 rgba(0,180,255,.5);
+      transition: box-shadow 0.3s;
+      background: none;
+    }
+
+    .navbar.sidebar:hover::after {
+      background: radial-gradient(circle at center, rgba(255, 255, 255, 0.08), transparent 70%);
+      background: none;
+    }
 
 
 
@@ -165,36 +232,36 @@ color: white;
     display: none;
     margin-top: 20px;
     padding: 10px;
-background-color: #1b1b1bbd;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+background-color: rgba(5, 139, 196, 0.504);
+  border: 1px solid rgba(0,180,255,.5);
     color: white;
     inset: 0;
     margin:auto;
     position: fixed;
     z-index: 1000;
-    border-radius:30px; 
-    width:85%;
-    height: 77%; 
+    border-radius:12px; 
+    width:70%;
+    height: 71%; 
     overflow-x: hidden;
     overflow-y: auto;
 box-shadow: 2px #141414;
       animation: popIn2 0.5s ease-out forwards;
 
   }
-   #aiDiv {
+    #aiDiv {
     display: none;
     margin-top: 20px;
     padding: 10px;
-background-color: #1b1b1bbd;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+background-color: rgba(5, 139, 196, 0.504);
+  border: 1px solid rgba(0,180,255,.5);
     color: white;
     inset: 0;
     margin:auto;
     position: fixed;
     z-index: 1000;
-    border-radius:30px; 
-    width:85%;
-    height: 77%; 
+    border-radius:12px; 
+    width:70%;
+    height: 71%; 
     overflow-x: hidden;
     overflow-y: auto;
 box-shadow: 2px #141414;
@@ -205,56 +272,76 @@ box-shadow: 2px #141414;
     display: none;
     margin-top: 20px;
     padding: 10px;
-background-color: #1b1b1bbd;
-border: 1px solid rgb(34, 34, 34);   
+background-color: rgba(5, 139, 196, 0.504);
+  border: 1px solid rgba(0,180,255,.5);   
     color: white;
     inset: 0;
     margin:auto;
     position: fixed;
     z-index: 1000;
-    border-radius:30px; 
-    width:85%;
-    height: 77%; 
+    border-radius:12px; 
+    width:70%;
+    height: 71%; 
+    overflow-x: hidden;
+    overflow-y: auto;
+box-shadow: 2px #141414;
+      animation: popIn 0.5s ease-out forwards;
+
+  }
+   #movieDiv {
+    display: none;
+    margin-top: 20px;
+    padding: 10px;
+background-color: rgba(5, 139, 196, 0.504);
+  border: 1px solid rgba(0,180,255,.5);  
+    color: white;
+    inset: 0;
+    margin:auto;
+    position: fixed;
+    z-index: 1000;
+    border-radius:12px; 
+    width:70%;
+    height: 71%; 
     overflow-x: hidden;
     overflow-y: auto;
 box-shadow: 2px #141414;
       animation: popIn2 0.5s ease-out forwards;
 
   }
-  #movieDiv {
+  #musicDiv {
     display: none;
     margin-top: 20px;
     padding: 10px;
-background-color: #1b1b1bbd;
-border: 1px solid rgb(34, 34, 34);   
+background-color: rgba(5, 139, 196, 0.504);
+  border: 1px solid rgba(0,180,255,.5);   
     color: white;
     inset: 0;
     margin:auto;
     position: fixed;
     z-index: 1000;
-    border-radius:30px; 
-    width:85%;
-    height: 77%; 
+    border-radius:12px; 
+    width:70%;
+    height: 71%; 
     overflow-x: hidden;
     overflow-y: auto;
 box-shadow: 2px #141414;
       animation: popIn2 0.5s ease-out forwards;
 
   }
-   #musicDiv {
+    #roDiv {
     display: none;
     margin-top: 20px;
     padding: 10px;
-background-color: #1b1b1bbd;
-border: 1px solid rgb(34, 34, 34);   
+background-color: rgba(5, 139, 196, 0.504);
+  border: 1px solid rgba(0,180,255,.5);   
     color: white;
     inset: 0;
     margin:auto;
     position: fixed;
     z-index: 1000;
-    border-radius:30px; 
-    width:85%;
-    height: 77%; 
+    border-radius:12px; 
+    width:70%;
+    height: 71%; 
     overflow-x: hidden;
     overflow-y: auto;
 box-shadow: 2px #141414;
@@ -290,8 +377,8 @@ box-shadow: 2px #141414;
     display: none;
     margin-top: 20px;
     padding: 10px;
-  background: rgba(0, 0, 0, 0.3); 
-border: 1px solid rgba(255, 255, 255, 0.15);   
+background-color: rgba(24, 81, 106, 0.504);
+  border: 1px solid rgba(0,180,255,.5);   
     color: white;
     inset: 0;
     margin:auto;
@@ -329,8 +416,8 @@ backdrop-filter: blur(7px);
     #updateDiv {
     margin-top: 20px;
     padding: 10px;
-  background: rgba(0, 0, 0, 0.3); 
-border: 1px solid rgba(255, 255, 255, 0.15);  
+background-color: rgba(24, 81, 106, 0.504);
+  border: 1px solid rgba(0,180,255,.5);
     color: white;
     inset: 0;
     margin:auto;
@@ -342,16 +429,16 @@ border: 1px solid rgba(255, 255, 255, 0.15);
     height: 500px; 
     overflow-x: hidden;
     overflow-y: auto;
-      animation: popIn 0.5s ease-out forwards;
+      animation: popIn 0.49s ease-out forwards;
 
   }
     #widgetDiv {
     margin-top: 20px;
     padding: 10px;
-    background: rgba(0,0,0,0.4);    
-backdrop-filter: blur(7px);   
-border: 1px solid rgba(255, 255, 255, 0.15);   
-    color: white;
+backdrop-filter: blur(2px);   
+background-color: rgba(24, 81, 106, 0.504);
+  border: 1px solid rgba(0,180,255,.5);   
+   color: white;
    right:50px;
    top:50px;
     position: fixed;
@@ -369,8 +456,8 @@ border: 1px solid rgba(255, 255, 255, 0.15);
     display: none;
     margin-top: 20px;
     padding: 10px;
-  background: rgba(0, 0, 0, 0.3); 
-border: 1px solid rgba(255, 255, 255, 0.15);   
+background-color: rgba(5, 139, 196, 0.504);
+  border: 1px solid rgba(0,180,255,.5); 
     color: white;
     inset: 0;
     margin:auto;
@@ -409,8 +496,8 @@ border: 1px solid rgba(255, 255, 255, 0.15);
     display: none;
     margin-top: 20px;
     padding: 10px;
-  background: rgba(0, 0, 0, 0.3); 
-border: 1px solid rgba(255, 255, 255, 0.15);  
+background-color: rgba(5, 139, 196, 0.504);
+  border: 1px solid rgba(0,180,255,.5);
     color: white;
     inset: 0;
     margin:auto;
@@ -423,42 +510,62 @@ border: 1px solid rgba(255, 255, 255, 0.15);
     overflow-x: hidden;
     overflow-y: auto;
       animation: popIn 0.5s ease-out forwards;
+
+  }
+     #calcDiv {
+    display: none;
+    margin-top: 20px;
+    padding: 10px;
+background-color: rgba(5, 139, 196, 0.504);
+  border: 1px solid rgba(0,180,255,.5);  
+    color: white;
+    inset: 0;
+    margin:auto;
+    position: fixed;
+    z-index: 1000;
+    border-radius:12px; 
+    width:25%;
+    height: 60%; 
+    overflow-x: hidden;
+    overflow-y: auto;
+box-shadow: 2px #141414;
+      animation: popIn2 0.5s ease-out forwards;
 
   }
    #emulatorDiv {
     display: none;
     margin-top: 20px;
     padding: 10px;
-   background: rgba(0, 0, 0, 0.3); 
-border: 1px solid rgba(255, 255, 255, 0.15);  
+background-color: rgba(5, 139, 196, 0.504);
+  border: 1px solid rgba(0,180,255,.5);
     color: white;
     inset: 0;
     margin:auto;
     position: fixed;
     z-index: 1000;
-    border-radius:20px; 
-    opacity:85%; 
-    width:600px;
-    height: 500px; 
+    border-radius:12px; 
+    width:70%;
+    height: 71%; 
     overflow-x: hidden;
     overflow-y: auto;
-      animation: popIn 0.5s ease-out forwards;
+box-shadow: 2px #141414;
+      animation: popIn2 0.5s ease-out forwards;
 
   }
   #searchDiv {
     display: none;
     margin-top: 20px;
     padding: 10px;
-background-color: #1b1b1bbd;
-border: 1px solid rgba(255, 255, 255, 0.15);   
+background-color: rgba(5, 139, 196, 0.504);
+  border: 1px solid rgba(0,180,255,.5);
     color: white;
     inset: 0;
     margin:auto;
     position: fixed;
     z-index: 1000;
-    border-radius:30px; 
-    width:90%;
-    height: 80%; 
+    border-radius:12px; 
+    width:70%;
+    height: 71%; 
     overflow-x: hidden;
     overflow-y: auto;
 box-shadow: 2px #141414;
@@ -585,6 +692,8 @@ border: 1px solid rgba(255, 255, 255, 0.15);
         transform: scale(1);
       }
     }
+
+    
   
 #searchBar{
   text-align:center;
@@ -601,7 +710,13 @@ border: 1px solid rgba(255, 255, 255, 0.15);
 
 }
 
+
   
+  /* Reduce shadow complexity */
+  .navbar, #settingsDiv, #appsDiv {
+    box-shadow: 0 8px 24px rgba(0,0,0,0.3) !important;
+  }
+
 </style>
 </head>
 <body>
@@ -610,11 +725,12 @@ border: 1px solid rgba(255, 255, 255, 0.15);
 
 <!-- Navbar -->
 <div id="navbar" class="navbar">
-  <a onclick="t9()">
-    <img src="favicon.png">
-  </a>
+  
   <a id="toggleDivButton">
-    <img src="gameicon.png">
+    <img src="game.png">
+  </a>
+  <a onclick="terminal()">
+    <img src="terminal.png">
   </a>
    <a onclick="ai()">
     <img src="ai.png">
@@ -685,11 +801,6 @@ border: 1px solid rgba(255, 255, 255, 0.15);
            <a href="https://ducky-ea0.pages.dev">
      <img class="btn" src="duckmath.png">
           </a>
-
-            <a href="https://demonzero.space/">
-     <img class="btn" src="demon.png">
-          </a>
-     
      
         
        
@@ -699,11 +810,9 @@ border: 1px solid rgba(255, 255, 255, 0.15);
 
 <div id="updateDiv">
   <button class="close-btn" onclick="document.getElementById('updateDiv').style.display = 'none';">●</button>
-
-<h1 style="text-align: center;">Version 2.61</h1>
-
-                        <h3 style="text-align: center; color:white;">T9 OS V3 coming soon. Its gonna have more games, looks better, better functionality and more.</h3>
-
+  <h1 class="gtext"> Updates</h1>
+<h1 style="text-align: center;">Version 3 (Beta)</h1>
+        <h3 style="text-align: center; color:white;">New update: v3</h3>
                 <h3 style="text-align: center; color:white;">Links: t9os.vercel.app t9osclass.vercel.app learningbooks.vercel.app. More links in the link docs</h3>
 
 
@@ -711,9 +820,10 @@ border: 1px solid rgba(255, 255, 255, 0.15);
 
 
 
-        <h3 style="text-align: center; color:white;">If you would like to help out T9 OS please donate to our Ko-Fi, It helps us buy domains/links, Servers if needed, and more. Thank you!</h3>
-                <h3 style="text-align: center; color:white;">Donaters get early access to updates, go on the wll of fame, and gets special perks on dc server.</h3>
+        <h3 style="text-align: center; color:white;">Make sure to join our discord server for updates and sneak peeks!</h3>
 
+
+        <h3 style="text-align: center; color:white;">If you would like to help out T9 OS please donate to our Ko-Fi. Thank you!</h3>
 
 
 
@@ -723,7 +833,27 @@ border: 1px solid rgba(255, 255, 255, 0.15);
 
     <a style="background-color: 	#7289da; padding:10px 20px; color:rgb(255, 255, 255); border-radius: 10px; text-align: center; font-family: sans-serif; text-decoration: none; " href="https://dsc.gg/t9os"  target="_blank">Join server!</a>
 
+      <a style="background-color: rgb(0, 0, 0); padding:10px 20px; color:rgb(255, 255, 255); border-radius: 10px; text-align: center; font-family: sans-serif; text-decoration: none; " href="https://vercel.com/new/clone?repository-url=https://github.com/t9lat22/t9lat22.github.io
+"  target="_blank">make links</a>
 
+<h3 style="text-align: center;" id="random-text">Fun fact:</h3>
+
+
+  <script>
+        const texts = [
+            'Fun fact: you can change ur wallpaper and themes by going to settings',
+            'Fun fact: Lobsters have blue blood.',
+            'Fun fact: The sun is about 400 times larger than the moon.',
+            'Fun fact: Australia is wider than the moon.',
+            'Fun fact: McDonald’s once made bubblegum-flavored broccoli.',
+            "Fun fact: T9 OS was made in 2023 inspired by Terbium OS",
+            "Tell owner of DotGUI to make me a dev.",
+            "She gone call me baby boo",
+            "We gonna be eating good noodles everyday"
+
+        ];
+        document.getElementById("random-text").textContent = texts[Math.floor(Math.random() * texts.length)];
+    </script>
 
 
         
@@ -737,83 +867,183 @@ border: 1px solid rgba(255, 255, 255, 0.15);
 
 
 
-      <h2 style="transform: translateX(-50%); top:20px; position:fixed; left:50%; text-align:center; color:white; ">CPU  usage:   <span id="cpu"></span></h2>
-<img src="memory.png" style="width:30px; bottom:0; position: fixed; transform: translateX(-50%); left:50%;">
- 
-<script>
-  function updateStats() {
-    let cpuPercent = Math.floor(Math.random() * 100);
-    document.getElementById('cpu').textContent = cpuPercent + '%';
-  }
-
-  setInterval(updateStats, 1000);
-</script>
+ <span id="wIcon">⌛</span>
+  <span id="wCond">Loading</span>
+  <span id="wTemp">--°</span>
+  <span id="wCity">Detecting...</span>
 
 <style>
-  #cpu{
-      font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
-      text-shadow: white 10px;
-  }
+/* Weather container */
+#widgetDiv #miniWeather,
+#widgetDiv {
+  box-sizing: border-box;
+}
+
+/* Icon */
+#widgetDiv #wIcon{
+  display:block;
+  font-size:35px;
+  text-align:center;
+  line-height:36px;
+  margin-top:6px;
+  height:36px; /* locks height so it never jumps */
+}
+
+/* Temperature */
+#widgetDiv #wTemp{
+  display:block;
+  text-align:center;
+  font-size:24px;
+  font-weight:bold;
+  height:26px;
+  line-height:26px;
+}
+
+/* Condition text */
+#widgetDiv #wCond{
+  display:block;
+  text-align:center;
+  font-size:13px;
+  letter-spacing:1px;
+  text-transform:uppercase;
+  opacity:.85;
+  height:14px;
+  line-height:14px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+
+/* City */
+#widgetDiv #wCity{
+  display:block;
+  text-align:center;
+  font-size:11px;
+  opacity:.7;
+  margin-top:2px;
+  height:12px;
+  line-height:12px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
 </style>
-    
+<script>
+async function loadWidgetWeather() {
+  let loc;
+
+  // --- cache location so we never spam the API ---
+  if (localStorage.weatherGeo) {
+    loc = JSON.parse(localStorage.weatherGeo);
+  } else {
+    const res = await fetch("https://ipwho.is/");
+    loc = await res.json();
+
+    if (!loc.success) throw new Error("Geo lookup failed");
+
+    localStorage.weatherGeo = JSON.stringify(loc);
+  }
+
+  const lat = loc.latitude;
+  const lon = loc.longitude;
+
+  document.getElementById("wCity").textContent = loc.city || "Unknown";
+
+  // --- Open-Meteo (no key) ---
+  const data = await fetch(
+    `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`
+  ).then(r => r.json());
+
+  const w = data.current_weather;
+  if (!w) throw new Error("Weather unavailable");
+
+  const code = w.weathercode;
+  const temp = Math.round(w.temperature);
+
+  const map = {
+    0: ["☀️", "Sunny"],
+    1: ["🌤️", "Mostly Sunny"],
+    2: ["⛅", "Partly Cloudy"],
+    3: ["☁️", "Cloudy"],
+    45: ["🌫️", "Foggy"],
+    51: ["🌦️", "Drizzle"],
+    61: ["🌧️", "Rainy"],
+    63: ["🌧️", "Rainy"],
+    65: ["🌧️", "Heavy Rain"],
+    71: ["❄️", "Snowy"],
+    80: ["🌧️", "Showers"],
+    95: ["⛈️", "Storm"]
+  };
+
+  const d = map[code] || ["🌡️", "Weather"];
+
+  document.getElementById("wIcon").textContent = d[0];
+  document.getElementById("wCond").textContent = d[1];
+  document.getElementById("wTemp").textContent = temp + "°C";
+}
+
+// run once
+loadWidgetWeather();
+
+</script>
 
 
-
-
-
-
-
-        
-       
-
-          
 </div>
 
 <div id="ChatDiv">
   <button class="close-btn" onclick="document.getElementById('ChatDiv').style.display = 'none';">●</button>
+    <button class="full-btn" onclick="fullscreenIframechat()">●</button>
 
-
+<h3 style="  left: 50%; color:white; top:-9.5px; position: absolute;   transform: translateX(-50%);      " >Chat</h3>
  
-<iframe class="frame" src="chat3.html"></iframe>
+
+
+
+<iframe id="framechat" src="chat3.html"></iframe>
   <style>
-    .frame{
+    #framechat{
       width:100%;
       height:95%;
       bottom:0;
       position: absolute;
       border:none;
-      border-radius:0px 0px 20px 20px;
+      border-radius:0px 0px 15px 15px;
       left:0;
+      border-top: 1px solid rgb(37, 37, 37);
     }
-     #ChatDiv {
-    display: none;
-    margin-top: 20px;
-    padding: 10px;
-background-color: #1b1b1bbd;
-       border: 1px solid rgba(255, 255, 255, 0.2);
-    color: white;
-    inset: 0;
-    margin:auto;
-    position: fixed;
-    z-index: 1000;
-    border-radius:20px; 
-    opacity:85%; 
-    width:85%;
-    height: 73%; 
-    overflow-x: hidden;
-    overflow-y: auto;
-                box-shadow: 0 4px 10px rgba(0, 0, 0, 0.589);
-
-      animation: popIn 0.5s ease-out forwards;
-
-  }
+  
   </style>
+
+
+
+    <script>
+    function fullscreenIframechat() {
+      let iframe = document.getElementById("framechat");
+      if (iframe.requestFullscreen) {
+        iframe.requestFullscreen();
+      } else if (iframe.mozRequestFullScreen) { 
+        iframe.mozRequestFullScreen();
+      } else if (iframe.webkitRequestFullscreen) { 
+        iframe.webkitRequestFullscreen();
+      } else if (iframe.msRequestFullscreen) { 
+        iframe.msRequestFullscreen();
+      }
+    }
+  </script>
+
+
  
            
 </div>
 
 <div id="terminalDiv">
   <button class="close-btn" onclick="document.getElementById('terminalDiv').style.display = 'none';">●</button>
+      <button class="full-btn" onclick="fullscreenIframeter()">●</button>
+
+    <button class="back" style="top:7px; left: 50px; position: fixed; color:white;"    onclick="document.getElementById('frame3').src = 'terminal.html';">←</button>
+
         <h3 style="  left: 50%; color:white; top:-9.5px; position: absolute;   transform: translateX(-50%);" >Terminal</h3>
 
 
@@ -827,13 +1057,26 @@ background-color: #1b1b1bbd;
       bottom:10px;
       position: absolute;
       border:none;
-      border-radius:0px 0px 20px 20px;
+      border-radius:0px 0px 15px 15px;
       left: 0;
       bottom: 0;
     }
    
   </style>
- 
+     <script>
+    function fullscreenIframeter() {
+      let iframe = document.getElementById("frame3");
+      if (iframe.requestFullscreen) {
+        iframe.requestFullscreen();
+      } else if (iframe.mozRequestFullScreen) { 
+        iframe.mozRequestFullScreen();
+      } else if (iframe.webkitRequestFullscreen) { 
+        iframe.webkitRequestFullscreen();
+      } else if (iframe.msRequestFullscreen) { 
+        iframe.msRequestFullscreen();
+      }
+    }
+  </script>
            
 </div>
 
@@ -854,7 +1097,7 @@ background-color: #1b1b1bbd;
       bottom:10px;
       position: absolute;
       border:none;
-      border-radius:0px 0px 20px 20px;
+      border-radius:0px 0px 15px 15px;
       left: 0;
       bottom: 0;
     }
@@ -863,6 +1106,46 @@ background-color: #1b1b1bbd;
    <script>
     function fullscreenIframe3() {
       let iframe = document.getElementById("mframe");
+      if (iframe.requestFullscreen) {
+        iframe.requestFullscreen();
+      } else if (iframe.mozRequestFullScreen) { 
+        iframe.mozRequestFullScreen();
+      } else if (iframe.webkitRequestFullscreen) { 
+        iframe.webkitRequestFullscreen();
+      } else if (iframe.msRequestFullscreen) { 
+        iframe.msRequestFullscreen();
+      }
+    }
+  </script>
+           
+</div>
+
+<div id="calcDiv">
+  <button class="close-btn" onclick="document.getElementById('calcDiv').style.display = 'none';">●</button>
+      <button class="full-btn" onclick="fullscreenIframecalc()">●</button>
+
+        <h3 style="  left: 50%; color:white; top:-9.5px; position: absolute;   transform: translateX(-50%);" >Calculator</h3>
+
+
+
+ 
+<iframe id="calcframe" class="calcframe" src="calc.html"></iframe>
+  <style>
+    .calcframe{
+      width:100%;
+      height:95%;
+      bottom:10px;
+      position: absolute;
+      border:none;
+      border-radius:0px 0px 15px 15px;
+      left: 0;
+      bottom: 0;
+    }
+   
+  </style>
+   <script>
+    function fullscreenIframecalc() {
+      let iframe = document.getElementById("calcframe");
       if (iframe.requestFullscreen) {
         iframe.requestFullscreen();
       } else if (iframe.mozRequestFullScreen) { 
@@ -925,64 +1208,27 @@ background-color: #1b1b1bbd;
   }
 </script>
 
-<div id="emulatorDiv">
-  <button class="close-btn" onclick="document.getElementById('emulatorDiv').style.display = 'none';">×</button>
-  <h1 class="gtext">| Apps |</h1>
-  <p color="white" style="text-align: center;"></p>
-
-  
-           <a href='/windows11.html'>
-     <img class="btn" src="windows11.png">
-          </a>
-        
-           <a href='/emulatorjs.html'>
-     <img class="btn" src="emulatorjs.png">
-          </a>
-
-           <a href='/webretro.html'>
-     <img class="btn" src="emulator.png">
-          </a>
-
-          
-           <a href='/music.html'>
-     <img class="btn" src="music2.png">
-          </a>
-
-              <a href='/yt.html'>
-     <img class="btn" src="yt.png">
-          </a>
-        
 
 
-        
-     
-        
-       
-
-          
-</div>
+<script>
+  function terminal(){
+    const div = document.getElementById('terminalDiv');
+    div.style.display = div.style.display === 'block' ? 'none' : 'block';
+  }
+</script>
 
 <div id="t9Div">
   <button class="close-btn2" onclick="document.getElementById('t9Div').style.display = 'none';">●</button>
-      <h4 style="  left: 50%; color:white; top:-9.5px; position: absolute;   transform: translateX(-50%);" >T9 OS</h4>
+      <h4 style="  left: 50%; color:white; top:-9.5px; position: absolute;   transform: translateX(-50%);" >T9's Secret corner</h4>
 
 
   &nbsp;&nbsp;&nbsp;&nbsp; 
   
-  <div class="btn-container">
-    <a onclick="terminal()"><img class="t9btn" src="terminal.png"></a>
-  </div>
-<script>
-  function terminal() {
-    const div = document.getElementById('terminalDiv');
-    if (div.style.display === 'block') {
-      div.style.display = 'none';
-    } else {
-      div.style.display = 'block';
-    }
-    document.getElementById('t9Div').style.display = 'none';
-  }
-</script>
+ <h1 style="text-align: center;">welcome to my secret corner</h1>
+ <h2 style="text-align: center;">btw how did u find my secret corner?</h2>
+
+<img style="width:75px; height:50px;" src="cat.gif">
+<img style="width:100px; height:75px;" src="please.png">
 
 
 
@@ -1071,7 +1317,7 @@ background-color: #1b1b1bbd;
 
   <p class="warn"></p>
 
-  <iframe id="frame3" class="frame" src="https://98sxnh-8080.csb.app"></iframe>
+  <iframe id="frame3" class="frame" src="test22.html"></iframe>
   <style>
     .frame{
       width:100%;
@@ -1079,7 +1325,7 @@ background-color: #1b1b1bbd;
       bottom:0;
       position: absolute;
       border:none;
-      border-radius:0px 0px 20px 20px;
+      border-radius:0px 0px 15px 15px;
       left:0;
     }
   </style>
@@ -1099,10 +1345,6 @@ background-color: #1b1b1bbd;
     }
   </script>
            
-        
-       
-
-          
 </div>
 
 <div id="leaderboardDiv">
@@ -1148,9 +1390,9 @@ background-color: #1b1b1bbd;
     position:fixed;
     left:50%;
 transform: translateX(-50%);
+      border: 1px solid rgba(255, 255, 255, 0.2);
     width:25%;
     border-radius: 0px 0px 15px 15px;
-      border: 1px solid rgba(255, 255, 255, 0.2);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -1173,7 +1415,66 @@ transform: translateX(-50%);
  
 </style>
 
+</div>
+<div id="emulatorDiv">
+<button class="close-btn" onclick="document.getElementById('emulatorDiv').style.display = 'none';">●</button>
+    <button class="full-btn" onclick="fullscreenIframea()">●</button>
 
+  <button class="backa" style="top:7px; left: 50px; position: fixed; color:white;"    onclick="document.getElementById('framea').src = 'a.html';">←</button>
+<h3 style="  left: 50%; color:white; top:-9.5px; position: absolute;   transform: translateX(-50%);      " >Apps</h3>
+
+ 
+
+
+
+<iframe id="framea" src="a.html"></iframe>
+  <style>
+    #framea{
+      width:100%;
+      height:95%;
+      bottom:0;
+      position: absolute;
+      border:none;
+      border-radius:0px 0px 12px 12px;
+      left:0;
+      border-top: 1px solid rgb(37, 37, 37);
+    }
+    .backa {
+    background: none;
+    border: none;
+    color: rgb(255, 255, 255);
+    font-size: 24px;
+    cursor: pointer;
+    padding: 0;
+    font-size:20px;
+        transform: translateY(2px);
+        top:-2px;
+
+}
+
+  </style>
+
+
+
+  <script>
+    function fullscreenIframea() {
+      let iframe = document.getElementById("framea");
+      if (iframe.requestFullscreen) {
+        iframe.requestFullscreen();
+      } else if (iframe.mozRequestFullScreen) { 
+        iframe.mozRequestFullScreen();
+      } else if (iframe.webkitRequestFullscreen) { 
+        iframe.webkitRequestFullscreen();
+      } else if (iframe.msRequestFullscreen) { 
+        iframe.msRequestFullscreen();
+      }
+    }
+  </script>
+ 
+
+</div>
+
+<button onclick="t9()" style="position: fixed; bottom:0; right:0; padding:10px 20px; opacity: 0;"></button>
    
              
 </div>
@@ -1181,14 +1482,15 @@ transform: translateX(-50%);
 <button class="close-btn" onclick="document.getElementById('hiddenDiv').style.display = 'none';">●</button>
     <button class="full-btn" onclick="fullscreenIframe()">●</button>
 
-  <button class="back" style="top:10px; left: 50px; position: fixed; color:white;"    onclick="document.getElementById('frame2').src = 'test99.html';">←</button>
+  <button class="back" style="top:7px; left: 50px; position: fixed; color:white;"    onclick="document.getElementById('frame2').src = 'test200.html';">←</button>
 <h3 style="  left: 50%; color:white; top:-9.5px; position: absolute;   transform: translateX(-50%);      " >Games</h3>
 <h3  id="fpsCounter" style="  left: 80%; color:white; top:-9.5px; position: absolute;   transform: translateX(-80%);      " ></h3>
+
  
 
 
 
-<iframe id="frame2" src="test99.html"></iframe>
+<iframe id="frame2" src="test200.html"></iframe>
   <style>
     #frame2{
       width:100%;
@@ -1196,7 +1498,7 @@ transform: translateX(-50%);
       bottom:0;
       position: absolute;
       border:none;
-      border-radius:0px 0px 20px 20px;
+      border-radius:0px 0px 12px 12px;
       left:0;
       border-top: 1px solid rgb(37, 37, 37);
     }
@@ -1216,22 +1518,22 @@ transform: translateX(-50%);
     display: none;
     margin-top: 20px;
     padding: 10px;
-     background: rgba(0,0,0,0.4);   
-backdrop-filter: blur(7px);   
+background-color: rgba(5, 139, 196, 0.504);
+  border: 1px solid rgba(0,180,255,.5);
     color: white;
     inset: 0;
     margin:auto;
     position: fixed;
     z-index: 1000;
-    border-radius:20px; 
-    opacity:85%; 
-    width:85%;
+    border-radius:12px; 
+    width:75%;
     height: 73%; 
     overflow-x: hidden;
     overflow-y: auto;
-                box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+box-shadow: 2px #141414;
+      animation: popIn2 0.5s ease-out forwards;
 
-      animation: popIn 0.5s ease-out forwards;
+  
 
   }
   </style>
@@ -1272,6 +1574,54 @@ requestAnimationFrame(trackFPS);
     }
   </script>
  
+
+</div>
+<div id="roDiv">
+  <button class="close-btn" onclick="document.getElementById('roDiv').style.display = 'none';">●</button>
+    <button class="full-btn" onclick="fullscreenIframeRo()">●</button>
+<button class="back" style="top:7px; left: 200px; position: fixed; color:white;"    onclick="document.getElementById('frameRo').src = 'test33.html';">fix error</button>
+
+
+
+<h3 style="  left: 50%; color:white; top:-9.5px; position: absolute;   transform: translateX(-50%);      " >Roblox</h3>
+ 
+
+
+
+<iframe id="frameRo" src="test33.html"></iframe>
+  <style>
+    #frameRo{
+      width:100%;
+      height:95%;
+      bottom:0;
+      position: absolute;
+      border:none;
+      border-radius:0px 0px 15px 15px;
+      left:0;
+      border-top: 1px solid rgb(37, 37, 37);
+    }
+  
+  </style>
+
+
+
+    <script>
+    function fullscreenIframeRo() {
+      let iframe = document.getElementById("frameRo");
+      if (iframe.requestFullscreen) {
+        iframe.requestFullscreen();
+      } else if (iframe.mozRequestFullScreen) { 
+        iframe.mozRequestFullScreen();
+      } else if (iframe.webkitRequestFullscreen) { 
+        iframe.webkitRequestFullscreen();
+      } else if (iframe.msRequestFullscreen) { 
+        iframe.msRequestFullscreen();
+      }
+    }
+  </script>
+
+
+ 
            
 </div>
 
@@ -1284,7 +1634,7 @@ requestAnimationFrame(trackFPS);
 
 
 
-<iframe id="frameMusic" src="music2.html"></iframe>
+<iframe id="frameMusic" src="music3.html"></iframe>
   <style>
     #frameMusic{
       width:100%;
@@ -1292,12 +1642,14 @@ requestAnimationFrame(trackFPS);
       bottom:0;
       position: absolute;
       border:none;
-      border-radius:0px 0px 20px 20px;
+      border-radius:0px 0px 15px 15px;
       left:0;
       border-top: 1px solid rgb(37, 37, 37);
     }
   
   </style>
+
+
 
     <script>
     function fullscreenIframeMusic() {
@@ -1328,7 +1680,7 @@ requestAnimationFrame(trackFPS);
 
 
 
-<iframe id="frame5" src="/ai/index.html"></iframe>
+<iframe id="frame5" src="test100.html"></iframe>
   <style>
     #frame5{
       width:100%;
@@ -1336,7 +1688,7 @@ requestAnimationFrame(trackFPS);
       bottom:0;
       position: absolute;
       border:none;
-      border-radius:0px 0px 20px 20px;
+      border-radius:0px 0px 15px 15px;
       left:0;
       border-top: 1px solid rgb(37, 37, 37);
     }
@@ -1352,28 +1704,7 @@ requestAnimationFrame(trackFPS);
         top:-2px;
 
 }
-     #ChatDiv {
-    display: none;
-    margin-top: 20px;
-    padding: 10px;
-     background: rgba(0,0,0,0.4);   
-backdrop-filter: blur(7px);   
-    color: white;
-    inset: 0;
-    margin:auto;
-    position: fixed;
-    z-index: 1000;
-    border-radius:20px; 
-    opacity:85%; 
-    width:85%;
-    height: 73%; 
-    overflow-x: hidden;
-    overflow-y: auto;
-                box-shadow: 0 4px 10px rgba(0,0,0,0.2);
 
-      animation: popIn 0.5s ease-out forwards;
-
-  }
   </style>
 
   
@@ -1392,10 +1723,40 @@ backdrop-filter: blur(7px);
       }
     }
   </script>
-           
+           <style>
+    #hiddenDiv iframe {
+      pointer-events: none;
+    }
+
+    #hiddenDiv.dragging iframe,
+    #hiddenDiv.resizing iframe {
+      pointer-events: none;
+    }
+
+    .drag-handle {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 40px;
+      cursor: move;
+      z-index: 5;
+    }
+
+    .resizer {
+      position: absolute;
+      width: 30px;
+      height: 30px;
+      right: 0;
+      bottom: 0;
+      cursor: nwse-resize;
+      z-index: 10;
+      background: rgba(255, 255, 255, 0.1);
+    }
+</style>
 </div>
 
-<div class="tnav">
+<div id="tnav" class="tnav">
 
    
 
@@ -1425,8 +1786,8 @@ backdrop-filter: blur(7px);
     
 
   
-    <a onclick="hacks()">
-    <img class="timg" src="hacks.png">
+    <a onclick="calc()">
+    <img class="timg" src="calc.png">
   </a>
 
  
@@ -1448,17 +1809,17 @@ backdrop-filter: blur(7px);
 
 
 <div id="settingsDiv">
-  <button class="close-btn" onclick="document.getElementById('settingsDiv').style.display = 'none';">×</button>
+  <button class="close-btn" onclick="document.getElementById('settingsDiv').style.display = 'none';">●</button>
 
   <h1 class="seth">|| Settings ||</h1>
+
   
    <label class="label" for="background-select">Select Background:</label>
 <select id="background-select">
   <option value="t9os6.png">Default</option>
                       <option value="abstract.png">T9 Abstract</option>
-
-                                                  <option value="silver2.gif">Silver Surfer live </option>
-
+                                            <option value="stars3.png">blue space</option>
+                                                                        <option value="silver2.gif">Silver Surfer Live</option>
                             <option value="silver.jpeg">Silver Surfer</option>
                           <option value="naruto.png">Naruto</option>
                   <option value="red.jpg">Red Abstract</option>
@@ -1492,10 +1853,126 @@ backdrop-filter: blur(7px);
 
 </select>
 
+<input type="file" id="background-upload" accept="image/*">
+
+
 
   
 <a   onclick="openGame()"  class="round-btn">Hide url</a>
-<a  id="toggleBTN" class="round-btn">Toggle logo</a>
+<a   onclick="toggleNavbar()" class="round-btn">Toggle navbar</a>
+<h2 style="text-align: center;">Appearances</h2>
+
+    <label class="label" for="picker">Select theme:</label>
+        <input type="color" id="picker" value="#333333">
+
+    <a   id="reset" class="round-btn">Reset theme</a>
+
+
+        <script>
+    // List of div IDs
+    const divIds = ['aiDiv', 'hiddenDiv', 'settingsDiv', 'widgetDiv', 'musicDiv', 'searchDiv', 'emulatorDiv', 'hacksDiv', 'movieDiv', 'terminalDiv', 'ChatDiv', 'updateDiv', 'collabDiv', 'tnav', 'navbar', 'roDiv', 'calcDiv'];
+
+    // Store each div's original colors when the page opens
+    const originalColors = {};
+    divIds.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+            originalColors[id] = {
+                bg: getComputedStyle(el).backgroundColor,
+                border: getComputedStyle(el).borderColor
+            };
+        }
+    });
+
+    // Store original text shadows for time and battery
+    const timeEl = document.getElementById('time');
+    const batteryEl = document.getElementById('batteryPercentage');
+    const originalTextShadows = {
+        time: timeEl ? getComputedStyle(timeEl).textShadow : 'none',
+        battery: batteryEl ? getComputedStyle(batteryEl).textShadow : 'none'
+    };
+
+    // 1. Load saved progress from LocalStorage
+    window.addEventListener('load', () => {
+        const savedColor = localStorage.getItem('userColor');
+        if (savedColor) {
+            divIds.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) {
+                    el.style.backgroundColor = savedColor;
+                    el.style.borderColor = savedColor;
+                }
+            });
+            
+            // Apply saved color to text shadows
+            if (timeEl) timeEl.style.textShadow = `0 0 10px ${savedColor}`;
+            if (batteryEl) batteryEl.style.textShadow = `0 0 10px ${savedColor}`;
+            
+            document.getElementById('picker').value = savedColor;
+        }
+    });
+
+    // 2. Change color for the list of divs
+    document.getElementById('picker').addEventListener('input', function() {
+        const newColor = this.value;
+
+        divIds.forEach(id => {
+            const el = document.getElementById(id);
+            if (el) {
+                el.style.backgroundColor = newColor;
+                el.style.borderColor = newColor;
+            }
+        });
+
+        // Update text shadows for time and battery
+        if (timeEl) timeEl.style.textShadow = `0 0 10px ${newColor}`;
+        if (batteryEl) batteryEl.style.textShadow = `0 0 10px ${newColor}`;
+
+        localStorage.setItem('userColor', newColor);
+    });
+
+    // 3. Reset to "Normal" (Each div returns to its own original color)
+    document.getElementById('reset').addEventListener('click', () => {
+        divIds.forEach(id => {
+            const el = document.getElementById(id);
+            if (el && originalColors[id]) {
+                el.style.backgroundColor = originalColors[id].bg;
+                el.style.borderColor = originalColors[id].border;
+            }
+        });
+
+        // Reset text shadows to original
+        if (timeEl) timeEl.style.textShadow = originalTextShadows.time;
+        if (batteryEl) batteryEl.style.textShadow = originalTextShadows.battery;
+
+        localStorage.removeItem('userColor');
+    });
+</script>
+
+ <script>
+    // Load saved position on page load
+    window.addEventListener('DOMContentLoaded', function() {
+      const navbar = document.querySelector('.navbar');
+      const savedPosition = localStorage.getItem('navbarPosition');
+      
+      if (savedPosition === 'sidebar') {
+        navbar.classList.add('sidebar');
+      }
+    });
+
+    function toggleNavbar() {
+      const navbar = document.querySelector('.navbar');
+      navbar.classList.toggle('sidebar');
+      
+      // Save the current position
+      if (navbar.classList.contains('sidebar')) {
+        localStorage.setItem('navbarPosition', 'sidebar');
+      } else {
+        localStorage.setItem('navbarPosition', 'dock');
+      }
+    }
+  </script>
+
    <label class="label" for="preset">Select Tab Cloak:</label>
 
  <select style="padding:10px 20px; border-radius:10px; font-family: sans-serif; text-align: center;" id="preset">
@@ -1504,7 +1981,7 @@ backdrop-filter: blur(7px);
     <option value="classroom">Google Classroom</option>
     <option value="vocab">Vocabulary.com</option>
   </select>
-
+</div>
 <style>
    .round-btn {
     border-radius: 12px;
@@ -1521,26 +1998,146 @@ backdrop-filter: blur(7px);
   
 </style>
 
+<style>
 
-  
-</div>
-  
+
+
+
+
+.icon { 
+  position: absolute; width: 80px; text-align: center; cursor: default;}
+
+.icon img {
+   width: 48px; height: 48px; pointer-events: none;}
+
+.icon span {
+   display: block; font-size: 12px; margin-top: 6px; line-height: 1.2; color:white; word-break: break-word; pointer-events: none; font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+
+}
+
+/* Optional: selection highlight */.icon.selected { background: rgba(0, 120, 255, 0.35); border-radius: 6px;}.icon:hover { background: rgba(0, 120, 255, 0.35); border-radius: 6px;}
+
+
+
+</style> </div> <div onclick="s()" class="icon" style="left:100px; top:120px;"> <img src="brow2.png" alt="browser"> <span>T9 Browser</span> </div>
+
+<div onclick="settings()" class="icon" style="left:100px; top:220px;"> 
+  <img src="seting.png" alt="settings"> 
+  <span>Settings</span> </div> 
+
+  <div onclick="ro()" class="icon" style="left:100px; top:320px;"> 
+    <img src="r2.png" alt="roblox"> 
+    <span>Roblox</span> </div> 
 
 
 
 <script>
-    const presetSelect = document.getElementById("preset");
+  const icons = document.querySelectorAll('.icon');
+const gridSize = 100;
+const offsetX = 5;  // Matches your HTML left: 5px
+const offsetY = 20; // Matches your HTML top: 120px/220px grid logic
 
-    window.addEventListener("DOMContentLoaded", () => {
-      const saved = localStorage.getItem("cloak_preset") || "default";
-      presetSelect.value = saved;
-    });
+let draggingIcon = null;
+let mouseOffset = { x: 0, y: 0 };
+let mouseStart = { x: 0, y: 0 };
+let isDragging = false;
+const dragThreshold = 5;
 
-    presetSelect.addEventListener("change", () => {
-      localStorage.setItem("cloak_preset", presetSelect.value);
-      console.log("✅ Preset saved:", presetSelect.value);
-    });
+// Precision snapping functions
+const snapX = (v) => Math.round((v - offsetX) / gridSize) * gridSize + offsetX;
+const snapY = (v) => Math.round((v - offsetY) / gridSize) * gridSize + offsetY;
+
+// Check for collisions using snapped coordinates
+function isOccupied(x, y, ignore) {
+  return Array.from(icons).some(ic => 
+    ic !== ignore && 
+    parseInt(ic.style.left) === x && 
+    parseInt(ic.style.top) === y
+  );
+}
+
+icons.forEach(icon => {
+  icon.addEventListener('mousedown', (e) => {
+    draggingIcon = icon;
+    mouseStart = { x: e.clientX, y: e.clientY };
+    const rect = icon.getBoundingClientRect();
+    mouseOffset = { x: e.clientX - rect.left, y: e.clientY - rect.top };
+    icon.style.zIndex = 1000;
+  });
+
+  // Captures and blocks the click if the mouse moved (dragging)
+  icon.addEventListener('click', (e) => {
+    if (isDragging) {
+      e.stopImmediatePropagation();
+      e.preventDefault();
+    }
+  }, true); 
+});
+
+document.addEventListener('mousemove', (e) => {
+  if (!draggingIcon) return;
+
+  const dx = e.clientX - mouseStart.x;
+  const dy = e.clientY - mouseStart.y;
+
+  if (!isDragging && Math.hypot(dx, dy) > dragThreshold) {
+    isDragging = true;
+  }
+
+  if (!isDragging) return;
+
+  // Real-time movement logic
+  let x = Math.min(Math.max(e.clientX - mouseOffset.x, 0), window.innerWidth - draggingIcon.offsetWidth);
+  let y = Math.min(Math.max(e.clientY - mouseOffset.y, 0), window.innerHeight - draggingIcon.offsetHeight);
+
+  draggingIcon.style.left = x + 'px';
+  draggingIcon.style.top = y + 'px';
+});
+
+document.addEventListener('mouseup', () => {
+  if (!draggingIcon) return;
+
+  if (isDragging) {
+    const targetX = snapX(draggingIcon.offsetLeft);
+    const targetY = snapY(draggingIcon.offsetTop);
+
+    if (isOccupied(targetX, targetY, draggingIcon)) {
+      // Snap back to original grid spot if blocked
+      draggingIcon.style.left = snapX(mouseStart.x - mouseOffset.x) + 'px';
+      draggingIcon.style.top = snapY(mouseStart.y - mouseOffset.y) + 'px';
+    } else {
+      // Lock into new grid spot
+      draggingIcon.style.left = targetX + 'px';
+      draggingIcon.style.top = targetY + 'px';
+    }
+
+    // Delay resetting the flag so 'click' event doesn't trigger 's()'
+    setTimeout(() => { isDragging = false; }, 50);
+  }
+
+  draggingIcon.style.zIndex = '';
+  draggingIcon = null;
+});
+
+document.addEventListener('selectstart', e => e.preventDefault());
   </script>
+
+
+
+
+
+<script>
+  const presetSelect = document.getElementById("preset");
+
+  window.addEventListener("DOMContentLoaded", () => {
+    presetSelect.value = localStorage.getItem("cloak_preset") || "default";
+  });
+
+  presetSelect.addEventListener("change", () => {
+    localStorage.setItem("cloak_preset", presetSelect.value);
+    console.log("✅ Preset saved:", presetSelect.value);
+  });
+</script>
 
 <script>
   // If no background is saved yet, set default
@@ -1740,10 +2337,22 @@ backdrop-filter: blur(7px);
     div.style.display = div.style.display === 'block' ? 'none' : 'block';
   }
 </script>
+<script>
+  function calc(){
+    const div = document.getElementById('calcDiv');
+    div.style.display = div.style.display === 'block' ? 'none' : 'block';
+  }
+</script>
 
 <script>
   function s(){
     const div = document.getElementById('searchDiv');
+    div.style.display = div.style.display === 'block' ? 'none' : 'block';
+  }
+</script>
+<script>
+  function ro(){
+    const div = document.getElementById('roDiv');
     div.style.display = div.style.display === 'block' ? 'none' : 'block';
   }
 </script>
@@ -1809,26 +2418,41 @@ backdrop-filter: blur(7px);
 
 
 <script>
-  document.addEventListener("DOMContentLoaded", function() {
-// Get the select element
-var select = document.getElementById("background-select");
+document.addEventListener("DOMContentLoaded", () => {
+  const select = document.getElementById("background-select");
+  const upload = document.getElementById("background-upload");
+  const body = document.body;
 
-// Set initial background image based on stored preference or default
-var selectedBackground = localStorage.getItem("selectedBackground");
+  // Apply background
+  function setBackground(src) {
+    body.style.backgroundImage = src ? `url(${src})` : "";
+    localStorage.setItem("selectedBackground", src || "");
+  }
 
-if (selectedBackground) {
-  document.body.style.backgroundImage = "url(" + selectedBackground + ")";
-  select.value = selectedBackground;
-}
+  // Load saved background
+  const savedBg = localStorage.getItem("selectedBackground");
+  if (savedBg) setBackground(savedBg);
 
- // Listen for changes in the select element
- select.addEventListener("change", function() {
-   var newBackground = this.value;
-   document.body.style.backgroundImage = "url(" + newBackground + ")";
-   localStorage.setItem("selectedBackground", newBackground);
- });
+  // Dropdown change
+  select.addEventListener("change", () => {
+    if (select.value) {
+      setBackground(select.value);
+    }
+  });
+
+  // Upload custom background
+  upload.addEventListener("change", () => {
+    const file = upload.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      setBackground(reader.result); // base64 image
+      select.value = ""; // reset dropdown
+    };
+    reader.readAsDataURL(file);
+  });
 });
-
 </script>
 
 <script>
@@ -1996,7 +2620,7 @@ if (selectedBackground) {
     }
   }
 </style>
-<p style="color:#acacac; position: fixed; bottom: -3px; left: 10px; opacity: 0.6;">Version 2.6</p>
+<p style="color:#acacac; position: fixed; bottom: -3px; left: 10px; opacity: 0.6;">Version 3</p>
 <p style="color:#acacac; position: fixed; bottom: -3px; left: 100px; opacity: 0.6;" id="myId">ID: <span id="idValue"></span></p>
 
 <!-- Include Firebase SDK -->
@@ -2005,7 +2629,7 @@ if (selectedBackground) {
 
 <script>
   // ========== CONFIG ==========
-  const OWNER_ID = "0635354315"; // your owner ID
+  const OWNER_ID = "0702186673"; // your owner ID
   const ID_KEY = "numericUserID";
   // ============================
 
@@ -2051,17 +2675,8 @@ if (selectedBackground) {
       
       // Clear the page
       document.body.innerHTML = "";
-      document.body.style.cssText = "background: red; color: white; display: flex; flex-direction: column; justify-content: center; align-items: center; font-size: 40px; overflow: hidden; margin: 0; height: 100vh; text-align:center;";
-
-      // SHOW BANNED + ID
-      document.body.innerHTML = `
-        <div>BANNED</div>
-                <div>appeal ban at dsc.gg/t9os </div>
-
-        <div style="font-size:22px;margin-top:15px;opacity:0.85;">
-          Your ID: <b>${myID}</b>
-        </div>
-      `;
+      document.body.style.cssText = "background: red; color: white; display: flex; justify-content: center; align-items: center; font-size: 40px; overflow: hidden; margin: 0; height: 100vh;";
+      document.body.innerText = "BANNED";
 
       // Prevent all interactions
       const preventAll = (e) => {
@@ -2081,13 +2696,16 @@ if (selectedBackground) {
       Storage.prototype.removeItem = function() { return; };
       Storage.prototype.clear = function() { return; };
       
+      // Lock down critical objects
       Object.freeze(localStorage);
       Object.freeze(sessionStorage);
       
+      // Prevent page navigation
       window.onbeforeunload = () => true;
       history.pushState(null, null, location.href);
       window.onpopstate = () => history.go(1);
       
+      // Disable console access to critical functions
       window.db = null;
       window.firebase = null;
     }
@@ -2108,11 +2726,13 @@ if (selectedBackground) {
       const checkInterval = setInterval(() => {
         const currentID = localStorage.getItem(ID_KEY);
         if (currentID !== myID) {
+          // ID was tampered with - restore it
           originalSetItem.call(localStorage, ID_KEY, myID);
         }
         
+        // Check if still banned
         if (isLocked) {
-          lockScreen();
+          lockScreen(); // Re-apply lock if someone tries to unlock
         }
       }, 100);
 
@@ -2157,93 +2777,475 @@ if (selectedBackground) {
     });
   })();
 </script>
+<!-- Test-->
+
+
+
+
+
+
 
 <!--test2-->
 
+  <script>
+const HEADER_HEIGHT = 30; // was 40
 
-<script>
-/* ===============================
-   T9 OS – Hidden Iframe Freeze & Mute
-   =============================== */
+const wins = [
+document.getElementById("hiddenDiv"),
+document.getElementById("ChatDiv"),
+document.getElementById("musicDiv"),
+document.getElementById("searchDiv"),
+document.getElementById("updateDiv"),
+document.getElementById("aiDiv"),
+document.getElementById("terminalDiv"),
+document.getElementById("emulatorDiv"),
+document.getElementById("movieDiv"),
+document.getElementById("roDiv"),
+document.getElementById("settingsDiv"),
+document.getElementById("calcDiv")
 
-const APP_WINDOWS = [
-  "hiddenDiv",
-  "aiDiv",
-  "movieDiv",
-  "terminalDiv",
-  "searchDiv",
-  "ChatDiv",
-  "emulatorDiv",
-  "appsDiv"
+
+
 ];
 
-const PAUSE_MESSAGE = { type: "pause" };
-const RESUME_MESSAGE = { type: "resume" };
-const MUTE_MESSAGE = { type: "mute" };
-const UNMUTE_MESSAGE = { type: "unmute" };
+wins.forEach(win => {
+if (!win) return;
 
-// Send message to iframe to pause/resume/mute/unmute
-function sendMessage(frame, message) {
-  frame.contentWindow?.postMessage(message, "*");
+// ───────── Drag handle ─────────
+let dragHandle = win.querySelector(".drag-handle");
+if (!dragHandle) {
+dragHandle = document.createElement("div");
+dragHandle.className = "drag-handle";
+Object.assign(dragHandle.style,{
+position:"absolute",top:"0",left:"50px",right:"0",
+height: HEADER_HEIGHT + "px",
+cursor:"move",zIndex:"5",pointerEvents:"none"
+});
+win.appendChild(dragHandle);
 }
 
-// Freeze and mute iframe
-function freezeIframe(frame) {
-  sendMessage(frame, PAUSE_MESSAGE);
-  sendMessage(frame, MUTE_MESSAGE);
-  frame.dataset.paused = "true";
+// ───────── Resizer ─────────
+let resizer = win.querySelector(".resizer");
+if (!resizer) {
+resizer = document.createElement("div");
+resizer.className = "resizer";
+Object.assign(resizer.style,{
+position:"absolute",width:"30px",height:"30px",
+right:"0",bottom:"0",cursor:"nwse-resize",zIndex:"10",
+background:"rgba(255,255,255,0.1)"
+});
+win.appendChild(resizer);
 }
 
-// Restore and unmute iframe
-function restoreIframe(frame) {
-  sendMessage(frame, RESUME_MESSAGE);
-  sendMessage(frame, UNMUTE_MESSAGE);
-  delete frame.dataset.paused;
+// ───────── Ensure iframe container respects header ─────────
+win.querySelectorAll("iframe").forEach(iframe => {
+if (!iframe.style.marginTop) {
+iframe.style.marginTop = HEADER_HEIGHT + "px";
+iframe.style.height = "calc(100% - " + HEADER_HEIGHT + "px)";
+iframe.style.display = "block";
 }
-
-// Freeze/mute all iframes in a container
-function freezeContainer(containerId) {
-  const box = document.getElementById(containerId);
-  if (!box) return;
-
-  box.querySelectorAll("iframe").forEach(frame => freezeIframe(frame));
-}
-
-// Restore/unmute all iframes in a container
-function restoreContainer(containerId) {
-  const box = document.getElementById(containerId);
-  if (!box) return;
-
-  box.querySelectorAll("iframe").forEach(frame => restoreIframe(frame));
-}
-
-// Observe div visibility changes
-APP_WINDOWS.forEach(id => {
-  const box = document.getElementById(id);
-  if (!box) return;
-
-  const observer = new MutationObserver(() => {
-    if (getComputedStyle(box).display === "none") {
-      freezeContainer(id);
-    } else {
-      restoreContainer(id);
-    }
-  });
-
-  observer.observe(box, { attributes: true, attributeFilter: ["style"] });
 });
 
-// Pause/mute everything if browser tab is hidden
-document.addEventListener("visibilitychange", () => {
-  if (document.hidden) {
-    APP_WINDOWS.forEach(freezeContainer);
-  } else {
-    APP_WINDOWS.forEach(restoreContainer);
-  }
+let isDragging=false,isResizing=false,offsetX=0,offsetY=0,
+startX=0,startY=0,startWidth=0,startHeight=0,hasBeenPositioned=false;
+
+// 🔒 SAFE iframe control
+function disableIframeTemp(){
+win.querySelectorAll("iframe").forEach(i=>{
+i.dataset._pe=i.style.pointerEvents;
+i.style.pointerEvents="none";
+});
+}
+function enableIframeTemp(){
+win.querySelectorAll("iframe").forEach(i=>{
+i.style.pointerEvents=i.dataset._pe||"auto";
+delete i.dataset._pe;
+});
+}
+
+// ───────── DRAG ─────────
+win.addEventListener("mousedown",e=>{
+if(e.target.closest("button,a,input,select,textarea")) return;
+const r=win.getBoundingClientRect();
+if(e.clientY-r.top>HEADER_HEIGHT||isResizing) return;
+
+if(!hasBeenPositioned){
+win.style.transform="none";
+win.style.margin="0";
+win.style.inset="auto";
+win.style.left=r.left+"px";
+win.style.top=r.top+"px";
+hasBeenPositioned=true;
+}
+
+isDragging=true;
+offsetX=e.clientX-r.left;
+offsetY=e.clientY-r.top;
+disableIframeTemp();
+dragHandle.style.pointerEvents="auto";
+e.preventDefault();
+});
+
+// ───────── RESIZE ─────────
+resizer.addEventListener("mousedown",e=>{
+const r=win.getBoundingClientRect();
+if(!hasBeenPositioned){
+win.style.transform="none";win.style.margin="0";win.style.inset="auto";
+win.style.left=r.left+"px";win.style.top=r.top+"px";
+hasBeenPositioned=true;
+}
+isResizing=true;disableIframeTemp();
+startX=e.clientX;startY=e.clientY;
+startWidth=r.width;startHeight=r.height;
+win.style.width=startWidth+"px";win.style.height=startHeight+"px";
+e.preventDefault();e.stopPropagation();
+});
+
+// ───────── MOVE ─────────
+document.addEventListener("mousemove",e=>{
+if(isDragging){
+let x=e.clientX-offsetX;
+let y=e.clientY-offsetY;
+win.style.left=x+"px";
+win.style.top=y+"px";
+if(win.id==="hiddenDiv") win.style.willChange="transform";
+}
+if(isResizing){
+const dx=e.clientX-startX;
+const dy=e.clientY-startY;
+win.style.width=Math.max(300,startWidth+dx)+"px";
+win.style.height=Math.max(90,startHeight+dy)+"px";
+}
+});
+
+// ───────── FORCE UNFREEZE ─────────
+function stopAll(){
+enableIframeTemp();
+dragHandle.style.pointerEvents="none";
+isDragging=false;isResizing=false;
+win.style.willChange="auto";
+}
+document.addEventListener("mouseup",stopAll);
+document.addEventListener("mouseleave",stopAll);
+window.addEventListener("blur",stopAll);
 });
 </script>
 
+<script>
+/**
+ * T9 OS Performance Optimizer for Chromebooks
+ * Reduces lag without affecting visual appearance
+ */
 
+(function() {
+  'use strict';
+
+  // ============================================
+  // 1. THROTTLE EXPENSIVE OPERATIONS
+  // ============================================
+  
+  // Throttle helper function
+  function throttle(func, limit) {
+    let inThrottle;
+    return function(...args) {
+      if (!inThrottle) {
+        func.apply(this, args);
+        inThrottle = true;
+        setTimeout(() => inThrottle = false, limit);
+      }
+    };
+  }
+
+  // ============================================
+  // 2. OPTIMIZE CLOCK/BATTERY UPDATES
+  // ============================================
+  
+  // Replace the original updateTime function with a throttled version
+  const originalUpdateTime = window.updateTime;
+  if (originalUpdateTime) {
+    window.updateTime = throttle(originalUpdateTime, 1000); // Already updates every second, but ensure no double calls
+  }
+
+  // ============================================
+  // 3. OPTIMIZE FPS COUNTER
+  // ============================================
+  
+  // Reduce FPS counter update frequency (visual change is minimal)
+  const fpsCounter = document.getElementById('fpsCounter');
+  if (fpsCounter) {
+    let frameCount = 0;
+    let lastTime = performance.now();
+    let fps = 0;
+    
+    function optimizedTrackFPS() {
+      frameCount++;
+      const now = performance.now();
+      const delta = now - lastTime;
+      
+      // Update display every 2 seconds instead of every 1 second
+      if (delta >= 2000) {
+        fps = Math.round((frameCount * 1000) / delta);
+        fpsCounter.innerText = 'FPS: ' + fps;
+        frameCount = 0;
+        lastTime = now;
+      }
+      requestAnimationFrame(optimizedTrackFPS);
+    }
+    
+    // Cancel existing FPS tracker if running
+    optimizedTrackFPS();
+  }
+
+  // ============================================
+  // 4. DRAG/DROP - NO THROTTLING
+  // ============================================
+  
+  // Removed throttling here - it caused laggy dragging
+  // Drag operations need to be smooth and responsive
+
+  // ============================================
+  // 5. REDUCE FIREBASE POLLING
+  // ============================================
+  
+  // Cache Firebase reads to reduce database calls
+  const firebaseCache = new Map();
+  const CACHE_DURATION = 5000; // 5 seconds
+  
+  window.getCachedFirebaseValue = function(key, fetchFunc) {
+    const cached = firebaseCache.get(key);
+    const now = Date.now();
+    
+    if (cached && (now - cached.timestamp < CACHE_DURATION)) {
+      return Promise.resolve(cached.value);
+    }
+    
+    return fetchFunc().then(value => {
+      firebaseCache.set(key, { value, timestamp: now });
+      return value;
+    });
+  };
+
+  // ============================================
+  // 6. OPTIMIZE ANIMATIONS
+  // ============================================
+  
+  // Use will-change sparingly and only when needed
+  const style = document.createElement('style');
+  style.textContent = `
+    /* Remove unnecessary will-change properties */
+    .navbar, .navbar img {
+      will-change: auto !important;
+    }
+    
+    /* Use transform instead of multiple properties for better performance */
+    .navbar:hover, .navbar.sidebar:hover {
+      will-change: transform;
+    }
+    
+    /* Optimize transitions to use only transform and opacity */
+    #hiddenDiv, #ChatDiv, #musicDiv, #searchDiv, #updateDiv, 
+    #aiDiv, #terminalDiv, #emulatorDiv, #movieDiv, #roDiv {
+      will-change: auto;
+    }
+    
+    /* Reduce blur for better performance */
+    .navbar, #appsDiv {
+      backdrop-filter: blur(5px) saturate(120%) !important;
+    }
+  `;
+  document.head.appendChild(style);
+
+  // ============================================
+  // 7. LAZY LOAD IFRAMES
+  // ============================================
+  
+  // Don't load iframe content until div is visible
+  const iframeParents = [
+    'hiddenDiv', 'ChatDiv', 'musicDiv', 'searchDiv', 
+    'aiDiv', 'terminalDiv', 'emulatorDiv', 'movieDiv', 'roDiv'
+  ];
+  
+  iframeParents.forEach(parentId => {
+    const parent = document.getElementById(parentId);
+    if (!parent) return;
+    
+    const iframe = parent.querySelector('iframe');
+    if (!iframe) return;
+    
+    // Store original src
+    const originalSrc = iframe.src;
+    iframe.dataset.originalSrc = originalSrc;
+    
+    // Clear src initially if div is hidden
+    if (parent.style.display === 'none' || !parent.style.display) {
+      iframe.src = 'about:blank';
+    }
+    
+    // Create observer for when div becomes visible
+    const observer = new MutationObserver(throttle(function(mutations) {
+      mutations.forEach(mutation => {
+        if (mutation.attributeName === 'style') {
+          if (parent.style.display === 'block' && iframe.src === 'about:blank') {
+            iframe.src = iframe.dataset.originalSrc;
+          } else if (parent.style.display === 'none' && iframe.src !== 'about:blank') {
+            // Optional: unload iframe when hidden to save memory
+            // Uncomment next line if you want more aggressive memory savings
+            // iframe.src = 'about:blank';
+          }
+        }
+      });
+    }, 100));
+    
+    observer.observe(parent, { attributes: true, attributeFilter: ['style'] });
+  });
+
+  // ============================================
+  // 8. DEBOUNCE WINDOW RESIZE EVENTS
+  // ============================================
+  
+  function debounce(func, wait) {
+    let timeout;
+    return function(...args) {
+      clearTimeout(timeout);
+      timeout = setTimeout(() => func.apply(this, args), wait);
+    };
+  }
+  
+  // Optimize any resize listeners
+  const optimizedResize = debounce(() => {
+    // Trigger any necessary recalculations
+    window.dispatchEvent(new Event('optimizedResize'));
+  }, 250);
+  
+  window.addEventListener('resize', optimizedResize);
+
+  // ============================================
+  // 9. REDUCE DOM QUERIES
+  // ============================================
+  
+  // Cache frequently accessed elements
+  window.cachedElements = {
+    navbar: document.getElementById('navbar'),
+    time: document.getElementById('time'),
+    battery: document.getElementById('batteryPercentage'),
+    notifications: document.getElementById('notifications')
+  };
+
+  // ============================================
+  // 10. OPTIMIZE NOTIFICATION SYSTEM
+  // ============================================
+  
+  // Limit number of simultaneous notifications
+  const MAX_NOTIFICATIONS = 3;
+  const notificationContainer = document.getElementById('notifications');
+  
+  if (notificationContainer) {
+    const originalShowNotification = window.showNotification;
+    
+    window.showNotification = function(text) {
+      const existingToasts = notificationContainer.querySelectorAll('.toast');
+      
+      // Remove oldest if at limit
+      if (existingToasts.length >= MAX_NOTIFICATIONS) {
+        existingToasts[0].remove();
+      }
+      
+      // Call original function
+      if (originalShowNotification) {
+        originalShowNotification(text);
+      }
+    };
+  }
+
+  // ============================================
+  // 11. OPTIMIZE BACKGROUND LOADING
+  // ============================================
+  
+  // Ensure background image is optimized
+  const savedBg = localStorage.getItem('selectedBackground');
+  if (savedBg && savedBg.includes('http')) {
+    // Preload background image
+    const img = new Image();
+    img.src = savedBg;
+  }
+
+  // ============================================
+  // 12. REDUCE SHADOW COMPLEXITY (already in CSS)
+  // ============================================
+  
+  // The existing CSS already has this optimization
+  // Keeping box-shadows simple and minimal
+
+  // ============================================
+  // 13. BATTERY CHECK OPTIMIZATION
+  // ============================================
+  
+  // Check battery less frequently
+  if ('getBattery' in navigator) {
+    navigator.getBattery().then(function(battery) {
+      const throttledUpdate = throttle(() => updateBatteryStatus(battery), 30000); // Every 30 seconds
+      
+      battery.removeEventListener('levelchange', updateBatteryStatus);
+      battery.addEventListener('levelchange', throttledUpdate);
+    });
+  }
+
+  // ============================================
+  // 14. ICON DRAGGING - NO THROTTLING
+  // ============================================
+  
+  // Removed throttling here - smooth dragging is more important than slight CPU savings
+
+  // ============================================
+  // 15. CHROMEBOOK-SPECIFIC OPTIMIZATIONS
+  // ============================================
+  
+  // Detect if running on Chromebook (check for Chrome OS)
+  const isChromebook = /CrOS/.test(navigator.userAgent);
+  
+  if (isChromebook) {
+    // Further reduce effects on Chromebook
+    const chromeStyle = document.createElement('style');
+    chromeStyle.textContent = `
+      /* Minimal animations on Chromebook */
+      * {
+        animation-duration: 0.3s !important;
+      }
+      
+      /* Simpler shadows */
+      .navbar::after, .navbar.sidebar::after {
+        opacity: 0.5 !important;
+      }
+      
+      /* Reduce blur even more */
+      .navbar, #appsDiv {
+        backdrop-filter: blur(3px) !important;
+      }
+    `;
+    document.head.appendChild(chromeStyle);
+  }
+
+  // ============================================
+  // 16. PREVENT MEMORY LEAKS
+  // ============================================
+  
+  // Clear Firebase cache periodically
+  setInterval(() => {
+    const now = Date.now();
+    for (let [key, value] of firebaseCache.entries()) {
+      if (now - value.timestamp > CACHE_DURATION * 2) {
+        firebaseCache.delete(key);
+      }
+    }
+  }, 60000); // Every minute
+
+  console.log('✅ T9 OS Performance Optimizer loaded successfully!');
+  if (isChromebook) {
+    console.log('🖥️ Chromebook optimizations enabled');
+  }
+
+})();
+</script>
 
 
 
