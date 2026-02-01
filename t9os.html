@@ -2639,7 +2639,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 <script>
   // ========== CONFIG ==========
-const OWNER_IDS = ["0702186673", "3222695271"]; 
+  const OWNER_IDS = ["0702186673", "1234567890"]; // add both owner IDs here
   const ID_KEY = "numericUserID";
   // ============================
 
@@ -2670,7 +2670,6 @@ const OWNER_IDS = ["0702186673", "3222695271"];
   (function() {
     'use strict';
     
-    // Store original localStorage methods
     const originalSetItem = Storage.prototype.setItem;
     const originalRemoveItem = Storage.prototype.removeItem;
     const originalClear = Storage.prototype.clear;
@@ -2678,86 +2677,59 @@ const OWNER_IDS = ["0702186673", "3222695271"];
     let isLocked = false;
     let myID = null;
 
-    // Function to lock screen
     function lockScreen() {
       if (isLocked) return;
       isLocked = true;
-      
-      // Clear the page
       document.body.innerHTML = "";
       document.body.style.cssText = "background: red; color: white; display: flex; justify-content: center; align-items: center; font-size: 40px; overflow: hidden; margin: 0; height: 100vh;";
       document.body.innerText = "BANNED";
 
-      // Prevent all interactions
-      const preventAll = (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        return false;
-      };
-      
-      ['keydown', 'keyup', 'keypress', 'mousedown', 'mouseup', 'click', 
-       'touchstart', 'touchend', 'contextmenu', 'beforeunload'].forEach(event => {
+      const preventAll = (e) => { e.preventDefault(); e.stopPropagation(); return false; };
+      ['keydown','keyup','keypress','mousedown','mouseup','click','touchstart','touchend','contextmenu','beforeunload'].forEach(event => {
         document.addEventListener(event, preventAll, true);
         window.addEventListener(event, preventAll, true);
       });
 
-      // Prevent localStorage manipulation
-      Storage.prototype.setItem = function() { return; };
-      Storage.prototype.removeItem = function() { return; };
-      Storage.prototype.clear = function() { return; };
+      Storage.prototype.setItem = function() {};
+      Storage.prototype.removeItem = function() {};
+      Storage.prototype.clear = function() {};
       
-      // Lock down critical objects
       Object.freeze(localStorage);
       Object.freeze(sessionStorage);
       
-      // Prevent page navigation
       window.onbeforeunload = () => true;
       history.pushState(null, null, location.href);
       window.onpopstate = () => history.go(1);
       
-      // Disable console access to critical functions
       window.db = null;
       window.firebase = null;
     }
 
     document.addEventListener("DOMContentLoaded", () => {
-      // Get or create user ID using original methods
       myID = originalSetItem.call(localStorage, ID_KEY, localStorage.getItem(ID_KEY) || generateNumericID()) || localStorage.getItem(ID_KEY);
       if (!myID) {
         myID = generateNumericID();
         originalSetItem.call(localStorage, ID_KEY, myID);
       }
 
-      // Show ID
       const idSpan = document.getElementById("idValue");
       if (idSpan) idSpan.textContent = myID;
 
-      // Monitor localStorage changes - prevent ID tampering
       const checkInterval = setInterval(() => {
         const currentID = localStorage.getItem(ID_KEY);
-        if (currentID !== myID) {
-          // ID was tampered with - restore it
-          originalSetItem.call(localStorage, ID_KEY, myID);
-        }
-        
-        // Check if still banned
-        if (isLocked) {
-          lockScreen(); // Re-apply lock if someone tries to unlock
-        }
+        if (currentID !== myID) originalSetItem.call(localStorage, ID_KEY, myID);
+        if (isLocked) lockScreen();
       }, 100);
 
-      // Check banned list from Firebase
       const bannedRef = db.ref("bannedIDs");
       bannedRef.on("value", (snapshot) => {
         const bannedIDs = snapshot.val() || [];
-        if (bannedIDs.includes(myID)) {
-          lockScreen();
-        }
+        if (bannedIDs.includes(myID)) lockScreen();
       });
 
       // Owner shortcut: press "," to ban/unban
       document.addEventListener("keydown", async (e) => {
-        if (myID !== OWNER_ID) return;
+        if (!OWNER_IDS.includes(myID)) return; // check against both owners
         if (e.key === ",") {
           const action = prompt("Type 'ban' to ban or 'unban' to unban:");
           if (!action) return;
@@ -2787,6 +2759,7 @@ const OWNER_IDS = ["0702186673", "3222695271"];
     });
   })();
 </script>
+
 <!-- Test-->
 
 
