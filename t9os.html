@@ -1590,7 +1590,7 @@ requestAnimationFrame(trackFPS);
 
 
 
-<h3 style="  left: 50%; color:white; top:-9.5px; position: absolute;   transform: translateX(-50%);      " >Roblox</h3>
+<h3 style="  left: 50%; color:white; top:-9.5px; position: absolute;   transform: translateX(-50%);" >Roblox</h3>
  
 
 
@@ -2588,30 +2588,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 </script>
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
-
-const firebaseConfig = {
-  apiKey: "AIzaSyD74Fi2RKsvv1sXTAEIiTYrRKCv22MRhh8",
-  authDomain: "t9oschat.firebaseapp.com",
-  databaseURL: "https://t9oschat-default-rtdb.firebaseio.com",
-  projectId: "t9oschat",
-  storageBucket: "t9oschat.firebasestorage.app",
-  messagingSenderId: "930534704832",
-  appId: "1:930534704832:web:c154890c3b5f36736f8f25"
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
-
-const connectionsRef = ref(db,"connections");
-
-// Only read the count and show it
-onValue(connectionsRef, (snapshot) => {
-  document.getElementById("count").innerText = snapshot.numChildren();
-});
-</script>
 
 <style>
   #notifications {
@@ -2653,6 +2629,8 @@ onValue(connectionsRef, (snapshot) => {
 </style>
 <p style="color:#acacac; position: fixed; bottom: -3px; left: 10px; opacity: 0.6;">Version 3</p>
 <p style="color:#acacac; position: fixed; bottom: -3px; left: 100px; opacity: 0.6;" id="myId">ID: <span id="idValue"></span></p>
+<p style="color:#acacac; position: fixed; bottom: -3px; left: 210px; opacity: 0.6;" id="count">Users online: <span id="idValue">please no bot</span></p>
+
 
 <!-- Include Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
