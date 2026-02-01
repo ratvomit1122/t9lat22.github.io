@@ -2938,7 +2938,7 @@ window.addEventListener("blur",stopAll);
 });
 </script>
 <script>
-  /**
+ /**
  * T9 OS Performance Optimizer - Smart Edition
  * Optimizes performance WITHOUT affecting visuals or animations
  * Focuses on reducing unnecessary work behind the scenes
@@ -2954,23 +2954,20 @@ window.addEventListener("blur",stopAll);
   // ============================================
   
   if (typeof firebase !== 'undefined' && firebase.database) {
-    // Batch Firebase updates to reduce constant re-renders
     const originalOnValue = firebase.database.Reference.prototype.on;
     firebase.database.Reference.prototype.on = function(eventType, callback, cancelCallbackOrContext, context) {
       let throttledCallback = callback;
       
-      // Only throttle non-critical listeners (not banned checks)
       if (eventType === 'value' && !this.toString().includes('bannedIDs') && !this.toString().includes('globalMessages')) {
-        let timeoutId;
         let pending = false;
         
         throttledCallback = function(...args) {
           if (!pending) {
             pending = true;
-            timeoutId = setTimeout(() => {
+            setTimeout(() => {
               callback.apply(this, args);
               pending = false;
-            }, 1000); // 1 second throttle for non-critical updates
+            }, 1000);
           }
         };
       }
@@ -2983,13 +2980,11 @@ window.addEventListener("blur",stopAll);
   // 2. DEBOUNCE LOCALSTORAGE WRITES
   // ============================================
   
-  // Icon position saves spam localStorage - batch them
   const localStorageQueue = new Map();
   let saveTimeout = null;
   
   const originalSetItem = localStorage.setItem.bind(localStorage);
   localStorage.setItem = function(key, value) {
-    // Only debounce icon positions and theme changes
     if (key.includes('icon') || key.includes('theme') || key.includes('background')) {
       localStorageQueue.set(key, value);
       
@@ -2999,15 +2994,14 @@ window.addEventListener("blur",stopAll);
           originalSetItem(k, val);
         });
         localStorageQueue.clear();
-      }, 300); // Save after 300ms of inactivity
+      }, 300);
     } else {
-      // Save immediately for important data
       originalSetItem(key, value);
     }
   };
 
   // ============================================
-  // 3. OPTIMIZE IFRAMES - PAUSE WHEN HIDDEN
+  // 3. OPTIMIZE IFRAMES
   // ============================================
   
   function optimizeIframes() {
@@ -3015,25 +3009,13 @@ window.addEventListener("blur",stopAll);
       const parent = iframe.closest('[id$="Div"]');
       if (!parent) return;
       
-      // Create observer to pause iframes when their window is hidden
       const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
-          if (!entry.isIntersecting) {
-            // Window is hidden - reduce iframe CPU usage
-            if (iframe.contentWindow) {
-              try {
-                // Pause videos/animations in iframe if possible
-                iframe.contentWindow.postMessage({ type: 'pause' }, '*');
-              } catch(e) {}
-            }
-          } else {
-            // Window is visible - resume
-            if (iframe.contentWindow) {
-              try {
-                iframe.contentWindow.postMessage({ type: 'resume' }, '*');
-              } catch(e) {}
-            }
-          }
+          try {
+            iframe.contentWindow?.postMessage(
+              { type: entry.isIntersecting ? 'resume' : 'pause' }, '*'
+            );
+          } catch(e) {}
         });
       }, { threshold: 0.01 });
       
@@ -3041,284 +3023,176 @@ window.addEventListener("blur",stopAll);
     });
   }
   
-  // Run optimization
   optimizeIframes();
-  
-  // Re-check for new iframes every 5 seconds
   setInterval(optimizeIframes, 5000);
 
   // ============================================
-  // 4. REDUCE UNNECESSARY REPAINTS
+  // 4. BATCH DOM UPDATES
   // ============================================
   
-  // Batch DOM reads and writes using requestAnimationFrame
-  window.batchDOMUpdate = function(readCallback, writeCallback) {
+  window.batchDOMUpdate = function(read, write) {
     requestAnimationFrame(() => {
-      // Read phase
-      const data = readCallback ? readCallback() : null;
-      
-      // Write phase (next frame to avoid layout thrashing)
-      requestAnimationFrame(() => {
-        if (writeCallback) writeCallback(data);
-      });
+      const data = read ? read() : null;
+      requestAnimationFrame(() => write && write(data));
     });
   };
 
   // ============================================
-  // 5. OPTIMIZE DRAG PERFORMANCE (GPU ACCELERATION)
+  // 5. DRAG PERFORMANCE
   // ============================================
   
-  // Add will-change only during actual dragging
   let activeDrags = new Set();
   
-  document.addEventListener('mousedown', (e) => {
-    const draggable = e.target.closest('.icon, [id$="Div"]');
-    if (draggable && !activeDrags.has(draggable)) {
-      activeDrags.add(draggable);
-      draggable.style.willChange = 'transform, left, top';
+  document.addEventListener('mousedown', e => {
+    const d = e.target.closest('.icon, [id$="Div"]');
+    if (d && !activeDrags.has(d)) {
+      activeDrags.add(d);
+      d.style.willChange = 'transform,left,top';
     }
   }, true);
   
   document.addEventListener('mouseup', () => {
-    // Remove will-change after drag completes
     setTimeout(() => {
-      activeDrags.forEach(el => {
-        el.style.willChange = 'auto';
-      });
+      activeDrags.forEach(el => el.style.willChange = 'auto');
       activeDrags.clear();
     }, 100);
   }, true);
 
   // ============================================
-  // 6. OPTIMIZE CLOCK/BATTERY UPDATES
+  // 6. CLOCK/BATTERY CONTAINMENT
   // ============================================
   
-  // These update every second but don't need to repaint everything
-  const clockEl = document.getElementById('time');
-  const batteryEl = document.getElementById('batteryPercentage');
-  
-  if (clockEl || batteryEl) {
-    // Use CSS containment to prevent repaints from affecting other elements
-    if (clockEl) {
-      clockEl.style.contain = 'layout style paint';
-    }
-    if (batteryEl) {
-      batteryEl.style.contain = 'layout style paint';
-    }
-  }
+  document.getElementById('time')?.style.setProperty('contain','layout style paint');
+  document.getElementById('batteryPercentage')?.style.setProperty('contain','layout style paint');
 
   // ============================================
-  // 7. PASSIVE EVENT LISTENERS
+  // 7. PASSIVE EVENTS
   // ============================================
   
-  // Make scroll/touch events passive for better performance
-  const passiveEvents = ['scroll', 'touchstart', 'touchmove', 'wheel'];
-  const originalAddEventListener = EventTarget.prototype.addEventListener;
+  const passiveEvents = ['scroll','touchstart','touchmove','wheel'];
+  const origAdd = EventTarget.prototype.addEventListener;
   
   EventTarget.prototype.addEventListener = function(type, listener, options) {
-    if (passiveEvents.includes(type) && typeof options !== 'object') {
-      options = { passive: true };
-    } else if (passiveEvents.includes(type) && typeof options === 'object' && options.passive === undefined) {
-      options.passive = true;
+    if (passiveEvents.includes(type)) {
+      options = typeof options === 'object' ? {...options, passive:true} : {passive:true};
     }
-    
-    return originalAddEventListener.call(this, type, listener, options);
+    return origAdd.call(this,type,listener,options);
   };
 
   // ============================================
-  // 8. REDUCE NOTIFICATION SPAM
+  // 8. NOTIFICATION OPTIMIZATION
   // ============================================
   
-  if (typeof window.showNotification === 'function') {
-    const notificationQueue = [];
-    const MAX_NOTIFICATIONS = 3; // Only show 3 at a time
-    
-    window.originalShowNotification = window.showNotification;
-    window.showNotification = function(text) {
-      // Prevent duplicate notifications
-      if (notificationQueue.some(n => n === text)) return;
-      
-      notificationQueue.push(text);
-      
-      // Limit queue size
-      if (notificationQueue.length > MAX_NOTIFICATIONS) {
-        notificationQueue.shift();
-      }
-      
-      // Use RAF to batch notification rendering
-      requestAnimationFrame(() => {
-        if (window.originalShowNotification) {
-          window.originalShowNotification(text);
-        }
-      });
+  if (window.showNotification) {
+    const queue=[];
+    window.originalShowNotification=window.showNotification;
+    window.showNotification=function(text){
+      if(queue.includes(text))return;
+      queue.push(text);
+      if(queue.length>3)queue.shift();
+      requestAnimationFrame(()=>window.originalShowNotification(text));
     };
   }
 
   // ============================================
-  // 9. LAZY LOAD OFF-SCREEN CONTENT
+  // 9. LAZY LOAD IMAGES
   // ============================================
   
-  function lazyLoadImages() {
-    const images = document.querySelectorAll('img:not([loading])');
-    images.forEach(img => {
-      // Add native lazy loading
-      img.loading = 'lazy';
+  const lazy=()=>document.querySelectorAll('img:not([loading])')
+    .forEach(i=>i.loading='lazy');
+  lazy();
+  new MutationObserver(lazy).observe(document.body,{childList:true,subtree:true});
+
+  // ============================================
+  // 10. TAB VISIBILITY
+  // ============================================
+  
+  document.addEventListener('visibilitychange',()=>{
+    document.querySelectorAll('iframe').forEach(f=>{
+      try{
+        f.contentWindow?.postMessage(
+          {type:document.hidden?'pause':'resume'},'*'
+        );
+      }catch(e){}
     });
-  }
-  
-  lazyLoadImages();
-  
-  // Watch for new images
-  const imageObserver = new MutationObserver(() => {
-    lazyLoadImages();
-  });
-  
-  imageObserver.observe(document.body, {
-    childList: true,
-    subtree: true
   });
 
   // ============================================
-  // 10. OPTIMIZE WINDOW VISIBILITY CHANGES
+  // 11. CHROMEBOOK MODE
   // ============================================
   
-  // Pause expensive operations when tab is not visible
-  let isTabVisible = !document.hidden;
+  const isChromebook=/CrOS/.test(navigator.userAgent);
+  const isLowMemory=navigator.deviceMemory&&navigator.deviceMemory<4;
   
-  document.addEventListener('visibilitychange', () => {
-    isTabVisible = !document.hidden;
-    
-    if (!isTabVisible) {
-      // Tab is hidden - reduce activity
-      console.log('⏸️ Tab hidden - reducing activity');
-      
-      // Pause all iframes
-      document.querySelectorAll('iframe').forEach(iframe => {
-        if (iframe.contentWindow) {
-          try {
-            iframe.contentWindow.postMessage({ type: 'pause' }, '*');
-          } catch(e) {}
-        }
-      });
-    } else {
-      // Tab is visible again - resume
-      console.log('▶️ Tab visible - resuming activity');
-      
-      document.querySelectorAll('iframe').forEach(iframe => {
-        if (iframe.contentWindow) {
-          try {
-            iframe.contentWindow.postMessage({ type: 'resume' }, '*');
-          } catch(e) {}
-        }
-      });
-    }
-  });
-
-  // ============================================
-  // 11. CHROMEBOOK-SPECIFIC OPTIMIZATIONS
-  // ============================================
-  
-  const isChromebook = /CrOS/.test(navigator.userAgent);
-  const isLowMemory = navigator.deviceMemory && navigator.deviceMemory < 4;
-  
-  if (isChromebook || isLowMemory) {
-    console.log('💻 Chromebook detected - enabling extra optimizations');
-    
-    // Reduce animation complexity on low-end devices
-    const style = document.createElement('style');
-    style.textContent = `
-      /* Simplify animations for low-end devices */
-      @media (prefers-reduced-motion: reduce) {
-        *, *::before, *::after {
-          animation-duration: 0.01ms !important;
-          animation-iteration-count: 1 !important;
-          transition-duration: 0.01ms !important;
+  if(isChromebook||isLowMemory){
+    const style=document.createElement('style');
+    style.textContent=`
+      @media (prefers-reduced-motion: reduce){
+        *,*::before,*::after{
+          animation-duration:.01ms!important;
+          animation-iteration-count:1!important;
+          transition-duration:.01ms!important;
         }
       }
-      
-      /* Use GPU for transforms */
-      .icon, [id$="Div"], .navbar {
-        transform: translateZ(0);
-        backface-visibility: hidden;
+      /* FIX: navbar removed from GPU transform */
+      .icon,[id$="Div"]{
+        transform:translateZ(0);
+        backface-visibility:hidden;
       }
     `;
     document.head.appendChild(style);
   }
 
   // ============================================
-  // 12. REDUCE FPS COUNTER OVERHEAD
+  // 12. FPS COUNTER
   // ============================================
   
-  // FPS counter itself can cause lag - optimize it
-  const fpsCounter = document.getElementById('fpsCounter');
-  if (fpsCounter) {
-    // Only update FPS display every 500ms instead of every frame
-    let lastFPSUpdate = 0;
-    const originalTrackFPS = window.trackFPS;
-    
-    if (originalTrackFPS) {
-      window.trackFPS = function() {
-        const now = performance.now();
-        if (now - lastFPSUpdate > 500) {
-          originalTrackFPS();
-          lastFPSUpdate = now;
-        }
-      };
-    }
+  const fps=document.getElementById('fpsCounter');
+  if(fps&&window.trackFPS){
+    let last=0;
+    const orig=window.trackFPS;
+    window.trackFPS=function(){
+      const now=performance.now();
+      if(now-last>500){orig();last=now;}
+    };
   }
 
   // ============================================
-  // 13. PREVENT MEMORY LEAKS
+  // 13. MEMORY OBSERVER
   // ============================================
   
-  // Clean up event listeners on removed elements
-  const cleanupObserver = new MutationObserver((mutations) => {
-    mutations.forEach((mutation) => {
-      mutation.removedNodes.forEach((node) => {
-        if (node.nodeType === 1) { // Element node
-          // Clone and replace to remove all event listeners
-          // Only for elements that aren't coming back
-          if (node.id && node.style.display === 'none') {
-            // Skip - element might come back
-          }
-        }
-      });
+  new MutationObserver(()=>{}).observe(document.body,{childList:true,subtree:true});
+
+  // ============================================
+  // 14. GPU ACCELERATION (NAVBAR EXCLUDED)
+  // ============================================
+  
+  document.querySelectorAll('[id$="Div"], .icon')
+    .forEach(el=>{
+      el.style.transform=el.style.transform||'translateZ(0)';
     });
-  });
-  
-  cleanupObserver.observe(document.body, {
-    childList: true,
-    subtree: true
-  });
 
   // ============================================
-  // 14. OPTIMIZE CSS ANIMATIONS
+  // NAVBAR HARD FIX
   // ============================================
   
-  // Force GPU acceleration for animated elements
-  const animatedElements = document.querySelectorAll('[id$="Div"], .icon, .navbar');
-  animatedElements.forEach(el => {
-    // Use transform instead of top/left for better performance
-    el.style.transform = el.style.transform || 'translateZ(0)';
-  });
+  const navFix=document.createElement('style');
+  navFix.textContent=`
+    .navbar{
+      position:fixed!important;
+      bottom:0!important;
+      left:0!important;
+      right:0!important;
+      top:auto!important;
+      width:100%!important;
+      transform:none!important;
+    }
+  `;
+  document.head.appendChild(navFix);
 
-  // ============================================
-  // STATUS LOG
-  // ============================================
-  
   console.log('✅ Smart Performance Optimizer loaded successfully!');
-  console.log('📊 Optimizations active:');
-  console.log('  - Firebase throttling');
-  console.log('  - localStorage batching');
-  console.log('  - Iframe optimization');
-  console.log('  - GPU acceleration');
-  console.log('  - Lazy loading');
-  console.log('  - Memory leak prevention');
-  if (isChromebook || isLowMemory) {
-    console.log('  - Chromebook mode enabled');
-  }
-
 })();
+
 </script>
 
   <!--testing part-->
