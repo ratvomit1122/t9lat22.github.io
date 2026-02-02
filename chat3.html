@@ -27,9 +27,12 @@
   .msg{max-width:65%;animation:slideIn 0.2s ease}
   @keyframes slideIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
   .msg.own{align-self:flex-end}
-  .msg-name{font-size:.75rem;color:#7ea8ff;margin-bottom:5px;font-weight:500}
+  .msg-name{font-size:.75rem;color:#7ea8ff;margin-bottom:5px;font-weight:500;display:flex;align-items:center;gap:6px}
+  .msg-name.owner{background:linear-gradient(135deg,#FFD700 0%,#FFA500 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;font-weight:700;text-shadow:0 0 20px rgba(255,215,0,0.5)}
+  .owner-badge{display:inline-block;background:linear-gradient(135deg,#FFD700 0%,#FFA500 100%);color:#1a1f3a;padding:2px 8px;border-radius:10px;font-size:.65rem;font-weight:700;letter-spacing:0.5px;box-shadow:0 2px 8px rgba(255,215,0,0.4);text-shadow:none;-webkit-text-fill-color:initial}
   .msg-bubble{background:rgba(30,45,80,0.9);padding:12px 16px;border-radius:12px;color:#e8eaf6;box-shadow:0 2px 6px rgba(0,0,0,0.2);border:1px solid rgba(100,150,255,0.1);line-height:1.5}
   .msg.own .msg-bubble{background:linear-gradient(135deg,#4e8cff 0%,#5a98ff 100%);color:#fff;border-color:rgba(255,255,255,0.1)}
+  .msg.owner-msg .msg-bubble{background:linear-gradient(135deg,#FFD700 0%,#FFA500 100%);color:#1a1f3a;border-color:rgba(255,215,0,0.3);box-shadow:0 4px 12px rgba(255,215,0,0.3);font-weight:500}
 
   .input-bar {
     display: flex;
@@ -150,7 +153,7 @@
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
 <script>
-const OWNER_IDS = ["0702186673", "3222695271"]; 
+const OWNER_IDS = ["0702186673", "3222695271", "0376780508"]; 
   const ID_KEY = "numericUserID";
 
   const banFirebaseConfig = {
@@ -227,6 +230,7 @@ const OWNER_IDS = ["0702186673", "3222695271"];
 
       window.currentUserID = myID;
       window.banDatabase = banDB;
+      window.isOwner = OWNER_IDS.includes(myID);
 
       const checkInterval = setInterval(() => {
         const currentID = localStorage.getItem(ID_KEY);
@@ -248,7 +252,7 @@ const OWNER_IDS = ["0702186673", "3222695271"];
       });
 
       document.addEventListener("keydown", async (e) => {
-        if (myID !== OWNER_ID) return;
+        if (!OWNER_IDS.includes(myID)) return;
         if (e.key === ",") {
           const action = prompt("Type 'ban' to ban or 'unban' to unban:");
           if (!action) return;
@@ -293,6 +297,8 @@ const firebaseConfig = {
   appId: "1:930534704832:web:c154890c3b5f36736f8f25",
   measurementId: "G-STPKYT658F"
 };
+
+const OWNER_IDS = ["0702186673", "3222695271", "0376780508"];
 
 const app = initializeApp(firebaseConfig, "chatApp");
 const db = getDatabase(app);
@@ -426,12 +432,21 @@ async function handleViolation() {
 
 function escapeHtml(s){ return (s+'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;'); }
 
+function isOwner(id) {
+  return OWNER_IDS.includes(id);
+}
+
 function appendMessage(payload, skipOwn=false){
   if(skipOwn && payload.id===myID) return;
   const div = document.createElement('div');
-  div.className = 'msg' + ((payload.id === myID) ? ' own' : '');
+  const ownerClass = isOwner(payload.id) ? ' owner-msg' : '';
+  div.className = 'msg' + ((payload.id === myID) ? ' own' : '') + ownerClass;
+  
   const displayName = (payload.name && payload.id) ? `${payload.name} (${payload.id})` : (payload.name || `Anon (${payload.id || 'unknown'})`);
-  div.innerHTML = `<div class="msg-name">${escapeHtml(displayName)}</div>
+  const ownerBadge = isOwner(payload.id) ? '<span class="owner-badge">V.I.P</span>' : '';
+  const nameClass = isOwner(payload.id) ? 'msg-name owner' : 'msg-name';
+  
+  div.innerHTML = `<div class="${nameClass}">${escapeHtml(displayName)} ${ownerBadge}</div>
                    <div class="msg-bubble">${escapeHtml(payload.text)}</div>`;
   messagesEl.appendChild(div);
   
