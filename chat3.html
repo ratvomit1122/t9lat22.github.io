@@ -156,8 +156,8 @@
 const OWNER_IDS = ["0702186673", "3222695271", "0376780508"]; 
   const ID_KEY = "numericUserID";
 
-  const firebaseConfig = {
-  apiKey: "AIzaSyCTUq6Hye-l6Lh2ylHQ4yOM-HUWODGgMtY",
+   const banFirebaseConfig = {
+   apiKey: "AIzaSyCTUq6Hye-l6Lh2ylHQ4yOM-HUWODGgMtY",
   authDomain: "chatty-boi-c876e.firebaseapp.com",
   databaseURL: "https://chatty-boi-c876e-default-rtdb.firebaseio.com",
   projectId: "chatty-boi-c876e",
@@ -165,7 +165,7 @@ const OWNER_IDS = ["0702186673", "3222695271", "0376780508"];
   messagingSenderId: "1073159135051",
   appId: "1:1073159135051:web:8c991df26ea3c1eb84d2ce",
   measurementId: "G-03QWMK5ZNM"
-};
+  };
 
   const banApp = firebase.initializeApp(banFirebaseConfig);
   const banDB = firebase.database(banApp);
