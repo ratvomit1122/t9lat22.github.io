@@ -7,10 +7,59 @@
     place-items: center; /* Centers both horizontally and vertically */
   }
   .btn{
-    padding:10px 20px;
-    width:30px;
-    border-radius: 30px;
-    background-color: blue;
+    padding:20px 40px;
+    width:50px;
+    border-radius: 15px;
+    background-color: rgb(41, 133, 232);
     text-decoration: none;
+    color:white;
+    font-family: sans-serif;
+    top:50%;
+    position:absolute;
+  }
+    body {
+  background-repeat: no-repeat;
+  background-size: cover;   /* make sure images cover the whole screen */
+  margin: 0;
+  padding: 0;
+  font-family: Arial, sans-serif;
+  text-decoration: none;
   }
 </style>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const select = document.getElementById("background-select");
+  const upload = document.getElementById("background-upload");
+  const body = document.body;
+
+  // Apply background
+  function setBackground(src) {
+    body.style.backgroundImage = src ? `url(${src})` : "";
+    localStorage.setItem("selectedBackground", src || "");
+  }
+
+  // Load saved background
+  const savedBg = localStorage.getItem("selectedBackground");
+  if (savedBg) setBackground(savedBg);
+
+  // Dropdown change
+  select.addEventListener("change", () => {
+    if (select.value) {
+      setBackground(select.value);
+    }
+  });
+
+  // Upload custom background
+  upload.addEventListener("change", () => {
+    const file = upload.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      setBackground(reader.result); // base64 image
+      select.value = ""; // reset dropdown
+    };
+    reader.readAsDataURL(file);
+  });
+});
+</script>
