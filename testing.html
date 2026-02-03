@@ -1496,9 +1496,27 @@ transform: translateX(-50%);
   class="back"
   style="top:7px; left:120px; position:fixed; color:white;"
 onclick="
-  const frame = document.getElementById('frame2');
-  window.open(frame.contentWindow.location.href, '_blank');
-"
+    const frame = document.getElementById('frame2');
+    const url = frame.contentWindow.location.href;
+
+    const w = window.open('about:blank','_blank');
+
+    w.document.write(`
+      <html>
+        <head>
+          <style>
+            html,body{margin:0;height:100%;overflow:hidden;background:black;}
+            iframe{border:none;width:100%;height:100%;}
+          </style>
+        </head>
+        <body>
+          <iframe src='${url}' allowfullscreen></iframe>
+        </body>
+      </html>
+    `);
+
+    w.document.close();
+  "
 
 >↝</button>
 
