@@ -130,57 +130,56 @@
     window.addEventListener("load", resizeCanvas);
     window.addEventListener("resize", resizeCanvas);
     </script>
-    <script>
-      (function () {
-  const adBlockedIDs = ["0702186673","6528690208","0635354315"];
-  const MAX_WAIT = 5000; // max wait 5s for ID
-  const CHECK_INTERVAL = 100;
+   <script>
+  (function () {
+    const adBlockedIDs = ["0702186673","6528690208","0635354315"];
+    const MAX_WAIT = 5000; // max wait 5s for ID
+    const CHECK_INTERVAL = 100;
 
-  let waited = 0;
-  let adsLoaded = false;
+    let waited = 0;
+    let adsLoaded = false;
 
-  function tryLoadAds() {
-    if (adsLoaded) return;
+    function tryLoadAds() {
+      if (adsLoaded) return;
 
-    const myID = localStorage.getItem("numericUserID");
+      const myID = localStorage.getItem("numericUserID");
 
-    // Wait until ID exists
-    if (!myID) {
-      waited += CHECK_INTERVAL;
-      if (waited >= MAX_WAIT) {
-        console.log("No ID found, loading ads anyway");
+      // Wait until ID exists
+      if (!myID) {
+        waited += CHECK_INTERVAL;
+        if (waited >= MAX_WAIT) {
+          console.log("No ID found, loading ads anyway");
+          loadAds();
+        } else {
+          setTimeout(tryLoadAds, CHECK_INTERVAL);
+        }
+        return;
+      }
+
+      console.log("Detected ID:", myID);
+
+      if (!adBlockedIDs.includes(myID)) {
         loadAds();
       } else {
-        setTimeout(tryLoadAds, CHECK_INTERVAL);
+        console.log("Ads blocked for this ID");
       }
-      return;
     }
 
-    console.log("Detected ID:", myID);
+    function loadAds() {
+      if (adsLoaded) return;
+      adsLoaded = true;
 
-    if (!adBlockedIDs.includes(myID)) {
-      loadAds();
-    } else {
-      console.log("Ads blocked for this ID");
+      console.log("Loading ads...");
+
+      const s = document.createElement("script");
+      s.dataset.zone = "10569238";
+      s.src = "https://al5sm.com/tag.min.js";
+      document.body.appendChild(s);
     }
-  }
 
-  function loadAds() {
-    if (adsLoaded) return;
-    adsLoaded = true;
-
-    console.log("Loading ads...");
-
-    const s = document.createElement("script");
-    s.dataset.zone = "10569238";
-    s.src = "https://al5sm.com/tag.min.js";
-    document.body.appendChild(s);
-  }
-
-  tryLoadAds();
-})();
-
-    </script>
+    tryLoadAds();
+  })();
+</script>
         <script>(function(s){s.dataset.zone='10569238',s.src='https://al5sm.com/tag.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>
 
   </body>
