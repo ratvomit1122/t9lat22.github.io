@@ -847,6 +847,12 @@ body::-webkit-scrollbar {
 })(document);
 </script>
 
+<script>
+  document.querySelectorAll('#imageContainer img').forEach(img => {
+    const name = img.getAttribute('alt');
+    if (name) img.setAttribute('title', name);
+  });
+</script>
 
 <script>
 document.addEventListener("DOMContentLoaded", () => {
