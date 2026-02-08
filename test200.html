@@ -848,11 +848,16 @@ body::-webkit-scrollbar {
 </script>
 
 <script>
+document.addEventListener("DOMContentLoaded", function () {
   document.querySelectorAll('#imageContainer img').forEach(img => {
     const name = img.getAttribute('alt');
-    if (name) img.setAttribute('title', name);
+    if (name) {
+      img.setAttribute('title', name);
+    }
   });
+});
 </script>
+
 
 <script>
 document.addEventListener("DOMContentLoaded", () => {
