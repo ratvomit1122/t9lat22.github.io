@@ -8,6 +8,8 @@
      crossorigin="anonymous"></script>
 </head>
 <body>
+          <span id="tooltip"></span>
+
      <input style="background: rgba(0,0,0,0.4);  
  
 " type="text" id="searchBar" placeholder="Search apps by name...">
@@ -805,6 +807,26 @@ body::-webkit-scrollbar {
   width: 0;
   height: 0;
 }
+#tooltip {
+    position: fixed;
+    background: rgba(0, 0, 0, 0.9);
+    color: white;
+    padding: 8px 15px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: sans-serif;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    z-index: 10000;
+    white-space: nowrap;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+#tooltip.show {
+    opacity: 1;
+}
 
 
  
@@ -822,6 +844,27 @@ body::-webkit-scrollbar {
       } else {
         image.style.display = 'none';
       }
+    });
+  });
+  const tooltip = document.getElementById('tooltip');
+  const images = document.querySelectorAll('#imageContainer img');
+
+  images.forEach(img => {
+    img.addEventListener('mouseenter', function(e) {
+      const gameName = this.getAttribute('alt');
+      if (gameName) {
+        tooltip.textContent = gameName;
+        tooltip.classList.add('show');
+      }
+    });
+
+    img.addEventListener('mousemove', function(e) {
+      tooltip.style.left = e.pageX + 15 + 'px';
+      tooltip.style.top = e.pageY + 15 + 'px';
+    });
+
+    img.addEventListener('mouseleave', function() {
+      tooltip.classList.remove('show');
     });
   });
 </script>
