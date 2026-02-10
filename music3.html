@@ -183,172 +183,135 @@
 
     <audio id="player"></audio>
 
-<script>
-   const audio = document.getElementById('player');
-    const bgBlur = document.getElementById('bg-blur-img');
-    const lyricsContainer = document.getElementById('lyrics-container');
-    
-    let queue = JSON.parse(localStorage.getItem('t9_queue') || '[]');
-    let currentIndex = -1;
-    let currentTrackData = null;
-    let lyricsData = [];
-    let isLyricMode = false;
+  <script>
+        const audio = document.getElementById('player');
+        const bgBlur = document.getElementById('bg-blur-img');
+        const lyricsContainer = document.getElementById('lyrics-container');
+        
+        let queue = JSON.parse(localStorage.getItem('t9_queue') || '[]');
+        let currentIndex = -1;
+        let currentTrackData = null;
+        let lyricsData = [];
+        let isLyricMode = false;
 
-    function cleanQuery(str) {
-        return str.replace(/[^a-zA-Z0-9 ]/g, '').trim().replace(/\s+/g, '+');
-    }
+        function cleanQuery(str) {
+            return str.replace(/[^a-zA-Z0-9 ]/g, '').trim().replace(/\s+/g, '+');
+        }
 
-    async function execSearch(query) {
-        try {
-            const res = await fetch(`https://api.vantezzen.io/music/search?q=${cleanQuery(query)}&service=soundcloud`);
-            const data = await res.json();
-            
-            // Fix: Vantezzen returns the array directly, not inside a .results object
-            const results = Array.isArray(data) ? data : (data.results || []); 
-            
-            const container = document.getElementById('search-results');
-            container.innerHTML = '';
-            
-            results.forEach(t => {
-                // Map the data correctly: some versions use 'artwork_url' or 'user.username'
-                const artwork = t.artwork || t.artwork_url || 'https://via.placeholder.com/150';
-                const artistName = t.artist || (t.user ? t.user.username : 'Unknown Artist');
-                
-                const card = document.createElement('div');
-                card.style.cssText = "background: rgba(255,255,255,0.03); padding: 15px; border-radius: 15px; cursor: pointer; border: 1px solid transparent;";
-                card.onmouseover = () => card.style.borderColor = "var(--accent)";
-                card.onmouseout = () => card.style.borderColor = "transparent";
-                
-                // Store cleaned data into the queue
-                card.onclick = () => { 
-                    addToQueue({
-                        id: t.id,
-                        title: t.title,
-                        artist: artistName,
-                        artwork: artwork,
-                        url: t.permalink_url || t.url
-                    }); 
-                    hideOverlays(); 
-                };
+        async function execSearch(query) {
+            try {
+                const res = await fetch(`https://0.4texasplayz4.workers.dev/s/${cleanQuery(query)}`);
+                const data = await res.json();
+                const results = data.results || data; 
+                const container = document.getElementById('search-results');
+                container.innerHTML = '';
+                results.forEach(t => {
+                    const card = document.createElement('div');
+                    card.style.cssText = "background: rgba(255,255,255,0.03); padding: 15px; border-radius: 15px; cursor: pointer; border: 1px solid transparent;";
+                    card.onmouseover = () => card.style.borderColor = "var(--accent)";
+                    card.onmouseout = () => card.style.borderColor = "transparent";
+                    card.onclick = () => { addToQueue(t); hideOverlays(); };
+                    card.innerHTML = `<img src="${t.artwork}" style="width:100%; aspect-ratio:1; border-radius:10px; object-fit:cover; margin-bottom:10px;">
+                                      <div style="font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-size:0.9rem;">${t.title}</div>
+                                      <div style="color:var(--text-dim); font-size:0.7rem;">${t.artist}</div>`;
+                    container.appendChild(card);
+                });
+            } catch(e) { console.error("Search failed"); }
+        }
 
-                card.innerHTML = `<img src="${artwork}" style="width:100%; aspect-ratio:1; border-radius:10px; object-fit:cover; margin-bottom:10px;">
-                                  <div style="font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-size:0.9rem;">${t.title}</div>
-                                  <div style="color:var(--text-dim); font-size:0.7rem;">${artistName}</div>`;
-                container.appendChild(card);
-            });
-        } catch(e) { 
-            console.error("Search failed", e);
-            document.getElementById('search-results').innerHTML = '<p style="color:red">Search signal lost. Try again.</p>';
-        }
-    }
+        async function playTrack(index) {
+            if (index < 0 || index >= queue.length) return;
+            currentIndex = index;
+            let track = queue[index];
 
-    async function playTrack(index) {
-        if (index < 0 || index >= queue.length) return;
-        currentIndex = index;
-        let track = queue[index];
+            try {
+                const slug = track.url.replace(/https?:\/\/soundcloud\.com\//, '');
+                const res = await fetch(`https://0.4texasplayz4.workers.dev/d/${slug}`);
+                const data = await res.json();
+                
+                currentTrackData = data;
+                audio.src = data.streamUrl;
+                document.getElementById('art-zone').innerHTML = `<img src="${data.artwork}">`;
+                bgBlur.style.backgroundImage = `url(${data.artwork})`;
+                document.getElementById('track-title').innerText = data.song || data.title;
+                document.getElementById('track-artist').innerText = data.artist;
+                audio.play();
+                document.getElementById('play-btn').innerText = '⏸';
+                updateQueueUI();
+                
+                if (isLyricMode) fetchLyrics(data.artist, data.song || data.title);
+            } catch (e) { alert("Playback Error"); }
+        }
 
-        try {
-            // Updated playback endpoint
-            const res = await fetch(`https://api.vantezzen.io/music/download?id=${track.id}&service=soundcloud`);
-            const data = await res.json();
-            
-            if (data.streamUrl) {
-                currentTrackData = data;
-                audio.src = data.streamUrl;
-                document.getElementById('art-zone').innerHTML = `<img src="${track.artwork}">`;
-                bgBlur.style.backgroundImage = `url(${track.artwork})`;
-                document.getElementById('track-title').innerText = track.title;
-                document.getElementById('track-artist').innerText = track.artist;
-                
-                audio.play().catch(err => console.log("Autoplay blocked or failed"));
-                document.getElementById('play-btn').innerText = '⏸';
-                updateQueueUI();
-                
-                if (isLyricMode) fetchLyrics(track.artist, track.title);
-            } else {
-                throw new Error("No stream URL");
-            }
-        } catch (e) { 
-            alert("Playback Error: Signal Encrypted or Unavailable"); 
-            console.error(e);
-        }
-    }
+        function toggleLyrics() {
+            isLyricMode = !isLyricMode;
+            document.body.classList.toggle('lyric-mode', isLyricMode);
+            lyricsContainer.style.display = isLyricMode ? 'block' : 'none';
+            if (isLyricMode && currentTrackData) fetchLyrics(currentTrackData.artist, currentTrackData.song || currentTrackData.title);
+        }
 
-    // --- The rest of the functions (lyrics, time, UI) remain as you had them ---
-    
-    async function fetchLyrics(artist, title) {
-        lyricsContainer.innerHTML = '<p class="lyric-line" style="color:var(--accent)">Scanning Satellite Data...</p>';
-        try {
-            const res = await fetch(`https://lrclib.net/api/get?artist_name=${encodeURIComponent(artist)}&track_name=${encodeURIComponent(title)}`);
-            const data = await res.json();
-            if (data.syncedLyrics) {
-                const lines = data.syncedLyrics.split('\n');
-                lyricsData = lines.map(line => {
-                    const m = line.match(/\[(\d+):(\d+\.\d+)\](.*)/);
-                    return m ? { time: parseInt(m[1]) * 60 + parseFloat(m[2]), text: m[3] } : null;
-                }).filter(x => x);
-                lyricsContainer.innerHTML = lyricsData.map((l, i) => `<div class="lyric-line" id="l-${i}">${l.text}</div>`).join('');
-            } else {
-                lyricsContainer.innerHTML = '<p class="lyric-line">No lyrics found in orbit.</p>';
-            }
-        } catch (e) { lyricsContainer.innerHTML = ''; }
-    }
+        async function fetchLyrics(artist, title) {
+            lyricsContainer.innerHTML = '<p class="lyric-line" style="color:var(--accent)">Scanning Satellite Data...</p>';
+            try {
+                const res = await fetch(`https://lrclib.net/api/get?artist_name=${encodeURIComponent(artist)}&track_name=${encodeURIComponent(title)}`);
+                const data = await res.json();
+                if (data.syncedLyrics) {
+                    const lines = data.syncedLyrics.split('\n');
+                    lyricsData = lines.map(line => {
+                        const m = line.match(/\[(\d+):(\d+\.\d+)\](.*)/);
+                        return m ? { time: parseInt(m[1]) * 60 + parseFloat(m[2]), text: m[3] } : null;
+                    }).filter(x => x);
+                    lyricsContainer.innerHTML = lyricsData.map((l, i) => `<div class="lyric-line" id="l-${i}">${l.text}</div>`).join('');
+                }
+            } catch (e) { lyricsContainer.innerHTML = ''; }
+        }
 
-    audio.ontimeupdate = () => {
-        const b = document.getElementById('seek-bar');
-        b.max = audio.duration || 0; b.value = audio.currentTime;
-        document.getElementById('time-cur').innerText = formatTime(audio.currentTime);
-        document.getElementById('time-dur').innerText = formatTime(audio.duration);
+        audio.ontimeupdate = () => {
+            const b = document.getElementById('seek-bar');
+            b.max = audio.duration || 0; b.value = audio.currentTime;
+            document.getElementById('time-cur').innerText = formatTime(audio.currentTime);
+            document.getElementById('time-dur').innerText = formatTime(audio.duration);
 
-        if (isLyricMode && lyricsData.length > 0) {
-            const idx = lyricsData.findIndex((l, i) => audio.currentTime >= l.time && (!lyricsData[i+1] || audio.currentTime < lyricsData[i+1].time));
-            if (idx !== -1) {
-                document.querySelectorAll('.lyric-line').forEach(el => el.classList.remove('active'));
-                const active = document.getElementById(`l-${idx}`);
-                if (active) {
-                    active.classList.add('active');
-                    active.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                }
-            }
-        }
-    };
+            if (isLyricMode && lyricsData.length > 0) {
+                const idx = lyricsData.findIndex((l, i) => audio.currentTime >= l.time && (!lyricsData[i+1] || audio.currentTime < lyricsData[i+1].time));
+                if (idx !== -1) {
+                    document.querySelectorAll('.lyric-line').forEach(el => el.classList.remove('active'));
+                    const active = document.getElementById(`l-${idx}`);
+                    if (active) {
+                        active.classList.add('active');
+                        active.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                }
+            }
+        };
 
-    function togglePlay() { 
-        if(!audio.src) return;
-        audio.paused ? (audio.play(), document.getElementById('play-btn').innerText = '⏸') : (audio.pause(), document.getElementById('play-btn').innerText = '▶'); 
-    }
-    function changeTrack(dir) { playTrack(currentIndex + dir); }
-    function formatTime(s) { if(isNaN(s)) return "0:00"; const m=Math.floor(s/60), sc=Math.floor(s%60); return `${m}:${sc<10?'0':''}${sc}`; }
-    function showOverlay(id) { document.getElementById(id).style.display = 'flex'; }
-    function hideOverlays() { document.querySelectorAll('.overlay').forEach(o => o.style.display = 'none'); }
-    function addToQueue(t) { queue.push(t); save(); if (currentIndex === -1) playTrack(queue.length - 1); }
-    function save() { localStorage.setItem('t9_queue', JSON.stringify(queue)); updateQueueUI(); }
-    
-    function updateQueueUI() {
-        const list = document.getElementById('queue-list');
-        list.innerHTML = queue.map((t, i) => `
-            <div class="q-row ${i === currentIndex ? 'active' : ''}" onclick="playTrack(${i})">
-                <img src="${t.artwork || ''}">
-                <div style="flex:1; overflow:hidden">
-                    <div style="font-weight:700; white-space:nowrap; text-overflow:ellipsis; overflow:hidden; font-size:0.85rem;">${t.title}</div>
-                    <div style="font-size:0.7rem; color:var(--text-dim)">${t.artist}</div>
-                </div>
-            </div>
-        `).join('');
-    }
+        function togglePlay() { 
+            if(!audio.src) return;
+            audio.paused ? (audio.play(), document.getElementById('play-btn').innerText = '⏸') : (audio.pause(), document.getElementById('play-btn').innerText = '▶'); 
+        }
+        function changeTrack(dir) { playTrack(currentIndex + dir); }
+        function formatTime(s) { if(isNaN(s)) return "0:00"; const m=Math.floor(s/60), sc=Math.floor(s%60); return `${m}:${sc<10?'0':''}${sc}`; }
+        function showOverlay(id) { document.getElementById(id).style.display = 'flex'; }
+        function hideOverlays() { document.querySelectorAll('.overlay').forEach(o => o.style.display = 'none'); }
+        function addToQueue(t) { queue.push(t); save(); if (currentIndex === -1) playTrack(queue.length - 1); }
+        function save() { localStorage.setItem('t9_queue', JSON.stringify(queue)); updateQueueUI(); }
+        
+        function updateQueueUI() {
+            const list = document.getElementById('queue-list');
+            list.innerHTML = queue.map((t, i) => `
+                <div class="q-row ${i === currentIndex ? 'active' : ''}" onclick="playTrack(${i})">
+                    <img src="${t.artwork || ''}">
+                    <div style="flex:1; overflow:hidden">
+                        <div style="font-weight:700; white-space:nowrap; text-overflow:ellipsis; overflow:hidden; font-size:0.85rem;">${t.title}</div>
+                        <div style="font-size:0.7rem; color:var(--text-dim)">${t.artist}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
 
-    function toggleLyrics() {
-        isLyricMode = !isLyricMode;
-        document.body.classList.toggle('lyric-mode', isLyricMode);
-        lyricsContainer.style.display = isLyricMode ? 'block' : 'none';
-        if (isLyricMode && currentIndex !== -1) {
-            fetchLyrics(queue[currentIndex].artist, queue[currentIndex].title);
-        }
-    }
-
-    document.getElementById('seek-bar').oninput = (e) => audio.currentTime = e.target.value;
-    audio.onended = () => changeTrack(1);
-    updateQueueUI();
-</script>
+        document.getElementById('seek-bar').oninput = (e) => audio.currentTime = e.target.value;
+        audio.onended = () => changeTrack(1);
+        updateQueueUI();
+    </script>
 </body>
 </html>
