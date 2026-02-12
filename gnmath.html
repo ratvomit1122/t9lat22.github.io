@@ -443,7 +443,6 @@
             left: 0;
             width: 100%;
             background: rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(20px);
             border-top: 1px solid rgba(255, 255, 255, 0.1);
             padding: 15px;
             z-index: 100;
@@ -1584,5 +1583,42 @@
     <script>
         navigator.serviceWorker.register(location.protocol + "//" + location.hostname + "/sw.js");
     </script>
+    <script>
+document.addEventListener("DOMContentLoaded", () => {
+  const select = document.getElementById("background-select");
+  const upload = document.getElementById("background-upload");
+  const body = document.body;
+
+  // Apply background
+  function setBackground(src) {
+    body.style.backgroundImage = src ? `url(${src})` : "";
+    localStorage.setItem("selectedBackground", src || "");
+  }
+
+  // Load saved background
+  const savedBg = localStorage.getItem("selectedBackground");
+  if (savedBg) setBackground(savedBg);
+
+  // Dropdown change
+  select.addEventListener("change", () => {
+    if (select.value) {
+      setBackground(select.value);
+    }
+  });
+
+  // Upload custom background
+  upload.addEventListener("change", () => {
+    const file = upload.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      setBackground(reader.result); // base64 image
+      select.value = ""; // reset dropdown
+    };
+    reader.readAsDataURL(file);
+  });
+});
+</script>
 </body>
 </html>
